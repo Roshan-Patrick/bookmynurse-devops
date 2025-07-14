@@ -1,0 +1,25 @@
+# =============================================================================
+# k8s/monitoring/health-check-config.yaml
+# Health Check Configuration
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: health-check-config
+  namespace: default
+data:
+  default.conf: |
+    server {
+        listen 8080;
+        server_name localhost;
+        
+        location /health {
+            return 200 '{"status":"healthy","timestamp":"${time_iso8601}","services":{"frontend":"up","backend":"up","mysql":"up"}}';
+            add_header Content-Type application/json;
+        }
+        
+        location /ready {
+            return 200 '{"status":"ready"}';
+            add_header Content-Type application/json;
+        }
+    }

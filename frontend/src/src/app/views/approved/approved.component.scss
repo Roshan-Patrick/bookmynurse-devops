@@ -1,0 +1,196 @@
+.table-header{
+    background-color: lightgray; /* Primary color for the header */
+    color: #048990; /* Light text for contrast */
+    font-weight: 600;
+    border-bottom: 2px solid #004a52; /* Darker primary for separator */
+    padding: 10px; /* Slightly increased padding */
+    text-align: left;
+    font-size: 24px;
+    font-style: oblique;
+}
+
+.nurse-card{
+    background-color: white;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 
+    0px 8px 10px 1px rgba(0, 0, 0, 0.14), 
+    0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+th{
+    background-color: #e0f2f7; /* Light secondary for header background */
+    color: #048990; /* Primary color for header text */
+    border-bottom: 1px solid #ddd; 
+}
+th,td{
+    border: 1px solid #dee2e6; /* Consistent border for all cells */
+    padding: 10px; /* Adjust padding as needed */
+    vertical-align: middle; /* Align cell content vertically */
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Space between buttons */
+  }
+  
+  button[cButton] {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px; /* Proportional button size */
+    font-size: 14px; /* Adjust button text size */
+    border-radius: 4px; /* Rounded corners for buttons */
+    transition: background-color 0.3s, transform 0.3s;
+  }
+
+  button[cButton]:hover {
+    transform: translateY(-2px);
+    background-color: #0056b3;
+  }
+
+  /* Custom input field */
+.custom-input {
+  font-size: 14px; /* Reduce font size */
+  width: 200px; /* Set width */
+}
+
+/* Dropdown positioning */
+.custom-dropdown {
+  min-width: 200px; /* Set dropdown width */
+  text-align: left; /* Center text */
+  left: 50% !important; /* Center align */
+  transform: translateX(-50%); /* Adjust center alignment */
+  font-size: 14px; /* Reduce font size */
+}
+
+.form-check {
+  padding-left: 2.5em !important;
+  margin-bottom: 10px;
+}
+
+/* Custom input field */
+.custom-input {
+  font-size: 14px; /* Reduce font size */
+  width: 100%; /* Set width */
+}
+
+/* Dropdown positioning */
+.custom-dropdown {
+  min-width: 200px; /* Set dropdown width */
+  text-align: left; /* Center text */
+  left: 50% !important; /* Center align */
+  transform: translateX(-50%); /* Adjust center alignment */
+  font-size: 14px; /* Reduce font size */
+}
+
+
+.available-bg {
+  background-color: #d4edda; /* Light Green */
+  border: none;
+  // border-radius: 5px;
+  padding: 5px;
+}
+
+.busy-bg {
+  background-color: #f8d7da; /* Light Red */
+  border: none;
+  // border-radius: 5px;
+  padding: 5px;
+}
+
+.pending-bg {
+  background-color: #fff3cd; /* Light Yellow */
+  border: none;
+  // border-radius: 5px;
+  padding: 5px;
+}
+
+/* Styling for Modal */
+.custom-modal {
+  .modal-header-styled {
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .close {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: white;
+      cursor: pointer;
+
+      &:hover {
+        color: #ff4d4d;
+      }
+    }
+  }
+
+  .modal-content-styled {
+    padding: 20px;
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #444;
+
+      strong {
+        font-weight: bold;
+        color: #333;
+      }
+    }
+  }
+
+  .c-modal-footer {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      padding: 8px 20px;
+      border-radius: 5px;
+      transition: 0.3s;
+
+      &:hover {
+        background: #0056b3;
+      }
+    }
+  }
+}
+
+.custom-modal-overlay-1 {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+.custom-modal-1 {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 350px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.modal-header-1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.close-btn-1 {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+}

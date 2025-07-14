@@ -1,0 +1,194 @@
+<c-row>
+  <c-col xs>
+    <c-card style="padding: 0 !important;" class="mb-4 nurse-card">
+      <c-card-header class="table-header">Client Bookings</c-card-header>
+      <c-card-body style="padding: 0 !important;">
+        <table [hover]="true" [responsive]="true" [striped]="true" cTable class="mb-4 border table-styled">
+          <thead cTableColor="light">
+            <tr>
+              <th class="text-center">Enquiry Number</th>
+              <th class="text-center">User</th>
+              <th class="text-center">Looking For</th>
+              <th class="text-center">Location</th>
+              <th class="text-center">Services</th>
+              <th class="text-center">Service Options</th>
+              <th class="text-center">Actions</th>
+              <th class="text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users; index as i">
+              <td class="text-center">
+                <div>{{ user.enquiryno }}</div>
+              </td>
+              <td>
+                <div>{{ user.name }}</div>
+                <div class="small text-medium-emphasis text-nowrap">
+                  Phone: {{ user.mobile }}
+                </div>
+              </td>
+              <td class="text-center">
+                <div>{{ user.nurseType }}</div>
+              </td>
+              <td class="text-center">
+                <div>{{ user.location }}</div>
+              </td>
+              <td>
+                <div class="text-nowrap">{{ user.services }}</div>
+              </td>
+              <td>
+                <div class="text-nowrap">{{ user.preferences }}</div>
+              </td>
+              <td class="text-center">
+                <div class="button-container">
+                  <button
+                    [cModalToggle]="'fullScreenSm'"
+                    cButton
+                    color="primary"
+                    (click)="onEdit(user)"
+                  >
+                    <svg cIcon class="me-2" name="cil-bell"></svg>
+                    Edit
+                  </button>
+                  <button  (click)="onDelete(user)"  [cModalToggle]="'fullScreenSmdelete'" cButton color="secondary">
+                    <svg cIcon class="me-2" name="cil-bell"></svg>
+                    Delete
+                  </button>
+
+                  <button class="btn btn-primary" (click)="openNurseDetailsModal(user)">View Nurse Details</button>             
+                </div>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-success" (click)="onStatus(user.id)">Ongoing</button>
+              </td>                            
+            </tr>
+          </tbody>
+        </table>
+        
+        
+      </c-card-body>
+    </c-card>
+  </c-col>
+</c-row>
+
+
+
+
+<c-modal size="lg" [visible]="showNurseDetailsModal">
+  <c-modal-header>
+    <h5 cModalTitle>{{ selectedNurse?.name || 'Nurse Details' }}</h5>
+    <button type="button" cButtonClose (click)="showNurseDetailsModal = false"></button>
+  </c-modal-header>
+
+  <c-modal-body *ngIf="selectedNurse">
+    <p><strong>Charges:</strong> ₹{{ selectedNurse?.charges || 'N/A' }} {{ formatChargesType((selectedNurse?.charges_type)) || 'N/A' }}</p>
+    <!-- <p><strong>Charges_type:</strong> ₹{{(selectedNurse?.charges_type) || 'N/A' }}</p> -->
+    <p><strong>Age:</strong> {{ calculateAge(selectedNurse?.dob) || 'N/A' }}</p>
+    <p><strong>Gender:</strong> {{ selectedNurse?.gender || 'N/A' }}</p>
+    <p><strong>Location:</strong> {{ selectedNurse?.address || 'N/A' }}</p>
+    <p><strong>Specialization:</strong> {{ selectedNurse?.specialization || 'N/A' }}</p>
+    <p><strong>Languages Known:</strong> {{ selectedNurse?.languages?.join(', ') || 'N/A' }}</p>
+    <p><strong>Education:</strong> {{ selectedNurse?.education || 'N/A' }}</p>
+    <p><strong>Service Options:</strong> {{ selectedNurse?.serviceopt || 'N/A' }}</p>
+  </c-modal-body>
+</c-modal>
+
+
+<c-modal #fullScreenSm fullscreen="sm" id="fullScreenSm">
+  <c-modal-header>
+    <h5 cModalTitle>Edit Details</h5>
+    <button [cModalToggle]="'fullScreenSm'" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <!-- Modal form -->
+    <form (ngSubmit)="updateUser()" >
+      <div class="mb-3">
+        <label for="enqname" class="form-label">Enquiry Number</label>
+        <input
+          type="text"
+          id="enqname"
+          class="form-control"
+          [(ngModel)]="selectedUser.enquiryno"
+          name="enqname"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input
+          type="text"
+          id="name"
+          class="form-control"
+          [(ngModel)]="selectedUser.name"
+          name="name"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="mobile" class="form-label">Phone</label>
+        <input
+          type="text"
+          id="mobile"
+          class="form-control"
+          [(ngModel)]="selectedUser.mobile"
+          name="mobile"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="gender" class="form-label">Gender</label>
+        <input
+          type="text"
+          id="gender"
+          class="form-control"
+          [(ngModel)]="selectedUser.nurseType"
+          name="gender"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input
+          type="text"
+          id="location"
+          class="form-control"
+          [(ngModel)]="selectedUser.location"
+          name="location"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="services" class="form-label">Services</label>
+        <input
+          type="text"
+          id="activity"
+          class="form-control"
+          [(ngModel)]="selectedUser.services"
+          name="services"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="serviceopt" class="form-label">Services Options</label>
+        <input
+          type="text"
+          id="activity"
+          class="form-control"
+          [(ngModel)]="selectedUser.preferences"
+          name="serviceopt"
+        />
+      </div>
+      <button type="submit" cButton color="primary" [cModalToggle]="'fullScreenSm'" (click)="updateUser()" >Submit</button>
+    </form>
+  </c-modal-body>
+</c-modal>
+
+<c-modal #fullScreenSmdelete fullscreen="sm" id="fullScreenSmdelete">
+  <c-modal-header>
+    <h5 cModalTitle>Delete User?</h5>
+    <!-- <button [cModalToggle]="'fullScreenSmdelete'" cButtonClose></button> -->
+  </c-modal-header>
+  <c-modal-body>
+    Are you sure you want to delete this User?
+  </c-modal-body>
+  <c-modal-footer>
+    <button [cModalToggle]="'fullScreenSmdelete'" cButton color="secondary">
+      Close
+    </button>
+    <button (click)="onDeleteBooking()" [cModalToggle]="'fullScreenSmdelete'" cButton color="danger">Delete</button>
+  </c-modal-footer>
+</c-modal>

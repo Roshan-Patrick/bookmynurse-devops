@@ -1,0 +1,414 @@
+<app-header></app-header>
+ 
+<div class="container mx-auto p-8 max-w-5xl bg-white shadow-lg rounded-lg">
+
+    <div style="text-align: right; margin-bottom: 15px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+  <span style="font-size: 20px; color: orange;">🌐</span>
+  
+  <select (change)="toggleLanguage($event)" 
+          style="background-color: white; color: orange; border: 2px solid orange; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+    <option [selected]="!isTamil" value="en">English</option>
+    <option [selected]="isTamil" value="ta">தமிழ்</option>
+  </select>
+</div>
+
+
+
+
+
+  <!-- English Content -->
+  <div *ngIf="!isTamil">
+  <h1 class="text-4xl font-bold mb-8 text-center text-orange-500"><b>Terms and Conditions</b></h1>
+
+  <div class="text-left mb-4">
+    <p class="text-gray-700"><strong>Effective Date:</strong> [Insert Date]</p>
+    <p class="text-gray-700"><strong>Contact Email:</strong>
+      <a href="mailto:hi&#64;bookmynurse.com" class="text-blue-500 hover:underline">hi&#64;bookmynurse.com</a>
+    </p>
+  </div>
+
+  <div class="section">
+  <h2 class="section-title">Introduction</h2>
+  <p>Welcome to BookMyNurse. These code of conduct rules and policies outline the responsibilities and expectations for all nurses using our platform. By accessing or engaging with our services, you agree to follow these terms.</p>
+</div>
+
+  <div class="section">
+    <h2 class="section-title">1. Organizational Integrity</h2>
+    <p>All decisions taken must align with the vision, mission, and future goals of Book My Nurse. Employees must abide by these policies and operate with discipline.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">2. Document Verification</h2>
+    <p>At the time of joining, nurses must present original nursing education certificates and other relevant documents for verification.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">3. Professional Conduct</h2>
+    <ul>
+      <li>No sleeping during duty</li>
+      <li>No watching movies or unnecessary phone use</li>
+      <li>No chatting on duty</li>
+      <li>No unauthorized absenteeism</li>
+      <li>No taking leave for non-medical reasons</li>
+      <li>No theft or unethical behavior</li>
+      <li>No involvement in any criminal activities</li>
+    </ul>
+    <p>Violation will result in strict actions including immediate suspension or permanent dismissal.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">4. Confidentiality</h2>
+    <p>Nurses must not share personal, client, patient, or internal company details with anyone outside the organization.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">5. Transfers and Shifts</h2>
+    <p>Nurses must work at the assigned location. Transfers may happen with prior notice for valid reasons.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">6. Visits to Patient Homes</h2>
+    <p>Bringing family or friends to the patient’s house is strictly prohibited without company approval.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">7. Personal Responsibility</h2>
+    <p>Nurses must know their duties and contact the office if problems arise during assignments.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">8. Medicine Handling</h2>
+    <ul>
+      <li>Do not give medicine without a doctor's prescription</li>
+      <li>Do not use Siddha, Ayurveda, or Unani medicine</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">9. Safety and Emergency</h2>
+    <ul>
+      <li>Leave the place if unsafe</li>
+      <li>Call 100 (police)</li>
+      <li>Inform the company immediately</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">10. Disassociation from Company</h2>
+    <p>If a nurse leaves in the middle of an assignment, Book My Nurse is not responsible for their future employment or contact.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">11. Misuse of Information</h2>
+    <p>Using internal information for personal benefit, fraud, or private services is serious misconduct and will lead to strict action.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">12. Former Employee Conduct</h2>
+    <p>Former nurses must not keep contact with clients or misuse Book My Nurse’s name for any personal benefit.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">13. Unauthorized Services</h2>
+    <p>Offering services using Book My Nurse’s name without permission is illegal and punishable.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">14. Duty Ethics</h2>
+    <ul>
+      <li>Wear gloves and mask during patient care</li>
+      <li>Write daily duty reports</li>
+      <li>Report bedsores to the office immediately</li>
+      <li>Follow doctor and supervisor instructions for treatment</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">15. Medical Procedures</h2>
+    <p>Procedures like Ryle's Tube Insertion, Catheterization, IV Infusion, and Enema require:</p>
+    <ul>
+      <li>Doctor’s prescription</li>
+      <li>Consent from family</li>
+      <li>Supervisor’s approval</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">16. Insulin and Medication Records</h2>
+    <ul>
+      <li>Maintain insulin chart</li>
+      <li>Record in-time and out-time daily</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">17. Understanding Patient Conditions</h2>
+    <p>Nurses must understand patient status (conscious, unconscious, bedridden, etc.) and act with empathy.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">18. Universal Precautions</h2>
+    <ul>
+      <li>Use barrier protection</li>
+      <li>Wear gloves and masks</li>
+      <li>Properly discard contaminated material</li>
+      <li>Clean area after procedures</li>
+      <li>Wash hands and uniforms thoroughly</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">19. Five Rights of Medication</h2>
+    <ul>
+      <li>Right Patient</li>
+      <li>Right Time</li>
+      <li>Right Route</li>
+      <li>Right Dose</li>
+      <li>Right Medication</li>
+    </ul>
+    <p>Negligence in this area will be treated as a serious violation.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">20. Tips and Gifts</h2>
+    <p>Nurses must not accept tips, gifts, or money from patients or families.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">21. Resignation Policy</h2>
+    <p>Nurses must give 3 months written notice before resigning. Otherwise, original certificates may be held and legal action taken.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">22. Statutory Benefits</h2>
+    <p>Nurses will be enrolled in ESI and EPF schemes. Required documents must be submitted on time.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">23. Uniform and Hygiene</h2>
+    <ul>
+      <li>Uniform must be worn and kept clean</li>
+      <li>Not wearing a uniform may lead to being marked absent</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">24. Personal Hygiene Kit</h2>
+    <p>Nurses must carry a hygiene kit. Lack of hygiene is a policy violation.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">25. Shift Handover</h2>
+    <p>In case of two shifts, the outgoing nurse must complete reporting and the new nurse must properly take over responsibilities.</p>
+  </div>
+
+  <div style="margin-top: 20px;">
+      <p>For assistance, contact: <a href="mailto:hi&#64;bookmynurse.com" style="color: blue;">hi&#64;bookmynurse.com</a> | <a href="tel:+919943234569" style="color: blue;">99432 34569</a></p>
+    </div>
+
+  <div class="thank-you">
+    <p class="mt-8">✅ Thank you for respecting the values and responsibilities of Book My Nurse.</p>
+  </div>
+</div>
+
+  <!-- Tamil Content -->
+  <div *ngIf="isTamil">
+  <h1 class="text-4xl font-bold mb-8 text-center text-orange-500"><b>விதிமுறைகள் மற்றும் நிபந்தனைகள்</b></h1>
+
+  <div class="text-left mb-4">
+    <p class="text-gray-700"><strong>செயல்பாட்டுத் தேதி:</strong> [தேதி சேர்க்கவும்]</p>
+    <p class="text-gray-700"><strong>தொடர்பு மின்னஞ்சல்:</strong>
+      <a href="mailto:hi&#64;bookmynurse.com" class="text-blue-500 hover:underline">hi&#64;bookmynurse.com</a>
+    </p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">அறிமுகம்</h2>
+    <p>BookMyNurse இற்கு நல்வரவு. எங்கள் சேவைகளைப் பயன்படுத்தும் அனைத்து செவிலியர்களுக்கும் இந்த நடத்தை விதிமுறைகள் மற்றும் கொள்கைகள் பொருந்தும். இதில் ஈடுபடுவதன் மூலம் இவை அனைத்தையும் ஏற்றுக்கொள்கிறீர்கள்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">1. நிறுவன ஒழுங்குமுறை</h2>
+    <p>Book My Nurse நிறுவனத்தின் திசைமுகம், இலக்கு மற்றும் எதிர்கால திட்டங்களுக்கு ஏற்ப அனைத்து முடிவுகளும் எடுக்கப்பட வேண்டும். ஊழியர்கள் ஒழுங்கு மற்றும் கட்டுப்பாட்டுடன் செயல்பட வேண்டும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">2. ஆவண சரிபார்ப்பு</h2>
+    <p>சேரும் போது செவிலியர்கள் தங்கள் அசல் கல்விச் சான்றிதழ்கள் மற்றும் தொடர்புடைய ஆவணங்களை வழங்க வேண்டும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">3. தொழில்முறை நடத்தை</h2>
+    <ul>
+      <li>பணிக்கு இடைப்பட்டு தூங்கக்கூடாது</li>
+      <li>சினிமா பார்ப்பதும் தேவையில்லாத கைபேசி பயன்பாடும் வேண்டாம்</li>
+      <li>பணியின் போது அரட்டை தவிர்க்க வேண்டும்</li>
+      <li>அனுமதியில்லா அப்சண்ட் ஆக கூடாது</li>
+      <li>மருத்துவ காரணமில்லாமல் விடுப்பு எடுக்கக்கூடாது</li>
+      <li>திருட்டு அல்லது ஒழுங்கற்ற நடத்தை வேண்டாம்</li>
+      <li>குற்றச்செயலில் ஈடுபடக்கூடாது</li>
+    </ul>
+    <p>மீறல் கண்டுபிடிக்கப்பட்டால் உடனடி இடைநிறுத்தம் அல்லது நிரந்தர நீக்கம் செய்யப்படும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">4. ரகசியம் காப்பது</h2>
+    <p>செவிலியர்கள் தனிப்பட்ட, வாடிக்கையாளர், நோயாளி, நிறுவன தகவல்களை வெளியிடக்கூடாது.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">5. இடமாற்றங்கள் மற்றும் கடமைகள்</h2>
+    <p>வழங்கப்பட்ட இடத்தில் பணியாற்ற வேண்டும். தேவையானால் முன்னறிவிப்பு வழங்கி இடமாற்றம் செய்யப்படும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">6. நோயாளி வீடுகளுக்கான பயணங்கள்</h2>
+    <p>நோயாளியின் வீட்டிற்கு குடும்பத்தினர் அல்லது நண்பர்களை அனுமதி இல்லாமல் அழைத்துச் செல்லக்கூடாது.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">7. தனிப்பட்ட பொறுப்பு</h2>
+    <p>செவிலியர்கள் தங்களது கடமைகளை அறிந்து செயல்பட வேண்டும். சிக்கல்கள் ஏற்பட்டால் அலுவலகத்தைத் தொடர்பு கொள்ள வேண்டும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">8. மருந்து வழங்கல்</h2>
+    <ul>
+      <li>மருத்துவர் பரிந்துரை இல்லாமல் மருந்து வழங்கக்கூடாது</li>
+      <li>சித்தா, ஆயுர்வேதம், யுனானி மருந்துகள் பயன்படுத்தக்கூடாது</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">9. பாதுகாப்பு மற்றும் அவசரநிலை</h2>
+    <ul>
+      <li>பாதுகாப்பற்ற இடத்தை விட்டு விலக வேண்டும்</li>
+      <li>100 (போலீஸ்) அழைக்க வேண்டும்</li>
+      <li>நிறுவனத்திடம் உடனடியாக தகவல் வழங்க வேண்டும்</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">10. நிறுவனம் தொடர்பை நிறுத்தல்</h2>
+    <p>செவிலியர் பணியை இடைநிறுத்தினால், அவர்களின் எதிர்கால வேலைவாய்ப்புகளுக்காக நிறுவனம் பொறுப்பல்ல.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">11. தகவலின் தவறான பயன்பாடு</h2>
+    <p>உள்ளக தகவல்களை தனிப்பட்ட இலாபத்திற்காக பயன்படுத்துவது கடுமையான ஒழுங்கு மீறலாக கருதப்படும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">12. முன்னாள் ஊழியர் நடத்தை</h2>
+    <p>முன்னாள் செவிலியர்கள் வாடிக்கையாளர்களை தொடர்பில் வைக்கக்கூடாது அல்லது நிறுவத்தின் பெயரை தவறாக பயன்படுத்தக்கூடாது.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">13. அனுமதியில்லா சேவைகள்</h2>
+    <p>Book My Nurse பெயரை அனுமதியின்றி பயன்படுத்துவது சட்டவிரோதம் மற்றும் தண்டனைக்கு உட்பட்டது.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">14. கடமை ஒழுங்குமுறை</h2>
+    <ul>
+      <li>முககவசம் மற்றும் கையுறை அணிய வேண்டும்</li>
+      <li>தினசரி கடமை அறிக்கை எழுத வேண்டும்</li>
+      <li>படுக்கையடைப்பை உடனடியாக அலுவலகத்திற்கு தகவல் அளிக்க வேண்டும்</li>
+      <li>மருத்துவர் மற்றும் மேற்பார்வையாளர் வழிகாட்டுதல்களை பின்பற்ற வேண்டும்</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">15. மருத்துவ செயல்முறைகள்</h2>
+    <p>மருத்துவ செயல்முறைகளுக்கு கீழ்காணும்வை கட்டாயம்:</p>
+    <ul>
+      <li>மருத்துவர் பரிந்துரை</li>
+      <li>குடும்ப உறுப்பினர் ஒப்புதல்</li>
+      <li>மேற்பார்வையாளர் ஒப்புதல்</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">16. இன்சுலின் மற்றும் மருந்துப் பதிவு</h2>
+    <ul>
+      <li>இன்சுலின் கட்டுப்பாட்டு பட்டியல் வைத்திருக்க வேண்டும்</li>
+      <li>உள்வரும் மற்றும் வெளியேறும் நேரம் பதிவு செய்ய வேண்டும்</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">17. நோயாளியின் நிலையை புரிதல்</h2>
+    <p>செவிலியர்கள் நோயாளியின் நிலையை (உணர்வு, மயக்கம், படுக்கைபிடித்தல்) புரிந்து கொள்வது அவசியம்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">18. பொது முன்னெச்சரிக்கைகள்</h2>
+    <ul>
+      <li>தடை பாதுகாப்பை பயன்படுத்த வேண்டும்</li>
+      <li>முககவசம் மற்றும் கையுறை அணிய வேண்டும்</li>
+      <li>அழுக்கு பொருட்களை முறையாக தூக்கி எறிய வேண்டும்</li>
+      <li>செயல்பாடுகளுக்குப் பிறகு பகுதியை சுத்தம் செய்ய வேண்டும்</li>
+      <li>கைகள் மற்றும் யூனிஃபாரங்களை நன்றாக கழுவ வேண்டும்</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">19. மருந்து வழங்கும் ஐந்து உரிமைகள்</h2>
+    <ul>
+      <li>சரியான நோயாளர்</li>
+      <li>சரியான நேரம்</li>
+      <li>சரியான வழி</li>
+      <li>சரியான அளவு</li>
+      <li>சரியான மருந்து</li>
+    </ul>
+    <p>இதில் கவனக்குறைவு கடுமையாக கருதப்படும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">20. கம்பெனியில் பரிசுகள் மற்றும் டிப்ஸ்</h2>
+    <p>செவிலியர்கள் நோயாளிகள் மற்றும் குடும்பத்தாரிடமிருந்து பரிசுகள், டிப்ஸ் பெறக்கூடாது.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">21. ராஜினாமா கொள்கை</h2>
+    <p>செவிலியர்கள் ராஜினாமா செய்ய முன் 3 மாதங்கள் எழுத்துப்பூர்வமாக தெரிவிக்க வேண்டும். இல்லையெனில் சட்ட நடவடிக்கைக்கு உட்படுவர்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">22. சட்டப்படி வழங்கும் நலன்கள்</h2>
+    <p>செவிலியர்கள் ESI மற்றும் EPF யோஜனைகளில் சேர்க்கப்படுவர். தேவையான ஆவணங்களை சரியான நேரத்தில் வழங்க வேண்டும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">23. யூனிஃபாரம் மற்றும் தூய்மை</h2>
+    <ul>
+      <li>யூனிஃபாரம் அணிய வேண்டும் மற்றும் சுத்தமாக வைத்திருக்க வேண்டும்</li>
+      <li>யூனிஃபாரம் இல்லாமல் பணியாற்றினால் அப்சண்ட் ஆகக் கருதப்படும்</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">24. தனிப்பட்ட தூய்மை தொகுப்பு</h2>
+    <p>செவிலியர்கள் தனிப்பட்ட தூய்மை தொகுப்பை வைத்திருக்க வேண்டும். தூய்மையின்மை கொள்கை மீறலாகும்.</p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">25. ஷிப்ட் மாற்றம்</h2>
+    <p>இரண்டு ஷிப்ட்கள் இருந்தால், பழைய செவிலியர் சரியான முறையில் ஒப்படைக்க வேண்டும் மற்றும் புதிய செவிலியர் பொறுப்பை எடுத்துக் கொள்ள வேண்டும்.</p>
+  </div>
+
+  <div class="thank-you">
+    <p class="mt-8">✅ Book My Nurse நிறுவனத்தின் மதிப்பீடுகளையும் பொறுப்புகளையும் மதிப்பீடு செய்ததற்காக நன்றி.</p>
+  </div>
+
+    <div style="margin-top: 20px;">
+    <p>எந்தவொரு உதவி அல்லது விளக்கத்திற்கும், தயவுசெய்து தொடர்பு கொள்ளவும்: 
+      <a href="mailto:hi&#64;bookmynurse.com" style="color: blue; text-decoration: underline;">hi&#64;bookmynurse.com</a> | 
+      <a href="tel:+919943234569" style="color: blue; text-decoration: underline;">99432 34569</a>
+    </p>
+  </div>
+
+  
+</div>
+  </div>
+<app-footer></app-footer>

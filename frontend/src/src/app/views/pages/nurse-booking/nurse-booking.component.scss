@@ -1,0 +1,423 @@
+/* 🔹 Search Bar Enhancements */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.input-group {
+  width: 50%;
+  max-width: 500px;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out;
+}
+// .input-group:hover {
+//   transform: scale(1.02);
+// }
+
+.search-input {
+  height: 50px;
+  font-size: 16px;
+  border-radius: 0 30px 30px 0;
+  border: 1px solid #ddd;
+  padding-left: 15px;
+}
+
+.input-group-text {
+  background: linear-gradient(to right, #048990, #036d72);
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 30px 0 0 30px;
+}
+
+/* 🔹 Profile Card Enhancements */
+.profile-widget {
+  position: relative;
+  padding: 15px;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+/* 🔹 Disabled Link (Name & Image) */
+.disabled-link {
+  color: #888 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* 🔹 Disable Hover Effects on Busy Cards */
+.no-hover:hover {
+  transform: none !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.busy-card .doc-img:hover img {
+  transform: none !important;
+}
+
+/* 🔹 Available & Busy Cards */
+.available-card {
+  background: rgba(144, 238, 144, 0.3);
+  border-left: 5px solid green;
+}
+.busy-card {
+  background: rgba(255, 99, 71, 0.2); /* Light red-gray overlay */
+  border-left: 5px solid #ff6347;
+  opacity: 0.8; /* Slightly faded */
+}
+
+// /* 🔹 Availability Badge */
+// .availability-status {
+//   position: absolute;
+//   top: 11px;
+//   left: 3px;
+//   padding: 6px 12px;
+//   border-radius: 6px;
+//   font-size: 0.85rem;
+//   font-weight: bold;
+//   text-transform: uppercase;
+//   z-index: 10;
+//   transition: all 0.3s ease-in-out;
+// }
+
+// .available-text {
+//   background-color: rgba(144, 238, 144, 0.9);
+//   color: darkgreen;
+//   padding: 5px 12px;
+//   border-radius: 5px;
+// }
+// .busy-text {
+//   background-color: rgba(255, 99, 71, 0.9);
+//   color: darkred;
+//   padding: 5px 12px;
+//   border-radius: 5px;
+// }
+
+/* 🔹 Image Styling */
+.doc-img {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.doc-img img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
+}
+
+.doc-img:hover img {
+  transform: scale(1.1);
+}
+
+/* Disable Image Hover for Busy Users */
+.busy-card .doc-img:hover img {
+  transform: none !important;
+}
+
+/* 🔹 Profile Content */
+.pro-content {
+  text-align: center;
+  padding-top: 10px;
+}
+
+.title a {
+  color: #048990;
+  font-size: 18px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.title a:hover {
+  color: #f36302;
+  transition: all 0.3s ease-in-out;
+}
+
+/* 🔹 Specialization Text */
+/* 🔹 Specialization Section - Improved */
+.speciality {
+  background: rgba(255, 255, 255, 0.6); /* Light background */
+  width: fit-content;
+  position: relative;
+  left: 74px;
+  bottom: 4px;
+  height: 28px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #333; /* Darker color for contrast */
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.1); /* Subtle border */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05); /* Light shadow */
+}
+
+
+/* 🔹 View More Button */
+.view-btn {
+  background: linear-gradient(to right, #048990, #036d72);
+  color: white;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+  outline: none !important;
+}
+
+.view-btn:hover {
+  background: linear-gradient(to right, #036d72, #048990);
+}
+
+.book-btn {
+  background: linear-gradient(to right, #ef7e33, #d35400);
+  color: white;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+  outline: none !important;
+}
+
+.book-btn:hover {
+  background: linear-gradient(to right, #d35400, #ef7e33);
+}
+
+
+
+.disabled-button {
+  background: #e0e0e0 !important;
+  color: #999 !important;
+  cursor: not-allowed;
+  border: 1px solid #ccc;
+  pointer-events: none;
+}
+
+/* 🔹 Disabled Link */
+.disabled-link {
+  color: #888 !important;
+  cursor: not-allowed ;
+  pointer-events: none;
+}
+
+/* 🔹 Center Alignment */
+.row-align {
+  display: flex;
+  justify-content: center;
+}
+/* 🔹 Modal Enhancements */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in-out;
+  z-index: 9999;
+}
+
+.custom-modal {
+  background: #f9f9f9; /* Light background color */
+  padding: 30px;
+  border-radius: 15px; /* More rounded corners */
+  max-width: 550px; /* Increased max-width */
+  width: 90%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #048990, #036d72); /* Match website color */
+  color: white;
+  padding: 20px; /* Increased padding */
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  margin-bottom: 25px; /* Added margin */
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.6rem; /* Increased font size */
+}
+
+.close-btn {
+  background-color: rgba(255, 255, 255, 0.3); /* Slightly darker background */
+  border: none;
+  font-size: 22px; /* Increased font size */
+  color: white;
+  padding: 10px 15px; /* Increased padding */
+  border-radius: 8px; /* Slightly more rounded */
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.4); /* Darker on hover */
+}
+
+.modal-body {
+  font-size: 1rem;
+  line-height: 1.7; /* Increased line height */
+}
+
+.modal-body p {
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  margin-bottom: 15px;
+}
+
+.modal-body strong {
+  font-weight: 600;
+  margin-right: 15px;
+  flex-shrink: 0;
+  width: 150px; /* Fixed width for keys */
+  text-align: left; /* Align keys to the left */
+}
+
+/* 🔹 Animations */
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+  }
+  to {
+      opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+      transform: translateY(50px);
+  }
+  to {
+      transform: translateY(0);
+  }
+}
+
+
+/* 🔹 Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@media (max-width: 600px) {
+  .custom-modal[_ngcontent-ng-c3237665091] {
+      padding: 20px;
+      width: 90%;
+      max-width: 95%;
+      border-radius: 10px;
+  }
+}
+
+.nurse-charges-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #28a745;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.charges-tag {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background-color: #28a745;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  z-index: 1000;
+}
+
+.tooltip-star {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.custom-tooltip {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background-color: bisque;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 220px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.tooltip-img {
+  width: 30px;
+  height: 30px;
+  float: left;
+  margin-right: 8px;
+}
+
+.row-align {
+  position: relative;
+}
+
+@media screen and (min-width: 1024px) {
+  .tooltip-star {
+  position: absolute;
+  top: 10px;
+  left: 88px;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 5;
+} 
+}
+
+/* Mobile: screens smaller than 1024px */
+@media screen and (max-width: 1023px) {
+  .tooltip-star {
+    position: absolute;
+    top: 15px;
+    left: 30px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 5;
+  }
+}

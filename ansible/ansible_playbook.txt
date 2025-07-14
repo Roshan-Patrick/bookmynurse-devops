@@ -1,0 +1,410 @@
+---
+# ansible/playbook.yaml
+# BookMyNurse Server Provisioning Playbook
+
+- name: BookMyNurse DevOps Infrastructure Setup
+  hosts: "{{ target_host_group }}"
+  vars_prompt:
+    - name: target_host_group
+      prompt: "Enter the target host group (e.g., 'production' or 'testing')"
+      private: no
+  become: yes
+  gather_facts: yes
+  vars_prompt:
+    - name: mysql_root_password
+      prompt: "Enter MySQL root password"
+      private: yes
+      confirm: yes
+    - name: mysql_app_password
+      prompt: "Enter MySQL application password"
+      private: yes
+      confirm: yes
+    - name: confirm_migration
+      prompt: "Are you sure you want to proceed with the migration? (yes/no)"
+      private: no
+
+  pre_tasks:
+    - name: Verify migration confirmation
+      fail:
+        msg: "Migration cancelled by user"
+      when: confirm_migration != "yes"
+
+    - name: Display server information
+      debug:
+        msg: |
+          Server: {{ inventory_hostname }}
+          IP: {{ ansible_host }}
+          Port: {{ ansible_port }}
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Domain: {{ domain_name }}
+
+  tasks:
+    # Phase 1: Backup and Preparation
+    - name: Phase 1 - Backup Current Setup
+      block:
+        - name: Create backup directory
+          file:
+            path: /backup/ansible_migration_{{ ansible_date_time.epoch }}
+            state: directory
+            mode: '0755'
+          register: backup_dir
+
+        # - name: Stop Apache service gracefully
+        #   systemd:
+        #     name: apache2
+        #     state: stopped
+        #   ignore_errors: yes
+        #   register: apache_stop
+
+        - name: Backup Apache configuration
+          copy:
+            src: /etc/apache2
+            dest: "{{ backup_dir.path }}/apache2_backup"
+            remote_src: yes
+          ignore_errors: yes
+
+        - name: Backup website files
+          copy:
+            src: /var/www/bnm
+            dest: "{{ backup_dir.path }}/website_backup"
+            remote_src: yes
+          ignore_errors: yes
+
+        - name: Backup SSL certificates
+          copy:
+            src: /etc/letsencrypt
+            dest: "{{ backup_dir.path }}/ssl_backup"
+            remote_src: yes
+          ignore_errors: yes
+
+        - name: Create backup archive
+          archive:
+            path: "{{ backup_dir.path }}"
+            dest: "/backup/ansible_backup_{{ ansible_date_time.epoch }}.tar.gz"
+            format: gz
+
+        - name: Display backup information
+          debug:
+            msg: |
+              Backup created: /backup/ansible_backup_{{ ansible_date_time.epoch }}.tar.gz
+              Apache service stopped: {{ apache_stop.changed }}
+
+    # Phase 2: System Updates and Dependencies
+    - name: Phase 2 - System Updates
+      block:
+        - name: Update apt cache
+          apt:
+            update_cache: yes
+            cache_valid_time: 3600
+
+        - name: Upgrade system packages
+          apt:
+            upgrade: dist
+            autoremove: yes
+            autoclean: yes
+
+        - name: Install required packages
+          apt:
+            name:
+              - apt-transport-https
+              - ca-certificates
+              - curl
+              - gnupg
+              - lsb-release
+              - software-properties-common
+              - python3-pip
+              - unzip
+              - wget
+              - git
+              - htop
+              - vim
+              - ufw
+            state: present
+
+    # Phase 3: Docker Installation
+    - name: Phase 3 - Docker Installation
+      block:
+        - name: Remove old Docker installations
+          apt:
+            name:
+              - docker
+              - docker-engine
+              - docker.io
+              - containerd
+              - runc
+            state: absent
+
+        - name: Add Docker GPG key
+          apt_key:
+            url: https://download.docker.com/linux/ubuntu/gpg
+            state: present
+
+        - name: Add Docker repository
+          apt_repository:
+            repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+            state: present
+
+        - name: Install Docker
+          apt:
+            name:
+              - docker-ce
+              - docker-ce-cli
+              - containerd.io
+              - docker-buildx-plugin
+              - docker-compose-plugin
+            state: present
+            update_cache: yes
+
+        - name: Start and enable Docker
+          systemd:
+            name: docker
+            state: started
+            enabled: yes
+
+        - name: Add users to docker group
+          user:
+            name: "{{ item }}"
+            groups: docker
+            append: yes
+          loop: "{{ docker_users }}"
+
+        - name: Test Docker installation
+          command: docker --version
+          register: docker_version
+
+        - name: Display Docker version
+          debug:
+            msg: "Docker installed: {{ docker_version.stdout }}"
+
+    # Phase 4: Kubernetes Installation
+    - name: Phase 4 - Kubernetes Installation
+      block:
+        - name: Disable swap
+          shell: |
+            swapoff -a
+            sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+        - name: Load kernel modules
+          modprobe:
+            name: "{{ item }}"
+            state: present
+          loop:
+            - overlay
+            - br_netfilter
+
+        - name: Configure kernel modules to load on boot
+          copy:
+            dest: /etc/modules-load.d/k8s.conf
+            content: |
+              overlay
+              br_netfilter
+
+        - name: Configure sysctl parameters
+          copy:
+            dest: /etc/sysctl.d/k8s.conf
+            content: |
+              net.bridge.bridge-nf-call-iptables  = 1
+              net.bridge.bridge-nf-call-ip6tables = 1
+              net.ipv4.ip_forward                 = 1
+          notify: reload sysctl
+
+        - name: Add Kubernetes repository key
+          apt_key:
+            url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+            state: present
+
+        - name: Add Kubernetes repository
+          apt_repository:
+            repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+            state: present
+
+        - name: Install Kubernetes components
+          apt:
+            name:
+              - kubelet={{ k8s_version }}*
+              - kubeadm={{ k8s_version }}*
+              - kubectl={{ k8s_version }}*
+            state: present
+            update_cache: yes
+
+        - name: Hold Kubernetes packages
+          dpkg_selections:
+            name: "{{ item }}"
+            selection: hold
+          loop:
+            - kubelet
+            - kubeadm
+            - kubectl
+
+        - name: Initialize Kubernetes cluster
+          command: kubeadm init --pod-network-cidr={{ k8s_pod_network_cidr }}
+          register: kubeadm_output
+          failed_when: false
+
+        - name: Create .kube directory
+          file:
+            path: /root/.kube
+            state: directory
+            mode: '0755'
+          when: kubeadm_output.rc == 0
+
+        - name: Copy admin.conf to user's kube config
+          copy:
+            src: /etc/kubernetes/admin.conf
+            dest: /root/.kube/config
+            remote_src: yes
+            owner: root
+            group: root
+            mode: '0644'
+          when: kubeadm_output.rc == 0
+
+        - name: Install Flannel CNI
+          shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+          when: kubeadm_output.rc == 0
+
+        - name: Remove master taint (for single-node cluster)
+          shell: kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+          when: kubeadm_output.rc == 0
+          ignore_errors: yes
+
+    # Phase 5: Nginx Ingress Controller
+    - name: Phase 5 - Nginx Ingress Controller
+      block:
+        - name: Install Nginx Ingress Controller
+          shell: |
+            kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/baremetal/deploy.yaml
+            sed -i 's/hostPort: 80/hostPort: 8080/g' /tmp/ingress-deploy.yaml
+            sed -i 's/hostPort: 443/hostPort: 8443/g' /tmp/ingress-deploy.yaml
+            kubectl apply -f /tmp/ingress-deploy.yaml
+          when: kubeadm_output.rc == 0
+
+        - name: Wait for Nginx Ingress Controller to be ready
+          shell: kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=300s
+          when: kubeadm_output.rc == 0
+
+        - name: Patch Nginx Ingress Controller service
+          shell: |
+            kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "LoadBalancer", "externalIPs":["{{ ansible_host }}"]}}'
+          when: kubeadm_output.rc == 0
+
+    # Phase 6: Cert-Manager Installation
+    - name: Phase 6 - Cert-Manager Installation
+      block:
+        - name: Install cert-manager
+          shell: |
+            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+          when: kubeadm_output.rc == 0
+
+        - name: Wait for cert-manager to be ready
+          shell: kubectl wait --namespace cert-manager --for=condition=ready pod --selector=app.kubernetes.io/instance=cert-manager --timeout=300s
+          when: kubeadm_output.rc == 0
+
+        - name: Create ClusterIssuer for Let's Encrypt
+          copy:
+            dest: /tmp/letsencrypt-issuer.yaml
+            content: |
+              apiVersion: cert-manager.io/v1
+              kind: ClusterIssuer
+              metadata:
+                name: letsencrypt-prod
+              spec:
+                acme:
+                  server: https://acme-v02.api.letsencrypt.org/directory
+                  email: {{ letsencrypt_email }}
+                  privateKeySecretRef:
+                    name: letsencrypt-prod
+                  solvers:
+                  - http01:
+                      ingress:
+                        class: nginx
+          when: kubeadm_output.rc == 0
+
+        - name: Apply ClusterIssuer
+          shell: kubectl apply -f /tmp/letsencrypt-issuer.yaml
+          when: kubeadm_output.rc == 0
+
+    # Phase 7: MySQL Setup
+    - name: Phase 7 - MySQL Database Setup
+      block:
+        - name: Create MySQL namespace
+          shell: kubectl create namespace {{ app_name }} --dry-run=client -o yaml | kubectl apply -f -
+          when: kubeadm_output.rc == 0
+
+        - name: Create MySQL secret
+          shell: |
+            kubectl create secret generic mysql-secret \
+              --from-literal=root-password='{{ mysql_root_password }}' \
+              --from-literal=user-password='{{ mysql_app_password }}' \
+              --namespace {{ app_name }} \
+              --dry-run=client -o yaml | kubectl apply -f -
+          when: kubeadm_output.rc == 0
+
+    # Phase 8: Firewall Configuration
+    - name: Phase 8 - Firewall Configuration
+      block:
+        - name: Enable UFW
+          ufw:
+            state: enabled
+            policy: deny
+            direction: incoming
+
+        - name: Configure UFW rules
+          ufw:
+            rule: allow
+            port: "{{ item }}"
+          loop:
+            - "22"
+            - "{{ ansible_port }}"
+            - "80"
+            - "443"
+            - "6443"
+            - "30000:32767"
+
+        - name: Allow Docker subnet
+          ufw:
+            rule: allow
+            src: "172.17.0.0/16"
+
+        - name: Allow Flannel subnet
+          ufw:
+            rule: allow
+            src: "{{ k8s_pod_network_cidr }}"
+
+    # Phase 9: Final Verification
+    - name: Phase 9 - Final Verification
+      block:
+        - name: Check cluster status
+          shell: kubectl get nodes
+          register: cluster_nodes
+          when: kubeadm_output.rc == 0
+
+        - name: Check running pods
+          shell: kubectl get pods --all-namespaces
+          register: cluster_pods
+          when: kubeadm_output.rc == 0
+
+        - name: Display cluster information
+          debug:
+            msg: |
+              Cluster Nodes:
+              {{ cluster_nodes.stdout }}
+              
+              Cluster Pods:
+              {{ cluster_pods.stdout }}
+          when: kubeadm_output.rc == 0
+
+        - name: Create deployment summary
+          copy:
+            dest: /root/deployment_summary.txt
+            content: |
+              BookMyNurse DevOps Migration Summary
+              ===================================
+              Date: {{ ansible_date_time.iso8601 }}
+              Server: {{ inventory_hostname }}
+              Domain: {{ domain_name }}
+              
+              Installed Components:
+              - Docker: {{ docker_version.stdout }}
+              - Kubernetes: {{ k8s_version }}
+              - Nginx Ingress Controller: Installed
+              - Cert-Manager: Installe

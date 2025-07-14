@@ -1,0 +1,56 @@
+# ansible/inventory.ini
+# BookMyNurse Production Server Inventory
+
+[production]
+bookmynurse-main ansible_host=103.91.186.102 ansible_port=2244 ansible_user=root
+
+[production:vars]
+# Common variables for all production servers
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+ansible_python_interpreter=/usr/bin/python3
+
+# Application variables
+domain_name=app.bookmynurse.com
+app_name=bookmynurse
+app_env=production
+
+# Kubernetes configuration
+k8s_version=1.28
+k8s_pod_network_cidr=10.244.0.0/16
+
+# Docker configuration
+docker_users=['root']
+
+# SSL configuration
+letsencrypt_email=admin@bookmynurse.com
+
+# Database configuration (will be prompted for passwords)
+mysql_root_password_prompt=true
+mysql_app_password_prompt=true
+
+[testing]
+bookmynurse-test ansible_host=192.168.3.194 ansible_port=22 ansible_user=rndvm01
+
+[testing:vars]
+# Common variables for all testing servers
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+ansible_python_interpreter=/usr/bin/python3
+
+# Application variables
+domain_name=test.bookmynurse.com
+app_name=bookmynurse-test
+app_env=testing
+
+# Kubernetes configuration
+k8s_version=1.28
+k8s_pod_network_cidr=10.244.0.0/16
+
+# Docker configuration
+docker_users=['rndvm01']
+
+# SSL configuration
+letsencrypt_email=admin@bookmynurse.com
+
+# Database configuration (will be prompted for passwords)
+mysql_root_password_prompt=true
+mysql_app_password_prompt=true

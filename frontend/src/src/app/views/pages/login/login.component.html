@@ -1,0 +1,51 @@
+<div class="content-wrapper">
+
+  <div class="logo-container">
+    <img src="assets/img/bookmynurse-logo-2.png" alt="logo" class="logo-img">
+  </div>
+
+  <div [class]="'container ' + containerClass">
+    <div class="row">
+      <div class="admin"><b>Admin</b></div>
+      <!-- SIGN IN -->
+      <div class="col align-items-center flex-col sign-in">
+        <div class="form-wrapper align-items-center">
+          <div class="form sign-in">
+            <form [formGroup]="loginForm" (ngSubmit)="onLoggedIn()">
+              <div class="input-group">
+                <input type="text" placeholder="Username" formControlName="username">
+                <div *ngIf="f['username']?.hasError('required') && (f?.['username']?.touched || submitted)"
+                  style="color: red; font-size: 12px; text-align: left; padding-left: 10px;">
+                  Username is required
+                </div>
+              </div>
+
+              <div class="input-group">
+                <input type="password" placeholder="Password" formControlName="password">
+                <div *ngIf="f['password']?.hasError('required') && (f?.['password']?.touched || submitted)"
+                  style="color: red; font-size: 12px; text-align: left; padding-left: 10px;">
+                  Password is required
+                </div>
+              </div>
+              <button>Sign In</button>
+              <div class="text-danger mt-2" style="background-color: bisque" *ngIf="loginFailed">
+                Login Failed: {{ username_msg ? username_msg : pwd_msg }}
+              </div>
+              <!-- <p>
+                <b>Forgot password?</b>
+              </p> -->
+              <p>
+                <!-- <span>Don't have an account?</span> -->
+                <!-- <b (click)="toggleForm()" class="pointer">Sign up here</b> -->
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="mb-4 text-center">
+    <img style="width: 200px;background: antiquewhite;"
+        src="assets/img/bookmynurse-logo-1.png" alt="logo" class="img-fluid mb-3" />
+</div> -->
+</div>

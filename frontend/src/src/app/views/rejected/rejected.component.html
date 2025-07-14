@@ -1,0 +1,107 @@
+<c-row>
+  <c-col xs>
+    <c-card style="padding: 0 !important;" class="mb-4 nurse-card">
+      <c-card-header class="table-header">Rejected Nurse Profiles</c-card-header>
+      <c-card-body style="padding: 0 !important;">
+        <table [hover]="true" [responsive]="true" [striped]="true" cTable class="mb-4 border table-styled ">
+          <thead cTableColor="light">
+            <tr>
+              <th class="text-center"><svg cIcon name="cilPeople"></svg></th>
+              <th class="text-center">Name</th>
+              <th class="text-center">Mobile</th>
+              <th class="text-center">Email</th>
+              <th class="text-center">Actions</th>
+              <th class="text-center">Approval Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users; index as i">
+              <td class="text-center">
+                <c-avatar size="xl" src="{{ user.photoUrl }}"></c-avatar>
+              </td>
+              <td class="text-center">{{ user.name }}</td>
+              <td class="text-center">{{ user.mobile }}</td>
+              <td class="text-center">{{ user.email }}</td>
+              <td class="text-center">
+                <div class="button-container">
+                  <button (click)="openModal(user)" cButton style="background-color: #007bff; color: white;" class="me-2">
+                    <svg cIcon class="me-2" name="cil-magnifying-glass"></svg> View Details
+                  </button>
+                </div>
+              </td>
+              <td class="text-center">
+                  <div class="button-container">
+
+                    <button (click)="onDelete(user.id)" [cModalToggle]="'fullScreenSmdelete'" cButton color="danger">
+                      <svg cIcon class="me-2" name="cil-bell"></svg>
+                      Delete
+                    </button>
+                  </div>
+                
+                <!-- <div *ngIf="user.approval_status === 'Approved'">
+                  <div class="button-container">
+
+                    <button disabled [cModalToggle]="'fullScreenSmdelete'" cButton color="secondary">
+                      <svg cIcon class="me-2" name="cil-bell"></svg>
+                      Approved
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="user.approval_status === 'Rejected'">
+                  <div class="button-container">
+
+                    <button disabled [cModalToggle]="'fullScreenSmdelete'" cButton color="danger">
+                      <svg cIcon class="me-2" name="cil-bell"></svg>
+                      Rejected
+                    </button>
+                  </div>
+                </div> -->
+
+
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+
+      </c-card-body>
+    </c-card>
+  </c-col>
+  
+   <!-- Modal Popup with Conditional Rendering -->
+  <c-modal [(visible)]="isModalVisible" size="lg" [backdrop]="true" class="custom-modal">
+    <c-modal-header class="modal-header-styled">
+      <h5 class="modal-title">User Details</h5>
+      <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </c-modal-header>
+    
+    <c-modal-body>
+      <div *ngIf="selectedUser" class="modal-content-styled">
+        <div class="row">
+          <div class="col-md-6">
+            <!-- <p *ngIf="selectedUser.aadhaar"><strong>Aadhaar:</strong> {{ selectedUser.aadhaar }}</p> -->
+            <p *ngIf="selectedUser.gender"><strong>Gender:</strong> {{ selectedUser.gender }}</p>
+            <p *ngIf="selectedUser.dob"><strong>DOB:</strong> {{ selectedUser.dob | date: 'dd-MM-yyyy' }}</p>
+            <p *ngIf="selectedUser.education"><strong>Qualification:</strong> {{ selectedUser.education }}</p>
+            <p *ngIf="selectedUser.experience"><strong>Experience:</strong> {{ selectedUser.experience }} years</p>
+          </div>
+          <div class="col-md-6">
+            <p *ngIf="selectedUser.languages"><strong>Languages:</strong> {{ selectedUser.languages }}</p>
+            <p *ngIf="selectedUser.specialization"><strong>Specialization:</strong> {{ selectedUser.specialization }}</p>
+            <p *ngIf="selectedUser.address"><strong>Address:</strong> {{ selectedUser.address }}</p>
+            <p *ngIf="selectedUser.serviceopt"><strong>Service Options:</strong> {{ selectedUser.serviceopt }}</p>
+            <p *ngIf="selectedUser.base_location"><strong>Base Location:</strong> {{ selectedUser.base_location }}</p>
+            <p *ngIf="selectedUser.from_time"><strong>From:</strong> {{ selectedUser.from_time }}</p>
+            <p *ngIf="selectedUser.to_time"><strong>To:</strong> {{ selectedUser.to_time }}</p>
+          </div>
+        </div>
+      </div>
+    </c-modal-body>
+
+    <c-modal-footer>
+      <button (click)="closeModal()" cButton color="secondary">Close</button>
+    </c-modal-footer>
+  </c-modal>
+</c-row>

@@ -1,0 +1,134 @@
+<app-header></app-header>
+
+<div class="search-container">
+    <div class="input-group">
+        <span class="input-group-text">
+            <i class="fas fa-search"></i> <!-- Search Icon -->
+        </span>
+        <input type="text" class="form-control search-input" [(ngModel)]="searchText"
+            placeholder="Search by Name, Specialization, Qualification or Location" (input)="onSearchInput()">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4 row-align" *ngFor="let user of filteredNurses; let i = index">
+        <!-- Top-Left Star with Tooltip -->
+<div class="tooltip-star" (mouseenter)="activeTooltipIndex = i" (mouseleave)="activeTooltipIndex = null">
+  ⭐
+  <div class="custom-tooltip" *ngIf="activeTooltipIndex === i">
+    <p><strong>Booking Terms:</strong> <br>
+      Service quality is guaranteed under BMN policy.
+      Refunds will only be processed in the event of service breach.
+    </p>
+  </div>
+</div>
+
+
+        <div class="profile-widget"
+            [ngClass]="{'busy-card': user.availability === 'Unavailable', 'available-card': user.availability === 'Available', 'no-hover': user.availability === 'Unavailable'}">
+
+            <!-- Status Inside the Card -->
+            <div class="availability-status">
+                <span
+                    [ngClass]="{'available-text': user.availability === 'Available', 'busy-text': user.availability === 'Unavailable'}">
+                    <!-- {{ user.availability }} -->
+                </span>
+            </div>
+
+            <!-- Show Charges Top Right -->
+            <div class="charges-tag" *ngIf="user.charges">
+                ₹{{ user.charges }}<br>
+                <span *ngIf="user.charges_type">
+                    ({{ formatChargesType(user.charges_type) }})
+                </span>
+
+            </div>
+
+
+            <!-- Profile Image -->
+            <div class="doc-img">
+                <a [ngClass]="{'disabled-link': user.availability === 'Unavailable'}">
+                    <img class="img-fluid" [alt]="user.name"
+                        [src]="user.gender === 'male' ? 'assets/img/doctors/doctor-02.jpg' : 'assets/img/doctors/doctor-01.jpg'">
+                </a>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="pro-content">
+                <h3 class="title">
+                    <a style="text-decoration: none;"
+                        [ngClass]="{'disabled-link': user.availability === 'Unavailable'}">
+                        {{ user.name }}
+                    </a>
+                    <span class="age"> ({{ calculateAge(user.dob) }} yrs)</span>
+                    <i class="fas fa-check-circle verified"></i>
+                </h3>
+                <p class="speciality">{{ user.specialization }}</p>
+
+                <!-- View Profile Button -->
+                <div class="row row-sm text-center">
+                    <div class="col-12">
+                        <button class="btn view-btn mb-2" [disabled]="user.availability === 'Unavailable'"
+                            [ngClass]="{'disabled-button': user.availability === 'Unavailable'}"
+                            (click)="openModal(user)">
+                            View More
+                        </button>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn book-btn" [disabled]="user.availability === 'Unavailable'"
+                            [ngClass]="{'disabled-button': user.availability === 'Unavailable'}"
+                            (click)="handleBookClick(user)">
+                            Book Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL -->
+    <div *ngIf="isModalOpen" class="custom-modal-overlay">
+        <div class="custom-modal">
+            <div class="modal-header">
+                <h3>{{ selectedUser?.name }} - Profile</h3>
+                <button class="close-btn" (click)="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Age:</strong> {{ calculateAge(selectedUser?.dob) }} years</p>
+                <!-- <p><strong>Email:</strong> {{ selectedUser?.email }}</p>
+            <p><strong>Mobile:</strong> {{ selectedUser?.mobile }}</p> -->
+                <p><strong>Gender:</strong>{{ selectedUser.gender }}</p>
+                <p><strong>Location:</strong> {{ selectedUser?.address }}</p>
+                <p><strong>Specialization:</strong> {{ selectedUser?.specialization }}</p>
+                <p><strong>Languages Known:</strong> {{ selectedUser?.languages.join(', ') }}</p>
+                <p><strong>Education:</strong> {{ selectedUser?.education }}</p>
+                <p><strong>Available for:</strong> {{ selectedUser.serviceopt }}</p>
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <button (click)="closeModal()" style="
+            width: 200px;
+            padding: 12px 0;
+            background: linear-gradient(to right, #007e8f, #0099a5); 
+            border: none;
+            border-radius: 12px;
+            box-shadow: 6px 6px 12px #b3d4f8, -6px -6px 12px #ffffff;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+          ">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+    <app-footer></app-footer>

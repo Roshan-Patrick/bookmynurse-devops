@@ -1,0 +1,177 @@
+<app-header></app-header>
+
+<div class="container mx-auto p-8 max-w-5xl bg-white shadow-lg rounded-lg">
+
+  <div style="text-align: right; margin-bottom: 15px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+  <span style="font-size: 20px; color: orange;">🌐</span>
+  
+  <select (change)="toggleLanguage($event)" 
+          style="background-color: white; color: orange; border: 2px solid orange; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+    <option [selected]="!isTamil" value="en">English</option>
+    <option [selected]="isTamil" value="ta">தமிழ்</option>
+  </select>
+</div>
+
+
+
+
+
+  <!-- English Content -->
+  <div *ngIf="!isTamil">
+    <h1 class="text-4xl font-bold mb-8 text-center text-orange-500"><b>Privacy Policy</b></h1>
+
+    <div class="text-left mb-4">
+      <p class="text-gray-700"><strong>Effective Date:</strong> [Insert Date]</p>
+      <p class="text-gray-700"><strong>Contact Email:</strong> 
+        <a href="mailto:hi&#64;bookmynurse.com" class="text-blue-500 hover:underline">hi&#64;bookmynurse.com</a>
+      </p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">1. Information We Collect</h2>
+      <p><strong>Clients:</strong> Name, contact details, address, payment information, and service preferences.</p>
+      <p><strong>Nurses:</strong> Name, qualifications, experience, contact details, and uploaded documents (e.g., certifications, ID proof).</p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">2. How We Use Your Information</h2>
+      <ul>
+        <li>To process nurse registrations and client bookings.</li>
+        <li>To send confirmation emails, updates, and service notifications.</li>
+        <li>To improve platform functionality and user experience.</li>
+        <li>To comply with legal obligations.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">3. Data Storage & Security</h2>
+      <p>Your data is securely stored and protected with encryption and access controls.</p>
+      <p>We use local storage and secure servers to manage service-related data.</p>
+      <p>Sensitive information (e.g., payment details) is processed through trusted third-party payment gateways.</p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">4. Data Sharing</h2>
+      <p>We do not sell or rent your personal information. Your data may be shared with:</p>
+      <ul>
+        <li>Verified nurses or clients for service purposes.</li>
+        <li>Payment processors for transaction management.</li>
+        <li>Legal authorities, if required by law.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">5. Cookies & Tracking</h2>
+      <p>We may use cookies to enhance your browsing experience, analyze traffic, and personalize content. You can manage cookie preferences in your browser settings.</p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">6. Your Rights</h2>
+      <ul>
+        <li>Access and review your personal information.</li>
+        <li>Request corrections or deletions of inaccurate data.</li>
+        <li>Withdraw consent for data processing.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">7. Third-Party Links</h2>
+      <p>Our platform may contain links to third-party websites. We are not responsible for their privacy practices.</p>
+    </div>
+
+    <div class="section">
+  <h2 class="section-title">8. Policy Updates</h2>
+  <p>We may update this privacy policy periodically. The revised version will be effective from the date of publication.</p>
+  <p>For any privacy-related queries, contact us at 
+    <a href="mailto:hi&#64;bookmynurse.com" class="text-blue-500 hover:underline">hi&#64;bookmynurse.com</a> or call us at 
+    <a href="tel:+919943234569" class="text-blue-500 hover:underline">99432 34569</a>.
+  </p>
+</div>
+
+
+    <div class="thank-you">
+      <p>✅ Thank you for trusting BookMyNurse.</p>
+    </div>
+  </div>
+
+  <!-- Tamil Content -->
+  <div *ngIf="isTamil">
+    <h1 class="text-4xl font-bold mb-8 text-center text-orange-500"><b>தனியுரிமைக் கொள்கை</b></h1>
+
+    <div class="text-left mb-4">
+      <p class="text-gray-700"><strong>செயல்படுத்தும் தேதி:</strong> [தேதியை உள்ளிடவும்]</p>
+      <p class="text-gray-700"><strong>தொடர்பு மின்னஞ்சல்:</strong> 
+        <a href="mailto:hi&#64;bookmynurse.com" class="text-blue-500 hover:underline">hi&#64;bookmynurse.com</a>
+      </p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">1. நாங்கள் சேகரிக்கும் தகவல்கள்</h2>
+      <p><strong>வாடிக்கையாளர்கள்:</strong> பெயர், தொடர்பு விவரங்கள், முகவரி, கட்டண தகவல்கள் மற்றும் சேவை விருப்பங்கள்.</p>
+      <p><strong>செவிலியர்கள்:</strong> பெயர், தகுதி, அனுபவம், தொடர்பு விவரங்கள் மற்றும் பதிவேற்றப்பட்ட ஆவணங்கள் (எ.கா. சான்றிதழ்கள், அடையாள ஆவணங்கள்).</p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">2. உங்கள் தகவல்களை நாங்கள் எவ்வாறு பயன்படுத்துகிறோம்</h2>
+      <ul>
+        <li>செவிலியர் பதிவுகள் மற்றும் வாடிக்கையாளர் முன்பதிவுகளை செயல்படுத்த.</li>
+        <li>உறுதிப்படுத்தல் மின்னஞ்சல்கள், புதுப்பிப்புகள் மற்றும் சேவை அறிவிப்புகளை அனுப்ப.</li>
+        <li>தள செயல்பாட்டை மற்றும் பயனர் அனுபவத்தை மேம்படுத்த.</li>
+        <li>சட்டப்பூர்வ கடமைகளை பூர்த்தி செய்ய.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">3. தரவு சேமிப்பு மற்றும் பாதுகாப்பு</h2>
+      <p>உங்கள் தரவு பாதுகாப்புடன் சேமிக்கப்படுகிறது மற்றும் குறியாக்கம் மற்றும் அணுகல் கட்டுப்பாடுகளுடன் பாதுகாக்கப்படுகிறது.</p>
+      <p>சேவை தொடர்பான தரவுகளை நிர்வகிக்க நாங்கள் உள்ளூர் சேமிப்பகம் மற்றும் பாதுகாப்பான சேவையகங்களை பயன்படுத்துகிறோம்.</p>
+      <p>முக்கியமான தகவல்கள் (எ.கா. கட்டண விவரங்கள்) நம்பகமான மூன்றாம் தரப்பு கட்டண வாயில்கள் மூலம் செயல்படுத்தப்படுகின்றன.</p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">4. தரவு பகிர்வு</h2>
+      <p>நாங்கள் உங்கள் தனிப்பட்ட தகவல்களை விற்கவோ வாடகைக்கு விடுவதோ இல்லை. உங்கள் தரவு கீழ்க்காணும் நிலைகளில் பகிரப்படலாம்:</p>
+      <ul>
+        <li>சேவை தேவைகளுக்காக சரிபார்க்கப்பட்ட செவிலியர்கள் அல்லது வாடிக்கையாளர்களுடன்.</li>
+        <li>பணப்பரிவர்த்தனை நிர்வகிக்க கட்டண செயலாக்கர்களுடன்.</li>
+        <li>சட்டப்படி தேவையான நிலையில் சட்ட அதிகாரிகளுடன்.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">5. தரவுப் பிசுப்புகள் மற்றும் கண்காணிப்பு</h2>
+      <p>உங்கள் உலாவல் அனுபவத்தை மேம்படுத்த, போக்குவரத்தை பகுப்பாய்வு செய்ய மற்றும் உள்ளடக்கத்தை தனிப்பயனாக்க நாங்கள் குக்கிகளை பயன்படுத்தலாம். உங்கள் உலாவியில் குக்கி விருப்பங்களை நிர்வகிக்கலாம்.</p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">6. உங்கள் உரிமைகள்</h2>
+      <ul>
+        <li>உங்கள் தனிப்பட்ட தகவல்களை அணுகவும், மதிப்பாய்வு செய்யவும்.</li>
+        <li>தவறான தரவுகளின் திருத்தம் அல்லது நீக்கத்தை கோரலாம்.</li>
+        <li>தரவு செயலாக்கத்திற்கு ஒப்புதல் வாபஸ் பெறலாம்.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">7. மூன்றாம் தரப்பு இணைப்புகள்</h2>
+      <p>எங்கள் தளத்தில் மூன்றாம் தரப்பு இணையதளங்களுக்கு இணைப்புகள் இருக்கலாம். அவர்களது தனியுரிமை நடைமுறைகளுக்கு நாங்கள் பொறுப்பல்ல.</p>
+    </div>
+
+    <div class="section">
+  <h2 class="section-title">8. கொள்கை புதுப்பிப்புகள்</h2>
+  <p>இந்த தனியுரிமைக் கொள்கையை அவ்வப்போது நாங்கள் புதுப்பிக்கலாம். புதுப்பிக்கப்பட்ட பதிப்பு வெளியிடப்படும் தேதியிலிருந்து நடைமுறையில் இருக்கும்.</p>
+  <p>தனியுரிமை தொடர்பான கேள்விகளுக்கு எங்களை தொடர்பு கொள்ளவும்: 
+    <a href="mailto:hi&#64;bookmynurse.com" class="text-blue-500 hover:underline">hi&#64;bookmynurse.com</a> அல்லது 
+    <a href="tel:+919943234569" class="text-blue-500 hover:underline">99432 34569</a> என்ற எண்ணில் அழைக்கவும்.
+  </p>
+</div>
+
+
+    <div class="thank-you">
+      <p>✅ BookMyNurse மீது நம்பிக்கை வைத்ததற்கு நன்றி.</p>
+    </div>
+  </div>
+
+</div>
+
+<app-footer></app-footer>

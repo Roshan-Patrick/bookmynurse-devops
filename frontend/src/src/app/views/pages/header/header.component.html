@@ -1,0 +1,64 @@
+<header class="headers">
+	<nav class="navbar-expand-lg header-navs">
+		<div class="navbar-header">
+			<a id="mobile_btn" href="javascript:void(0);" (click)="toggleMobileMenu()">
+				<span class="bar-icon">
+					<span></span>
+					<span></span>
+					<span></span>
+				</span>
+			</a>
+			<a routerLink="HomeBMN.html" class="navbar-brand logo">
+				<img src="assets/img/bookmynurse-logo.png" class="img-fluid" alt="Book My Nurse Logo, Nursing Care at Home">
+			</a>
+		</div>
+		<div class="main-menu-wrapper" [ngClass]="{'menu-opened': isMenuOpen}">
+			<div class="menu-header">
+				<a routerLink="HomeBMN.html" class="menu-logo">
+					<img src="assets/img/bookmynurse-logo.png" class="img-fluid" alt="Logo">
+				</a>
+				<a id="menu_close" class="menu-close" (click)="toggleMobileMenu()">
+					<i class="fas fa-times"></i>
+				</a>
+			</div>
+			<ul class="main-nav">
+				<li><a (click)="closeMenu()" routerLink="/index"><b>Home</b></a></li>
+				<li><a style="cursor: pointer;" class="page-scroll"
+						(click)="scrollToSection('about-us')"><b>About Us</b></a></li>
+				<li><a style="cursor: pointer;" class="page-scroll"
+						(click)="scrollToSection('services')"><b>Services</b></a></li>
+				<li><a style="cursor: pointer;" class="page-scroll" 
+					    (click)="scrollToSection('FAQs')"><b>FAQs</b></a></li>
+				<li><a (click)="closeMenu()" class="page-scroll" routerLink="/nurses-registration"><b>Nurses Registration</b></a></li>
+				<!-- <li><a routerLink="/bmn-admin" target="_blank"><b>Admin Login</b></a></li> -->
+				<li><a class="download-btn" (click)="showPopup()"><b style="cursor: pointer;">Get the App</b></a></li>
+			</ul>
+		</div>
+	</nav>
+</header>
+<!-- Sidebar Overlay (closes menu when clicked) -->
+<div *ngIf="isMenuOpen" class="sidebar-overlay" (click)="toggleMobileMenu()">
+
+</div>
+<div id="successModal" class="custom-modal">
+	<div class="custom-modal-content">
+		<img src="assets/img/bookmynurse-logo.png" alt="App Store" style="width: 180px;">
+		<div class="flex-dir">
+			<br> <b> Download Our App </b>
+			<img src="assets/img/bmn-app-qr.png" alt="QR Code" style="width: 150px; height: 150px; margin: 10px 0;">
+		</div>
+		
+		<p>Scan the QR code to download</p>
+		<br>
+		<button (click)="closePopup()" style="
+		background-color: red;
+		color: white;
+		padding: 10px 20px;
+		border: none;
+		cursor: pointer;
+		border-radius: 5px;
+		margin-top: 10px;">
+			Close
+		</button>
+	</div>
+</div>

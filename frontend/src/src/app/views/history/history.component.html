@@ -1,0 +1,77 @@
+<c-row>
+  <c-col xs>
+    <c-card style="padding: 0 !important;" class="mb-4 nurse-card">
+      <c-card-header class="table-header">Client Service History</c-card-header>
+      <c-card-body style="padding: 0 !important;">
+        <table [hover]="true" [responsive]="true" [striped]="true" cTable class="mb-4 border table-styled">
+          <thead cTableColor="light">
+            <tr>
+              <th class="text-center">Enquiry Number</th>
+              <th class="text-center">User</th>
+              <th class="text-center">Looking For</th>
+              <th class="text-center">Location</th>
+              <th class="text-center">Services</th>
+              <th class="text-center">Service Options</th>
+              <th class="text-center">Actions</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td class="text-center">
+                <div>{{ user.enquiryno }}</div>
+              </td>
+              <td>
+                <div>{{ user.name }}</div>
+                <div class="small text-medium-emphasis text-nowrap">
+                  Phone: {{ user.mobile }}
+                </div>
+              </td>
+              <td class="text-center">
+                <div>{{ user.nurseType }}</div>
+              </td>
+              <td class="text-center">
+                <div>{{ user.location }}</div>
+              </td>
+              <td>
+                <div class="text-nowrap">{{ user.services }}</div>
+              </td>
+              <td>
+                <div class="text-nowrap">{{ user.preferences }}</div>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-info btn-sm" (click)="viewNurseDetails(user)">View Nurse Details</button>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-danger" (click)="onStatus(user.id)">Complete</button>
+              </td>
+
+            </tr>
+          </tbody>
+
+        </table>
+
+
+      </c-card-body>
+    </c-card>
+  </c-col>
+</c-row>
+
+
+<!-- Modal -->
+<c-modal size="lg" [visible]="showNurseDetailsModal">
+  <c-modal-header>
+    <h5 cModalTitle>{{ selectedNurse?.name }}</h5>
+    <button type="button" cButtonClose (click)="showNurseDetailsModal = false"></button>
+  </c-modal-header>
+  <c-modal-body>
+    <p><strong>Charges:</strong> ₹{{ selectedNurse?.charges }}</p>
+    <p><strong>Age:</strong> {{ calculateAge(selectedNurse?.dob) }}</p>
+    <p><strong>Gender:</strong> {{ selectedNurse?.gender }}</p>
+    <p><strong>Location:</strong> {{ selectedNurse?.address }}</p>
+    <p><strong>Specialization:</strong> {{ selectedNurse?.specialization }}</p>
+    <p><strong>Languages Known:</strong> {{ selectedNurse?.languages?.join(', ') }}</p>
+    <p><strong>Education:</strong> {{ selectedNurse?.education }}</p>
+    <p><strong>Service Options:</strong> {{ selectedNurse?.serviceopt }}</p>
+  </c-modal-body>
+</c-modal>

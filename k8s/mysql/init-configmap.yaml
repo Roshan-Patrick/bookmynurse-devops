@@ -1,0 +1,57 @@
+# =============================================================================
+# k8s/mysql/init-configmap.yaml
+# Database initialization scripts
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-scripts
+  namespace: default
+data:
+  # Add your nursingBackend.sql content here
+  init-db.sql: |
+    -- BookMyNurse Database Initialization
+    -- Replace this with your actual nursingBackend.sql content
+    
+    CREATE DATABASE IF NOT EXISTS bookmynurse;
+    USE bookmynurse;
+    
+    -- Example tables (replace with your actual schema)
+    CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL UNIQUE,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    CREATE TABLE IF NOT EXISTS nurses (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        name VARCHAR(255) NOT NULL,
+        specialization VARCHAR(255),
+        phone VARCHAR(20),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    
+    CREATE TABLE IF NOT EXISTS bookings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        nurse_id INT,
+        booking_date DATE,
+        booking_time TIME,
+        status ENUM('pending', 'confirmed', 'cancelled') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (nurse_id) REFERENCES nurses(id)
+    );
+    
+    -- Insert sample data
+    INSERT INTO users (username, email, password_hash) VALUES
+    ('admin', 'admin@bookmynurse.com', '$2b$10$example_hash'),
+    ('john_doe', 'john@example.com', '$2b$10$example_hash2');
+    
+    INSERT INTO nurses (user_id, name, specialization, phone) VALUES
+    (1, 'Sarah Johnson', 'ICU', '+1234567890'),
+    (1, 'Mike Wilson', 'Pediatrics', '+1234567891');

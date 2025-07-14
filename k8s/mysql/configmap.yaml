@@ -1,0 +1,31 @@
+# =============================================================================
+# k8s/mysql/configmap.yaml
+# MySQL Configuration and SQL Init Scripts
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: default
+data:
+  my.cnf: |
+    [mysqld]
+    default-storage-engine=innodb
+    skip-host-cache
+    skip-name-resolve
+    datadir=/var/lib/mysql
+    socket=/var/run/mysqld/mysqld.sock
+    secure-file-priv=/var/lib/mysql-files
+    user=mysql
+    
+    pid-file=/var/run/mysqld/mysqld.pid
+    bind-address=0.0.0.0
+    
+    # Performance tuning
+    innodb_buffer_pool_size=256M
+    innodb_log_file_size=64M
+    max_connections=200
+    
+    # Character set
+    character-set-server=utf8mb4
+    collation-server=utf8mb4_unicode_ci

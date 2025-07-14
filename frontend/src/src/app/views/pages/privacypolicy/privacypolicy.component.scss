@@ -1,0 +1,49 @@
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px;
+    background: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .section {
+    margin-bottom: 40px;
+  }
+  
+  .section-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #1e40af; /* Dark blue */
+    margin-bottom: 15px;
+  }
+  
+  p, li {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #555;
+  }
+  
+  ul {
+    list-style: disc;
+    // margin-left: 30px;
+  }
+  
+  a {
+    color: #1d4ed8;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  .thank-you {
+    font-size: 20px;
+    color: #15803d; /* Green */
+    font-weight: bold;
+    margin-top: 30px;
+    text-align: left;
+  }
+  

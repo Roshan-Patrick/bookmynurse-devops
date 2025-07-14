@@ -1,0 +1,19 @@
+# =============================================================================
+# k8s/monitoring/health-check-service.yaml
+# Health Check Service for Monitoring
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: health-check-service
+  namespace: default
+  labels:
+    app: health-check
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: health-check

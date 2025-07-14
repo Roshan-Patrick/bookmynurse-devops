@@ -1,0 +1,22 @@
+# =============================================================================
+# k8s/frontend/service.yaml
+# Frontend Service (ClusterIP for internal access)
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: default
+  labels:
+    app: frontend
+    tier: web
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: frontend
+    tier: web

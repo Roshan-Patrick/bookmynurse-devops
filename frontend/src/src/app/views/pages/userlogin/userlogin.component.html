@@ -1,0 +1,161 @@
+<app-header></app-header>
+<div class="content-layout">
+    <div class="inner-background">
+        <div class="row" style="height: 101%;">
+            <div class="col-md-7 background-img"></div>
+            <div class="col-md-5 d-flex align-items-center justify-content-center">
+
+                <form *ngIf="isLogin" [formGroup]="loginForm" (ngSubmit)="onLoggedIn()" class="login-form">
+                    <div class="mb-4 text-center">
+                        <img style="width: 300px;background: transparent;"
+                            src="assets/bmn-logo.png" alt="logo" class="img-fluid mb-3" />
+                    </div>
+
+                                        <!-- Username Input -->
+                    <div class="form-group">
+                        <label class="form-label me-3 flex-shrink-0" for="email">Email</label>
+                        <div class="input-group mb-2">
+                            <span style="padding: 14px;margin-right: 2px;" class="input-group-text"><svg cIcon name="cilUser"></svg></span>
+                            <input autocomplete="off" type="email" id="email" formControlName="email"
+                                class="form-control" placeholder="Enter username">
+                        </div>
+                        <div *ngIf="submitted && f['email'].invalid" class="text-danger">
+                            <div *ngIf="f['email'].errors?.['required']">Email is required.</div>
+                            <div *ngIf="f['email'].errors?.['email']">Invalid email format.</div>
+                        </div>      
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="form-group">
+                        <label class="form-label me-3 flex-shrink-0" for="password">Password</label>
+                        <div class="input-group mb-2">
+                            <span style="padding: 14px;margin-right: 2px;" class="input-group-text">
+                                <svg cIcon name="cilFingerprint"></svg>
+                            </span>
+                            <input type="password" id="password" formControlName="password" class="form-control"
+                                placeholder="Enter password">
+                        </div>
+
+                        <!-- Password Error Messages -->
+                        <div *ngIf="submitted && f['password'].invalid" class="text-danger">
+                            <div *ngIf="f['password'].errors?.['required']">Password is required.</div>
+                            <div *ngIf="!f['password'].errors?.['required']">Enter your correct password.</div>
+                        </div>
+                    </div>
+
+                    <!-- THANK YOU POPUP OUTSIDE MODAL -->
+                    <div id="thankYouPopup" class="popup-overlay" style="display: none;">
+                        <div class="popup-content">
+                        <img src="assets/img/BMN - Nurse.png" alt="Nurse" class="nurse-image">
+                        <h2><span style="color: #0077b6;">Dear Sir/Madam,</span></h2>
+                        <p>You've been logged in successfully.  
+                            Thank you for your booking — our team will reach out to you shortly.
+                        </p>      
+                        <button id="closePopupBtn">Close</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="mb-4 text-center">
+                        <button type="submit" class="loginButton mt-3">Login</button>
+                    </div>
+                    <div style="position: relative; left: 100px; margin-bottom: 1rem;"
+                        class="text-danger mt-2 text-center" *ngIf="loginFailed">
+                        {{ username_msg || pwd_msg }}
+                    </div>
+                    
+                    <!-- Toggle to Register -->
+                    <div class="text-center">
+                        <span class="toggle-link" (click)="toggleForm()">Register new?</span>
+                    </div>
+                    <div class="text-center mt-4 mb-2" style="font-size: 0.85rem; color: #6c757d;">
+                        © 2025 BookMyNurse. All rights reserved. Unauthorized access is prohibited.
+                    </div>                    
+                    
+                </form>
+
+                <!-- Registration Form -->
+                <form *ngIf="!isLogin" [formGroup]="registerForm" (ngSubmit)="onRegister()" class="login-form">
+                    <div class="mb-4 text-center">
+                        <img style="width: 300px;background: transparent;"
+                            src="assets/bmn-logo.png" alt="logo" class="img-fluid mb-3" />
+                    </div>
+
+                     <!-- Email -->
+                    <div class="form-group">
+                    <label class="form-label me-3 flex-shrink-0" for="reg-email">Email</label>
+                    <div class="input-group mb-2">
+                        <span style="padding: 14px;margin-right: 2px;" class="input-group-text">
+                        <svg cIcon name="cilEnvelopeClosed"></svg>
+                        </span>
+                        <input autocomplete="off" type="email" id="reg-email" formControlName="email"
+                        class="form-control" placeholder="Enter email">
+                    </div>
+                    <div *ngIf="r['email'].touched || r['email'].dirty" class="text-danger">
+                        <div *ngIf="r['email'].errors?.['required']">Email is required.</div>
+                        <div *ngIf="r['email'].errors?.['email']">Invalid email format.</div>
+                    </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="form-group">
+                    <label class="form-label me-3 flex-shrink-0" for="phone">Phone</label>
+                    <div class="input-group mb-2">
+                        <span style="padding: 14px;margin-right: 2px;" class="input-group-text">
+                        <svg cIcon name="cilMobile"></svg>
+                        </span>
+                        <input maxlength="10" autocomplete="off" type="text" id="phone" formControlName="phone_number"
+                        class="form-control" placeholder="Enter phone number"
+                        (keypress)="blockAlphabets($event)">
+                    </div>
+                    <div *ngIf="r['phone_number'].touched || r['phone_number'].dirty" class="text-danger">
+                        <div *ngIf="r['phone_number'].errors?.['required']">Phone number is required.</div>
+                        <div *ngIf="r['phone_number'].errors?.['pattern']">Phone number must be 10 digits.</div>
+                         <div *ngIf="r['phone_number'].errors?.['spamNumber']">Invalid or spam phone number.</div>
+                    </div>
+                    
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                    <label class="form-label me-3 flex-shrink-0" for="reg-password">Password</label>
+                    <div class="input-group mb-2">
+                        <span style="padding: 14px;margin-right: 2px;" class="input-group-text">
+                        <svg cIcon name="cilLockLocked"></svg>
+                        </span>
+                        <input type="password" id="reg-password" formControlName="password"
+                        class="form-control" placeholder="Enter password" (input)="checkPasswordStrength()">
+                    </div>
+                    <div *ngIf="r['password'].touched || r['password'].dirty" class="text-danger">
+                        <div *ngIf="r['password'].errors?.['required']">Password is required.</div>
+                        <div *ngIf="r['password'].errors?.['minlength']">Password must be at least 6 characters.</div>
+                    </div>
+                    <div *ngIf="passwordStrength" class="text-info">
+                        {{ passwordStrength }}
+                    </div>
+                    </div>
+
+
+                    <!-- Submit Button -->
+                    <div class="mb-2 text-center">
+                        <button type="submit" class="loginButton mt-3"
+                            [disabled]="registerForm.invalid">Register</button>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div style="position: relative; left: 95px; margin-bottom: 1rem;"
+                    class="text-danger mt-2 text-center" *ngIf="loginFailed">
+                        {{ username_msg || pwd_msg }}
+                    </div>
+
+                    <!-- Toggle to Login -->
+                    <div class="text-center">
+                        <span class="toggle-link" (click)="toggleForm()">Already have an account? Login</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <app-footer></app-footer> -->

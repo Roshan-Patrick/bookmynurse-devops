@@ -1,0 +1,201 @@
+<app-header></app-header>
+
+
+<div class="container mx-auto p-8 max-w-5xl bg-white shadow-lg rounded-lg">
+
+  <div style="text-align: right; margin-bottom: 15px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+  <span style="font-size: 20px; color: orange;">🌐</span>
+  
+  <select (change)="toggleLanguage($event)" 
+          style="background-color: white; color: orange; border: 2px solid orange; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+    <option [selected]="!isTamil" value="en">English</option>
+    <option [selected]="isTamil" value="ta">தமிழ்</option>
+  </select>
+</div>
+
+
+
+  <!-- English Content -->
+  <div *ngIf="!isTamil">
+    <h1 class="text-4xl font-bold mb-8 text-center text-orange-500"><b>User Agreement</b></h1>
+
+    <div style="margin-bottom: 15px;">
+      <p><strong>Effective Date:</strong> [Insert Date]</p>
+      <p><strong>Contact Email:</strong> <a href="mailto:hi&#64;bookmynurse.com" style="color: blue; text-decoration: underline;">hi&#64;bookmynurse.com</a></p>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <p>
+        Welcome to <strong>Book My Nurse</strong>. By engaging our services, you agree to the following comprehensive User Agreement, Terms of Service, and Disclaimer. Please read carefully before proceeding. Continued use implies full consent and acceptance.
+      </p>
+    </div>
+
+    <div>
+      <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Terms of Service</h2>
+      <ol style="padding-left: 20px;">
+        <li>Book My Nurse provides home nursing services as per the selected plan, patient condition, and doctor's advice.</li>
+        <li>Please consult your doctor regularly; our nurses are not qualified medical practitioners.</li>
+        <li>A relative must be present during the service, and their contact must be shared with the nurse for emergencies.</li>
+        <li>Nurses must be treated with respect and must not be asked to do household chores.</li>
+        <li>The safety and well-being of nurses is the responsibility of the client.</li>
+        <li>Clients must secure valuables. Book My Nurse is not liable for any losses of unattended belongings.</li>
+        <li>Nurses may use mobile phones for official communication, attendance, and personal use. Charging must be allowed.</li>
+        <li>Nurses are entitled to breaks, rest, weekly offs, and holidays as per labor regulations. Alternate staff will be arranged when necessary.</li>
+        <li>Clients must provide accessible and safe restroom and accommodation for both patient and nurse.</li>
+        <li>The nurse’s daily attendance sheet must be signed by the client without fail.</li>
+        <li>A safe, non-discriminatory environment must be ensured. Alcohol, smoking, or abuse will result in immediate service termination.</li>
+        <li>No trial period—service charges start from Day 1 regardless of service duration.</li>
+        <li>Minimum 10 days’ written notice is required for service cancellation. All dues must be cleared immediately.</li>
+        <li>Service charges: ₹[Insert amount]/month, payable before the 3rd of each month. Late fee: ₹500/day. Do not pay nurses directly.</li>
+        <li>A 10% increment applies to service charges annually after the first year.</li>
+        <li>We strive to allocate appropriate nurses but continuity with the same nurse is not guaranteed.</li>
+        <li>Medical interventions (injections, physiotherapy, etc.) require valid doctor prescriptions shared with the nurse.</li>
+        <li>Nurses are permitted to take photos of patient wounds for monitoring recovery, if required.</li>
+        <li>Patient records are confidential and maintained by Book My Nurse.</li>
+        <li>We are not liable for service interruptions caused by unforeseen circumstances, weather, or force majeure.</li>
+        <li>Book My Nurse cannot be held responsible for the death of any patient due to illness or related health conditions.</li>
+        <li>Payments made are strictly non-refundable under any circumstances.</li>
+        <li>All disputes will be subject to the jurisdiction of Madurai courts only.</li>
+        <li>Day and night shift nurses do not require meals. Meals and accommodation must be provided only to 24x7 residential nurses.</li>
+        <li>Clients must provide timely feedback on nurse performance.</li>
+        <li>All official communication will be conducted via email and WhatsApp only.</li>
+        <li>All communication must be routed through Book My Nurse management, not directly through nurses.</li>
+        <li>Clients should not offer tips.</li>
+        <li>Clients must not inquire about nurses’ caste, religion, or permit their relatives into the premises.</li>
+        <li>After service completion, clients must not establish contact or engage nurses directly.</li>
+        <li>Clients are prohibited from hiring any nurse who served them through Book My Nurse, directly or indirectly.</li>
+        <li>Any changes to the service duration require a one-month prior written/email notice.</li>
+        <li>In the event of a client's death during service, Book My Nurse is not liable in any form.</li>
+        <li>Nursing staff may be rotated based on the patient’s condition and requirements.</li>
+        <li>Once paid, service charges are strictly non-refundable.</li>
+        <li>Service charges will continue to increase by 10% upon each service anniversary.</li>
+        <li>Service charges must be paid before the 3rd of every month without fail to avoid penalties.</li>
+      </ol>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Disclaimer</h2>
+      <ol style="padding-left: 20px;">
+        <li>All caregivers are appointed after verifying educational and identity documents, ensuring good character and police clearance.</li>
+        <li>Book My Nurse is not responsible for personal misconduct, theft, or inappropriate actions by individual caregivers.</li>
+        <li>The management is not responsible for loss or theft of personal property or belongings.</li>
+        <li>Clients must secure valuables like gold, jewelry, and cash.</li>
+        <li>Patients and elderly individuals must secure their jewelry to avoid accidental loss.</li>
+        <li>Book My Nurse is not liable for any compensation in case of theft or loss of valuables.</li>
+        <li>Clients must install CCTV surveillance in common areas.</li>
+        <li>Hiring Book My Nurse staff privately without informing management is illegal.</li>
+        <li>After service completion, clients must return any belongings of the nurse safely.</li>
+        <li>In the event of theft by staff, clients must report to the police.</li>
+        <li>Book My Nurse will not be responsible for distress caused by such incidents.</li>
+      </ol>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Modifications</h2>
+      <p>We may update this agreement periodically. Continued use of our services implies your acceptance of any updates.</p>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <p>For assistance, contact: <a href="mailto:hi&#64;bookmynurse.com" style="color: blue;">hi&#64;bookmynurse.com</a> | <a href="tel:+919943234569" style="color: blue;">99432 34569</a></p>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <p>✅ Thank you for choosing <strong>Book My Nurse</strong>.</p>
+    </div>
+  </div>
+
+  <!-- Tamil Content -->
+  <div *ngIf="isTamil">
+      <h1 class="text-4xl font-bold mb-8 text-center text-orange-500"><b>பயனர் ஒப்பந்தம்</b></h1>
+
+  <div style="margin-bottom: 15px;">
+    <p><strong>செயலில் இருக்கும் தேதி:</strong> [தேதி சேர்க்கவும்]</p>
+    <p><strong>தொடர்பு மின்னஞ்சல்:</strong> 
+      <a href="mailto:hi&#64;bookmynurse.com" style="color: blue; text-decoration: underline;">hi&#64;bookmynurse.com</a>
+    </p>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <p>
+      <strong>Book My Nurse</strong>-ல் உங்களை வரவேற்கிறோம். எங்கள் சேவைகளை பயன்படுத்துவதன் மூலம், நீங்கள் கீழ்க்காணும் பயனர் ஒப்பந்தம், சேவை விதிமுறைகள் மற்றும் பொறுப்பு துறப்பை ஏற்கின்றீர்கள். தயவுசெய்து கவனமாக படிக்கவும். தொடர்ந்தும் பயன்படுத்துவது முழுமையான ஒப்புதலாக கருதப்படும்.
+    </p>
+  </div>
+
+  <div>
+    <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">சேவை விதிமுறைகள்</h2>
+    <ol style="padding-left: 20px;">
+      <li>Book My Nurse வீட்டு பராமரிப்பு சேவைகளை வழங்குகிறது; இது தேர்ந்தெடுக்கப்பட்ட திட்டம், நோயாளியின் நிலை, மருத்துவர் ஆலோசனை ஆகியவற்றின் அடிப்படையில் வழங்கப்படும்.</li>
+      <li>தயவுசெய்து உங்கள் மருத்துவரை முறையாக சந்திக்கவும்; எங்கள் நர்ஸ்கள் மருத்துவர்கள் அல்ல.</li>
+      <li>ஒரு உறவினர் சேவை நேரத்தில் இருப்பது அவசியம் மற்றும் அவற்றின் தொடர்பு எண்கள் அவசர காலங்களுக்கு நர்ஸுடன் பகிரப்பட வேண்டும்.</li>
+      <li>நர்ஸ்கள் மரியாதையுடன் நடத்தப்பட வேண்டும்; வீட்டு வேலைகளை செய்ய கேட்கக்கூடாது.</li>
+      <li>நர்ஸ்களின் பாதுகாப்பும் நலனும் வாடிக்கையாளர் பொறுப்பு.</li>
+      <li>மூலதனப் பொருட்கள் பாதுகாப்பாக வைக்கப்பட வேண்டும். தொலைந்துவிட்ட பொருட்களுக்கு Book My Nurse பொறுப்பு அல்ல.</li>
+      <li>நர்ஸ்கள் அதிகாரப்பூர்வ தொடர்பு மற்றும் தனிப்பட்ட பயன்பாட்டிற்கு மொபைல் போன்களை பயன்படுத்த அனுமதிக்கப்படும்; சார்ஜ் செய்ய அனுமதி வழங்க வேண்டும்.</li>
+      <li>நர்ஸ்களுக்கு ஓய்வு, வாராந்திர விடுமுறை மற்றும் பண்டிகை விடுமுறைகள் வழங்கப்படும். தேவைப்படும் போது மாற்றுப் பணியாளர்கள் அனுப்பப்படும்.</li>
+      <li>பாதுகாப்பான மற்றும் சுகாதாரமிக்க கழிப்பறை மற்றும் இருப்பிட வசதி வழங்கப்பட வேண்டும்.</li>
+      <li>நர்ஸின் தினசரி வருகை பதிவேட்டை வாடிக்கையாளர் கையொப்பமிட்டு உறுதி செய்ய வேண்டும்.</li>
+      <li>பாதுகாப்பான மற்றும் இனச்சித்திரவாதமில்லாத சூழல் வழங்கப்பட வேண்டும். மது, புகைபிடித்தல், அல்லது அத்துமீறல் இருந்தால் உடனடி சேவை நிறுத்தம் செய்யப்படும்.</li>
+      <li>முயற்சி கால அவகாசம் இல்லை — சேவை கட்டணம் முதல் நாளிலிருந்தே ஆரம்பம்.</li>
+      <li>சேவை ரத்து செய்ய 10 நாட்களுக்கு முன்பாக எழுத்துப்பூர்வமாக தெரிவிக்க வேண்டும். பாக்கி தொகை உடனடியாக செலுத்தப்பட வேண்டும்.</li>
+      <li>சேவை கட்டணம்: ₹[தொகை உள்ளிடவும்]/மாதம். ஒவ்வொரு மாதமும் 3ஆம் தேதிக்கு முன்னர் செலுத்த வேண்டும். தாமதம்: ₹500/நாள். நர்ஸ்களுக்கு நேரடியாக பணம் கொடுக்கக்கூடாது.</li>
+      <li>முதல் ஆண்டுக்குப் பிறகு ஆண்டுக்கு 10% கட்டண உயர்வு இருக்கும்.</li>
+      <li>ஒரே நர்ஸை தொடர்ந்தும் வழங்க முடியாது; தேவைக்கேற்ப மாற்றங்கள் செய்யப்படும்.</li>
+      <li>மருத்துவ நடவடிக்கைகள் மேற்கொள்ளும் முன் செல்லுபடியான மருத்துவர் பரிந்துரை அவசியம்.</li>
+      <li>தேவைப்படும் போது புண்களின் புகைப்படங்கள் எடுக்க நர்ஸ்கள் அனுமதிக்கப்படுவர்.</li>
+      <li>நோயாளியின் பதிவுகள் இரகசியமாக வைக்கப்படும்.</li>
+      <li>மாறிய சூழ்நிலைகள் காரணமாக சேவை இடைமறுக்கும் போது Book My Nurse பொறுப்பேற்காது.</li>
+      <li>நோயாளியின் மரணம் நிகழ்ந்தால் Book My Nurse பொறுப்பு இல்லை.</li>
+      <li>செலுத்திய தொகை எவ்வித சூழ்நிலையிலும் திருப்பித் தரமுடியாது.</li>
+      <li>எல்லா வழக்குகளும் மதுரை நீதிமன்றங்களை மட்டுமே பொருந்தும்.</li>
+      <li>பகல் மற்றும் இரவு நர்ஸ்களுக்கு உணவு தேவையில்லை; 24x7 இருப்பு நர்ஸ்களுக்கு மட்டும் உணவு வழங்க வேண்டும்.</li>
+      <li>நர்ஸ்களின் செயல்பாடு குறித்த கருத்து தர வேண்டும்.</li>
+      <li>அனைத்து அதிகாரப்பூர்வ தொடர்புகளும் மின்னஞ்சல் மற்றும் வாட்ஸ்அப்பில் மட்டுமே நடக்கும்.</li>
+      <li>நர்ஸ்களுடன் நேரடியாக தொடர்பு கொள்ளக் கூடாது.</li>
+      <li>உதவி தொகை வழங்கக்கூடாது; இது சேவை கட்டணத்துடன் இணைக்க இயலாது.</li>
+      <li>நர்ஸ்களின் சாதி, மதம் குறித்து வினவக்கூடாது.</li>
+      <li>சேவை முடிந்த பிறகு நர்ஸ்களை நேரடியாக தொடர்பு கொள்ள கூடாது; சட்ட நடவடிக்கை எடுக்கப்படும்.</li>
+      <li>நர்ஸ்களை தனிப்பட்ட முறையில் வேலைக்கு அமர்த்துதல் சட்ட விரோதம்.</li>
+      <li>சேவை கால அளவு மாற்றம் செய்ய ஒரு மாத முன்னறிவிப்பு வழங்க வேண்டும்.</li>
+      <li>சேவை பெறுபவரின் மரணம் ஏற்பட்டால் Book My Nurse எந்த வகையிலும் பொறுப்பு இல்லை.</li>
+      <li>நர்ஸ்கள் நோயாளியின் தேவைக்கேற்ப மாற்றப்படுவர்.</li>
+      <li>செலுத்திய தொகை திருப்பி வழங்க இயலாது.</li>
+      <li>ஒவ்வொரு வருடத்திலும் 10% கட்டண உயர்வு இருக்கும்.</li>
+      <li>ஒவ்வொரு மாதமும் 3ஆம் தேதிக்கு முன் கட்டணத்தை செலுத்த வேண்டும்.</li>
+    </ol>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">பொறுப்பு துறப்பு</h2>
+    <ol style="padding-left: 20px;">
+      <li>நர்ஸ்கள் கல்வி மற்றும் அடையாள ஆவணங்கள் சரிபார்க்கப்பட்ட பின்னரே நியமிக்கப்படுவர்.</li>
+      <li>நபரின் தவறான நடத்தை, திருட்டு ஆகியவற்றுக்கு Book My Nurse பொறுப்பல்ல.</li>
+      <li>தனிப்பட்ட சொத்துகள் இழப்பு ஏற்படும் போது நிறுவனம் பொறுப்பல்ல.</li>
+      <li>மதிப்புடைய பொருட்களை பாதுகாப்பாக வைத்திருக்க வேண்டும்.</li>
+      <li>நோயாளிகள் தங்களது நகைகளை பாதுகாப்பாக வைத்திருக்க வேண்டும்.</li>
+      <li>தொலைந்த பொருட்களுக்கு Book My Nurse பொறுப்பேற்காது.</li>
+      <li>பாதுகாப்பு கருதி வீடுகளில் CCTV நிறுவ வாடிக்கையாளர்களே பொறுப்பு.</li>
+      <li>நியமிக்கப்பட்ட பணியாளரை தனிப்பட்ட முறையில் வேலைக்கு அமர்த்துதல் சட்ட விரோதம்; கடுமையான சட்ட நடவடிக்கை எடுக்கப்படும்.</li>
+      <li>சேவை முடிந்த பிறகு நர்ஸின் சொத்துக்களை பாதுகாப்பாக வழங்க வேண்டும்.</li>
+      <li>திருட்டு நடந்தால் போலீஸில் புகார் செய்ய வேண்டும்; நிறுவனம் பொறுப்பு அல்ல.</li>
+      <li>திருட்டுக்கு சட்ட ரீதியாக நிரூபிக்கப்பட்டால் Book My Nurse பொறுப்பு ஏற்காது.</li>
+    </ol>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">மாற்றங்கள்</h2>
+    <p>இந்த ஒப்பந்தம் காலண்டைபடி புதுப்பிக்கப்படும். தொடர்ந்தும் எங்கள் சேவைகளைப் பயன்படுத்துவது புதுப்பிப்புகளை ஏற்கும் என்பதைக் குறிக்கிறது.</p>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <p>எந்தவொரு உதவி அல்லது விளக்கத்திற்கும், தயவுசெய்து தொடர்பு கொள்ளவும்: 
+      <a href="mailto:hi&#64;bookmynurse.com" style="color: blue; text-decoration: underline;">hi&#64;bookmynurse.com</a> | 
+      <a href="tel:+919943234569" style="color: blue; text-decoration: underline;">99432 34569</a>
+    </p>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <p>✅ <strong>Book My Nurse</strong>-ஐ தேர்ந்தெடுத்ததற்கு நன்றி. தரமான பராமரிப்பு மற்றும் தொழில்முறை சேவையை வழங்க நாங்கள் அர்ப்பணிக்கின்றோம்.</p>
+  </div>
+  </div>
+</div>
+<app-footer></app-footer>

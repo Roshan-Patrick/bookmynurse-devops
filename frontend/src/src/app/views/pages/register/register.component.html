@@ -1,0 +1,488 @@
+<app-header></app-header>
+<div class="container py-4">
+  <div class="logo-3">
+    <img src="assets/img/bmnnurse.png" alt="Header Image" class="header-img mx-auto d-block mb-4">
+    <div class="form-container">
+      <h1 class="text-center mb-4" style="color: #000;"><b>Nurse Registration Form</b></h1>
+      <form [formGroup]="nurseRegistrationForm" (ngSubmit)="onSubmit()">
+        <div class="row mb-4">
+          <div class="col-12 col-md-6 mb-3">
+            <label for="name" class="form-label me-3 flex-shrink-0">Name *</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cilUser"></svg>
+              </span>
+              <input autocomplete="off" formControlName="name" type="text" id="name" name="name" class="form-control"
+                required placeholder="Please enter your name">
+              <span *ngIf="f['name'].valid" class="ms-1 text-success">
+                ✔️
+              </span>
+              <span *ngIf="f['name'].invalid && f['name'].touched" class="ms-2">
+                ❌
+              </span>
+
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['name'].touched && f['name'].invalid">
+              <div *ngIf="f['name'].errors?.['required']">
+                Name is required
+              </div>
+            </div>
+
+          </div>
+          <!-- <div class="col-12 col-md-6 mb-3">
+            <label for="aadhaar" class="form-label ">Aadhaar Number * <span class="custom-tooltip-container">
+                <span class="tooltip-icon">!</span>
+                <span class="tooltip-text">
+                  Your aadhaar number will be encrypted and stored.
+                </span>
+              </span></label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cilFingerprint"></svg>
+              </span>
+              <input autocomplete="off" formControlName="aadhaar" type="text" id="aadhaar" name="aadhaar"
+                class="form-control" required placeholder="Please enter your Aadhaar number" pattern="\d{12}"
+                maxlength="12" required onkeypress="return /[0-9]/.test(event.key)">
+              <span *ngIf="f['aadhaar'].valid && f['aadhaar'].touched" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['aadhaar'].invalid && f['aadhaar'].touched" class="ms-2 ">❌</span>
+
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['aadhaar'].touched && f['aadhaar'].invalid">
+              <div *ngIf="f['aadhaar'].errors['required']">
+                Aadhaar number is required
+              </div>
+              <div *ngIf="f['aadhaar'].errors['pattern']">
+                Length should be 12
+              </div>
+            </div>
+          </div> -->
+
+          <div class="col-12 col-md-6 mb-3">
+            <label for="mobile" class="form-label me-3 flex-shrink-0">Mobile Number*</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cilMobile"></svg>
+              </span>
+              <input autocomplete="off" formControlName="mobile" type="text" id="mobile" name="mobile"
+                class="form-control nurse-inp" required placeholder="Please enter your mobile number" pattern="\d{10}" min="1000000000"
+                max="9999999999" onkeypress="return /[0-9]/.test(event.key)" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);">
+              <span *ngIf="f['mobile'].valid && f['mobile'].touched" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['mobile'].invalid && f['mobile'].touched" class="ms-2 ">❌</span>
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['mobile'].touched && f['mobile'].invalid">
+              <div *ngIf="f['mobile'].errors['required']">
+                Mobile number is required
+              </div>
+              <div *ngIf="f['mobile'].errors['pattern']">
+                Length should be 10
+              </div>
+              <div *ngIf="f['mobile'].errors?.['spamNumber']">
+              Invalid or spam mobile number. Please enter a valid 10-digit number starting with 6-9.
+            </div>
+
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 mb-3">
+            <label for="email" class="form-label me-3 flex-shrink-0">Email ID *</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cil-envelope-closed"></svg>
+              </span>
+              <input autocomplete="off" formControlName="email" type="email" id="email" name="email"
+                class="form-control nurse-inp" required placeholder="Please enter your email ID">
+              <span *ngIf="f['email'].valid && f['email'].touched" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['email'].invalid && f['email'].touched" class="ms-2 ">❌</span>
+
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['email'].touched && f['email'].invalid">
+              <div *ngIf="f['email'].errors?.['required']">Email ID is required</div>
+              <div *ngIf="f['email'].errors?.['email']">Invalid email format</div>
+            </div>
+
+          </div>
+
+          <!-- Gender -->
+          <div class="col-12 col-md-6 mb-3">
+            <label for="gender" class="form-label me-3 flex-shrink-0">Gender *</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cil-user"></svg> <!-- User icon for gender -->
+              </span>
+              <select formControlName="gender" id="gender" name="gender" class="form-select nurse-inp" required>
+                <option value="">Select</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+              <span *ngIf="f['gender'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['gender'].invalid && f['gender'].touched" class="ms-2">❌</span>
+
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['gender'].touched && f['gender'].invalid">
+              <div *ngIf="f['gender'].errors?.['required']">
+                Gender is required
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="col-12 col-md-6 mb-3">
+            <label for="dob" class="form-label me-3 flex-shrink-0">Date of Birth *</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cil-calendar"></svg> <!-- Calendar icon for DOB -->
+              </span>
+              <input formControlName="dob" type="date" id="dob" name="dob" class="form-control nurse-inp" required />
+              <span *ngIf="f['dob'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['dob'].invalid && f['dob'].touched" class="ms-2">❌</span>
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['dob'].touched && f['dob'].invalid">
+              <div *ngIf="f['dob'].errors?.['required']">
+                DOB is required
+              </div>
+            </div>
+          </div>
+
+          <!-- Education -->
+          <div class="col-12 col-md-6 mb-3">
+            <label for="education" class="form-label me-3 flex-shrink-0">Qualification *</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cilEducation"></svg> <!-- Education icon for qualification -->
+              </span>
+              <select formControlName="education" id="education" name="education" class="form-select nurse-inp"
+                required>
+                <option value="">Please select your qualification</option>
+                <option value="D.P.N.,">D.P.N.,</option>
+                <option value="A.N.M.,">A.N.M.,</option>
+                <option value="G.N.M.,">G.N.M.,</option>
+                <option value="B.Sc.,">B.Sc., Nursing</option>
+                <option value="M.Sc.,">M.Sc., Nursing</option>
+                <option value="Diploma Nursing,">Diploma in Nursing,</option>
+              </select>
+              <span *ngIf="f['education'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['education'].invalid && f['education'].touched" class="ms-2">❌</span>
+
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['education'].touched && f['education'].invalid">
+              <div *ngIf="f['education'].errors?.['required']">
+                Qualification is required
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Experience -->
+          <div class="col-12 col-md-6 mb-3">
+            <label for="experience" class="form-label me-3 flex-shrink-0">Experience *</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cilBriefcase"></svg> <!-- Briefcase icon for experience -->
+              </span>
+
+
+              <input autocomplete="off" formControlName="experience" type="text" id="experience" name="experience"
+                class="form-control" required placeholder="Please enter your experience" maxlength="2" pattern="\d{1,2}"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+              <span *ngIf="f['experience'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['experience'].invalid && f['experience'].touched" class="ms-2">❌</span>
+
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['experience'].touched && f['experience'].invalid">
+              <div *ngIf="f['experience'].errors?.['required']">
+                Experience is required
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Languages -->
+          <div class="col-12 col-md-6 mb-3">
+            <label for="languages" class="form-label me-3 flex-shrink-0">
+              Language Known *
+            </label>
+
+            <c-input-group class="dropdown">
+              <span cInputGroupText>
+                <svg cIcon name="cil-language"></svg>
+              </span>
+
+              <div #dropdownContainer class="dropdown-wrapper"
+                [style.width]="(f['languages'].valid || (f['languages'].invalid && f['languages'].touched)) ? '80%' : '88%'">
+
+                <input formControlName="languages" type="text" class="form-control custom-input"
+                  [value]="selectedLanguages.join(', ')" readonly (click)="toggleDropdown()"
+                  placeholder="Please select languages" />
+
+                <!-- <span *ngIf="f['languages'].valid" class="ms-2 text-success">✔️</span>
+                  <span *ngIf="f['languages'].invalid && f['languages'].touched" class="ms-2">❌</span> -->
+
+
+
+                <div class="dropdown-menu show custom-dropdown" *ngIf="dropdownOpen">
+                  <c-form-check *ngFor="let language of languageOptions">
+                    <input type="checkbox" cFormCheckInput [id]="language.value" [value]="language.value"
+                      [checked]="selectedLanguages.includes(language.value)"
+                      (change)="toggleSelection(language.value, $event)" />
+                    <label cFormCheckLabel [for]="language.value">
+                      {{ language.name }}
+                    </label>
+
+
+                  </c-form-check>
+
+                </div>
+              </div>
+              <span *ngIf="f['languages'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['languages'].invalid && f['languages'].touched" class="ms-2">❌</span>
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['languages'].touched && f['languages'].invalid">
+              <div *ngIf="f['languages'].errors?.['required']">
+                Languages is required
+              </div>
+            </div>
+
+          </div>
+
+
+          <!-- Specialization -->
+          <div class="col-12 col-md-12 mb-3">
+            <label for="specialization" class="form-label me-3 flex-shrink-0">Job Role*</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cil-medical-cross"></svg> <!-- Medical cross icon for specialization -->
+              </span>
+              <select formControlName="specialization" id="specialization" name="specialization" class="form-control"
+                required>
+                <option value="">Please select your job role</option>
+                <option value="Children Care Specialist">Children Care Specialist</option>
+                <option value="ICU Setup Specialist">ICU Specialist</option>
+                <option value="Elder Care Specialist">Elder Care Specialist</option>
+                <option value="Tracheostomy Specialist">Tracheostomy Specialist</option>
+                <option value="Stroke Care Specialist">Stroke Care Specialist</option>
+                <option value="Ryle’s Tube Care Specialist">Ryle’s Tube Care Specialist</option>
+                <option value="Wound Dressing Specialist">Wound Dressing Specialist</option>
+                <option value="IV/IM Injection Specialist">IV/IM Injection Specialist</option>
+                <option value="Catheter Care Specialist">Catheter Care Specialist</option>
+                <option value="Registered Neonatal Specialist">Registered Neonatal Specialist</option>
+                <option value="PEG Feeding Specialist">PEG Feeding Specialist</option>
+                <option value="Post-operative Care Specialist">Post-operative Care Specialist</option>
+                <option value="Cancer Patient Care Specialist">Cancer Patient Care Specialist</option>
+                <option value="Other">Other</option>
+              </select>
+              <span *ngIf="f['specialization'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['specialization'].invalid && f['specialization'].touched" class="ms-2">❌</span>
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['specialization'].touched && f['specialization'].invalid">
+              <div *ngIf="f['specialization'].errors?.['required']">
+                Job role is required
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-12 mb-3">
+            <label for="serviceopt" class="form-label me-3 flex-shrink-0">Duty Options *</label>
+            <c-input-group class="dropdown">
+              <span cInputGroupText>
+                <svg cIcon name="cilList"></svg> <!-- Education icon for qualification -->
+              </span>
+              <!-- Multi-select Dropdown for Service Options -->
+              <div #serviceDropdownContainer class="dropdown-wrapper"
+                [style.width]="(f['serviceopt'].valid || (f['serviceopt'].invalid && f['serviceopt'].touched)) ? '90%' : '94%'">
+                <input formControlName="serviceopt" type="text" class="form-control custom-input"
+                  [value]="selectedUser.join(', ')" readonly (click)="toggleServiceDropdown()"
+                  placeholder="Please select Duty options" />
+
+                <!-- Dropdown Menu -->
+                <div class="dropdown-menu show custom-dropdown-service" *ngIf="serviceDropdownOpen">
+                  <c-form-check *ngFor="let option of serviceOptions">
+                    <input type="checkbox" cFormCheckInput [id]="option.value" [value]="option.value"
+                      [checked]="selectedUser.includes(option.value)"
+                      (change)="toggleServiceSelection(option.value, $event)" />
+                    <label cFormCheckLabel [for]="option.value" class="d-flex align-items-center">
+                      {{ option.name }}
+
+                      <!-- Tooltip only for 'Care' -->
+                      <ng-container *ngIf="option.value === 'Care'">
+                        <span class="tooltip-container ms-1 position-relative">
+                          <span class="tooltip-icon-2">!</span>
+                          <span class="tooltip-text-2">
+                            Morning care 1 Hour<br>Evening care 1 Hour<br>IM/IV – Injection<br>Wound Dressing<br>Nursing Procedure
+                          </span>
+                        </span>
+                      </ng-container>
+                    </label>
+                  </c-form-check>
+
+                </div>
+              </div>
+
+              <span *ngIf="f['serviceopt'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['serviceopt'].invalid && f['serviceopt'].touched" class="ms-2">❌</span>
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['serviceopt'].touched && f['serviceopt'].invalid">
+              <div *ngIf="f['serviceopt'].errors?.['required']">
+                Duty option is required
+              </div>
+            </div>
+          </div>
+
+
+          <!-- <div class="col-12 col-md-6 mb-3">
+            <label for="from-time" class="form-label">From Time</label>
+            <div class="input-group">
+              <input id="from-time" type="text" class="form-control" formControlName="fromTime"
+                [ngxTimepicker]="fromTimePicker" readonly />
+                <span *ngIf="f['fromTime'].valid" class="ms-2 text-success">✔️</span>
+                <span *ngIf="f['fromTime'].invalid && f['fromTime'].touched" class="ms-2">❌</span>  
+              <ngx-material-timepicker-toggle [for]="fromTimePicker"></ngx-material-timepicker-toggle>
+              <ngx-material-timepicker #fromTimePicker></ngx-material-timepicker>
+            </div>
+            <div class="text-danger" *ngIf="f['fromTime'].touched && f['fromTime'].invalid">
+              <div *ngIf="f['fromTime'].errors?.['required']">
+                From Time is required
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 mb-3">
+            <label for="to-time" class="form-label">To Time</label>
+            <div class="input-group">
+              <input id="to-time" type="text" class="form-control" formControlName="toTime"
+                [ngxTimepicker]="toTimePicker" readonly />
+                <span *ngIf="f['toTime'].valid" class="ms-2 text-success">✔️</span>
+                <span *ngIf="f['toTime'].invalid && f['toTime'].touched" class="ms-2">❌</span>  
+              <ngx-material-timepicker-toggle [for]="toTimePicker"></ngx-material-timepicker-toggle>
+              <ngx-material-timepicker #toTimePicker></ngx-material-timepicker>
+            </div>
+            <div class="text-danger" *ngIf="f['toTime'].touched && f['toTime'].invalid">
+              <div *ngIf="f['toTime'].errors?.['required']">
+                To Time is required
+              </div>
+            </div>
+          </div> -->
+
+
+
+
+          <!-- Address -->
+          <div class="col-12 col-md-12 mb-3">
+            <label for="address" class="form-label me-3 flex-shrink-0">Address*</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cil-home"></svg> <!-- Home icon for address -->
+              </span>
+              <textarea autocomplete="off" style="padding-top: 8px !important;height: 70px;overflow-y: hidden;"
+                formControlName="address" id="address" name="address" class="form-control" required
+                placeholder="Please enter your address"></textarea>
+              <span *ngIf="f['address'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['address'].invalid && f['address'].touched" class="ms-2">❌</span>
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['address'].touched && f['address'].invalid">
+              <div *ngIf="f['address'].errors?.['required']">
+                Address is required
+              </div>
+            </div>
+          </div>
+
+          <!-- Base Location -->
+          <div class="col-12 col-md-6 mb-3">
+            <label for="base-location" class="form-label">Base Location / City</label>
+            <c-input-group>
+              <span cInputGroupText>
+                <svg cIcon name="cil-map"></svg> <!-- Map icon for base location -->
+              </span>
+              <input autocomplete="off" formControlName="base_location" type="text" id="base-location"
+                name="base_location" class="form-control" required placeholder="Please enter your location" />
+              <span *ngIf="f['base_location'].valid" class="ms-2 text-success">✔️</span>
+              <span *ngIf="f['base_location'].invalid && f['base_location'].touched" class="ms-2">❌</span>
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['base_location'].touched && f['base_location'].invalid">
+              <div *ngIf="f['base_location'].errors?.['required']">
+                Base Location is required
+              </div>
+              <div *ngIf="f['base_location'].errors?.['minlength']">
+                Base Location must be at least 3 characters long
+              </div>
+              <div *ngIf="f['base_location'].errors?.['maxlength']">
+                Base Location must not exceed 50 characters
+              </div>
+              <div *ngIf="f['base_location'].errors?.['pattern']">
+                Only alphabets and spaces are allowed
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 mb-3">
+            <label for="photo" class="form-label">Photo *
+              <span class="custom-tooltip-container">
+                <span class="tooltip-icon">!</span>
+                <span class="tooltip-text">
+                  Please upload a .jpg, .jpeg, or .png file. Max size: 5MB
+                </span>
+              </span>
+            </label>
+
+            <c-input-group>
+              <input formControlName="photo" style="padding-top: 10px !important;" type="file" name="photo" id="photo"
+                (change)="onFileChange($event)" class="form-control" accept=".jpg,.jpeg,.png" />
+              <span *ngIf="f['photo'].valid && !imageValidationError" class="ms-2 text-success">✔️</span>
+              <span *ngIf="(f['photo'].invalid && f['photo'].touched) || imageValidationError" class="ms-2">❌</span>
+            </c-input-group>
+            <div class="text-danger" *ngIf="f['photo'].touched && f['photo'].invalid">
+              <div *ngIf="f['photo'].errors?.['required']">
+                Photo is required
+              </div>
+            </div>
+            <small *ngIf="imageValidationError" class="text-danger">
+              {{ imageValidationError }}
+            </small>
+          </div>
+
+          <div class="col-12 col-md-12">
+            <div class="form-check">
+              <input formControlName="declaration" type="checkbox" id="declaration" name="declaration"
+                class="form-check-input" required>
+                <label for="declaration" class="form-check-label" style="color:#048990;">
+                  I hereby declare that the information provided in this form is true, correct, and complete to the best
+                  of my knowledge and belief. I understand that any false or misleading information may lead to the
+                  rejection of my application or other legal actions.<br>I agree to abide by the <a 
+                  routerLink="/terms-and-condition" target="_blank" style="color: #f36302; text-decoration: underline;">terms and
+                    conditions</a> of BMN as stated in the document.</label>
+            </div>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="custom-submit-button w-100"
+              [disabled]="nurseRegistrationForm.invalid || !photoFileValid">
+              Submit
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
+
+<div id="successModals" class="custom-modal">
+  <div class="custom-modal-content">
+    <img src="assets/img/BMN - Nurse.png" alt="Nurse" style="width: 150px; height: auto; margin-bottom: 15px;" />
+    <img src="assets/img/bmn-app-qr.png" alt="QR Code"
+      style="width: 120px; height: 120px; border: 4px solid orange; border-radius: 10px;">
+    <p style="color: #048990; font-size: 18px; font-weight: bold;">
+      Dear Sir/Madam,
+    </p>
+    <p style="color: #333; font-size: 16px;">
+      Thanks for registering with BookMyNurse.com. Please check your mail for the acknowledgment, and our team will get
+      back to you shortly.
+      Please download our BookMyNurse mobile app to stay connected with us.
+    </p>
+    <button id="closeModal"
+      style="background-color: #f36302; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;"
+      (click)="redirectToNurse()">
+      Proceed
+    </button>
+  </div>
+</div>

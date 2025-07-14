@@ -1,0 +1,625 @@
+<app-header></app-header>
+<section class="section-search py-5" id="home">
+
+	<div class="bg-slideshow">
+		<img src="../../../../assets/img/BMNForm.png" alt="Book My Nurse, Online Nurse Booking, Book a Nurse" class="bg-img img1">
+		<img src="../../../../assets/img/bmn(2).png" alt="Book My Nurse, Nurse Booking Onine, Home Nursing" class="bg-img img2">
+		<img src="../../../../assets/img/BMNForm3.png" alt="Book My Nurse, Home Nursing Services, Professional Health Care at Home" class="bg-img img3">
+	  </div> 
+	  
+	<div class="container">
+		<div class="row align-items-center">
+			<!-- Form on the left -->
+			<div class="col-md-12 form-card d-flex align-items-stretch">
+				<div class="card p-4 shadow animated fadeInLeft w-100"
+					style="background-color: #ffffff; border-radius: 10px;">
+					<!-- Heading -->
+					<div class="text-center mb-3">
+						<h1 class="fw-bold mb-2" style="color: #048990;">
+							<b class="welcome">Welcome to Book<span style="color: #f36302;">My</span>Nurse.Com</b>
+						</h1>
+						  <p class="text-muted fs-6 fw-bold mb-2">
+							<span>Choose the <span class="nurse">"Right Nurses"</span> for your loved ones.</span>
+						</p>
+					</div>
+					<!-- Booking Form -->
+					<form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+						<div class="mb-2 d-flex align-items-center">
+							<label for="name" class="form-label fw-bold mb-0" style="width: 120px;">Name</label>
+							<input autocomplete="off" formControlName="name" type="text" id="name" class="form-control"
+								placeholder="Please Enter your name" required>
+						</div>
+						<div class="mb-2">
+							<div class=" d-flex align-items-center">
+								<label for="mobile" class="form-label fw-bold mb-0" style="width: 120px;">Mobile</label>
+								<input autocomplete="off" formControlName="mobile" type="tel" id="mobile" class="form-control"
+								placeholder="Please Enter your mobile number" pattern="\d{10}" maxlength="10" required
+								onkeypress="return /[0-9]/.test(event.key)">
+														</div>
+							<div class="text-danger mobile-error-msg" *ngIf="f['mobile'].touched && f['mobile'].invalid"> 
+								<div *ngIf="f['mobile'].errors['required']">
+									Mobile number is required
+								</div>
+								<div *ngIf="f['mobile'].errors['pattern']">
+									Length should be 10
+								</div>
+								<div class="text-danger" *ngIf="f['mobile'].touched && f['mobile'].invalid">
+								
+								<div *ngIf="f['mobile'].errors?.['spamNumber']">
+									Invalid or spam mobile number. Please enter a valid 10-digit number <br> starting with 6–9.
+								</div>
+                             </div>
+
+							</div>
+						</div>
+						<div class="mb-2 d-flex align-items-center">
+							<label for="nurseType" class="form-label fw-bold mb-0" style="width: 120px;">Looking
+								for</label>
+							<select formControlName="nurseType" id="nurseType" class="form-select" required>
+								<option value="" selected>Select</option>
+								<option value="Male">Male Nurse</option>
+								<option value="Female">Female Nurse</option>
+							</select>
+						</div>
+						<div class="mb-2 d-flex align-items-center">
+							<label for="location" class="form-label fw-bold mb-0" style="width: 120px;">City</label>
+							<input autocomplete="off" formControlName="location" type="text" id="location" class="form-control"
+								placeholder="Please Enter your City" required>
+						</div>
+						<div class="mb-2 d-flex align-items-center">
+							<label for="services" class="form-label fw-bold mb-0" style="width: 120px;">Services</label>
+							<select formControlName="services" class="form-select" required>
+								<option value="" selected>Select</option>
+								<option value="Elder Care">Elder Care</option>
+								<option value="Bedridden Patient Care">Bedridden Patient Care</option>
+								<option value="Stroke Patient Care">Stroke Patient Care</option>
+								<option value="Tracheostomy Patient Care">Tracheostomy Patient Care</option>
+								<option value="Post Operative Care">Post Operative Care</option>
+								<option value="ICU Setup at Home">ICU Setup at Home</option>
+								<option value="Physiotherapy at Home">Physiotherapy at Home</option>
+								<option value="Travel Nurse">Travel Assist</option>
+								<option value="Doctor's Visit at Home">Doctor's Visit at Home</option>
+							</select>
+						</div>
+						<div class="mb-2 d-flex align-items-center">
+							<label for="preferences" class="form-label fw-bold mb-0">Service options</label>
+							<select style="margin-left: 8px;" formControlName="preferences" id="preferences" class="form-select" required>
+								<option value="" selected>Select</option>
+								<option value="24hrs">24 Hours</option>
+								<option value="12hrs">12 Hours</option>
+								<option value="8hrs">8 Hours</option>
+								<option value="4hrs">4 Hours</option>
+								<option value="Care" title="Morning care 1 Hour&#10;Evening care 1 Hour&#10;IM/IV – Injection&#10;Wound Dressing&#10;Nursing Procedure&#10;">Care ℹ️<span style="font-size: 48px; color: red;"></span> </option>
+							</select>
+						</div>
+						<div class="form-check mt-3">
+							<input formControlName="agreement" class="form-check-input" type="checkbox" id="agreement"
+								required>
+								<label class="form-check-label fw-bold" for="agreement" style="color: #048990;">
+									I have read and agree to the
+									<a routerLink="/user-agreement" target="_blank"
+										style="color: #f36302; text-decoration: underline;">user agreement</a>
+									and
+									<a routerLink="/privacy-policy" target="_blank"
+										style="color: #f36302; text-decoration: underline;">privacy policy</a>.
+								</label>
+						</div>
+						<div class="mt-3">
+							<button type="submit" class=" w-100 custom-submit-button"
+								[disabled]="!bookingForm.valid">Submit</button>
+						</div>
+					</form>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+
+
+<section class="section section-specialities py-5"
+	style="background: linear-gradient(120deg, #f0f4f7, #d9e2ec);">
+	<div class="container-fluid">
+		<div class="row">
+			<!-- Left Content -->
+			<div class="col-md-8">
+				<div class="section-header">
+					
+						<h2 style="text-align: center;"><b>Nursing Care Services at Home</b></h2>
+				
+					<p class="sub-title">
+						At BookMyNurse, we are your premier destination for professional and top-tier Home
+						Nursing Services, proudly serving over 1,00,000 satisfied patients since our inception
+						in 2012. With eight dedicated branches located strategically in Chennai, Pondicherry,
+						Trichy, Thanjavur, Madurai, Tirunelveli, and Coimbatore, we're committed to extending
+						our quality care services throughout India. Booking our services is simple; just call
+						at <b>99432 34569.</b>
+
+					</p>
+					
+				</div>
+				<div class="decorative-divider">
+					<span>✦✦✦</span>
+				</div>
+			</div>
+
+			<!-- Right Content -->
+			<div class="col-md-4 d-flex align-items-center justify-content-center">
+				<div class="bg-info text-dark p-4 rounded shadow text-center w-100">
+					<h2 class="fw-bold"><b>Nurse Registration</b></h2>
+					<p class="rk">Register now to join the BookMyNurse platform.</p>
+					<a routerLink="/nurses-registration" class="btn btn-light btn-lg mt-3 text-dark fw-bold">
+						Register Now
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+<section class="section section-doctor">
+	<!-- About Us Section
+	<div class="row mb-4">
+		<div class="col-12 text-center">
+			<h1 class="us"><b>About Us</b></h1>
+		</div>
+	</div> -->
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-4">
+				<div class="card bg-light border-0 shadow">
+					<div class="card-header bg-info text-white text-center p-3">
+						<h2 class="mb-0"><b>BookMyNurse</b></h2>
+					</div>
+					<div class="card-body p-3">
+						<p class="card-text text-center">
+							Welcome to BookMyNurse: <br> Your Trusted Partner in Home Healthcare
+						</p>
+						<div class="about-content">
+							<p>
+								At BookMyNurse, we understand that healthcare should be accessible and
+								personalized. Our dedicated team of experienced nurses is committed to providing
+								compassionate, high-quality care tailored to your individual needs.
+							</p>
+							<p>
+								Whether you require post-operative assistance, chronic illness management, or
+								simply a helping hand, our skilled professionals are here to support you every
+								step of the way. With just a few clicks, you can book a qualified nurse to
+								ensure your comfort and wellbeing in the familiar surroundings of your home.
+								Experience the peace of mind that comes with expert care at your fingertips.
+							</p>
+							<!-- <a href="javascript:;" class="btn btn-primary">Read More...</a> -->
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-8">
+				<div class="doctor-slider slider">
+					<div class="profile-widget" *ngFor="let user of users">
+					  <div class="doc-img">
+						<a routerLink="/nurse-booking">
+							<img class="img-fluid" alt="User Image"
+							[src]="user.gender === 'male' ? 'assets/img/doctors/doctor-02.jpg' : 'assets/img/doctors/doctor-03.jpg'">
+					   
+						</a>
+						<a href="javascript:void(0)" class="fav-btn">
+						  <i class="far fa-bookmark"></i>
+						</a>
+					  </div>
+					  <div class="pro-content">
+						<h3 class="title">
+						  <a routerLink="/nurse-booking">{{ user.name }}</a>
+						  <i class="fas fa-check-circle verified"></i>
+						</h3>
+						<p class="speciality">{{ user.education }}</p>
+						<ul  class="available-info">
+						  <li>
+							<i class="fas fa-map-marker-alt"></i> {{ user.address }}
+						  </li>
+						  <li>
+							<i class="far fa-clock"></i> Available for {{ user.serviceopt }}
+						  </li>
+						  <li>
+							<i class="fas fa-medkit"></i> Specialization: {{ user.specialization }}
+						  </li>
+						  <div id="about-us"></div>
+						  <li >
+							<i class="fas fa-language"></i> Languages Known: {{ user.languages.join(', ') }}
+						  </li>
+						</ul>
+						<div  class="row row-sm text-center">
+						  <div class="col-12">
+							<!-- <a routerLink="/nursebooking" class="btn view-btn">View Profile</a> -->
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				  
+			</div>
+			
+		</div>
+	</div >
+</section>
+
+<section  id="about-section" class="about-section pt-50"
+	style="background: linear-gradient(120deg, #f0f4f7, #d9e2ec);">
+	<div class="col-12 text-center">
+		<h2 class="us" style="color: #13A7F1;"><b>About Us</b></h2>
+	</div>
+	<div class="container" style="max-width: 1200px; padding-left: 15px; padding-right: 15px;">
+		<div class="row">
+			<div class="col-12 mx-auto">
+				<div class="about-content text-center mb-55">
+					<div class="section-title mb-30">
+						<h2 class="mb-15 wow fadeInUp text-dark" data-wow-delay=".4s" style="margin-top: 30px;">
+							<b>Welcome to BookMyNurse</b>
+						</h2>
+					</div>
+					<p class="mb-35 wow fadeInUp" data-wow-delay=".6s">
+						At Book My Nurse, we take immense pride in being your premier choice for Book My Nurse
+						 in Chennai. With a strong presence across Tamil Nadu, our Chennai branch
+						exemplifies our
+						commitment to delivering high-quality healthcare within the comfort and familiarity of
+						your home.
+					</p>
+
+					<h3 class="mb-35 wow fadeInUp text-dark" data-wow-delay=".6s" style="margin-top: 40px;">
+						<b>Why Choose BookMyNurse?</b>
+					</h3>
+
+					<p class="mb-35 wow fadeInUp" data-wow-delay=".6s">
+						<span class="about-down">Local Expertise, Global Standards:</span> Our Chennai branch
+						seamlessly blends local expertise with global healthcare standards. Our nursing
+						professionals are
+						not only highly skilled but also deeply familiar with the unique healthcare needs of the
+						local
+						community.
+					</p>
+					<p class="mb-35 wow fadeInUp" data-wow-delay=".6s">
+						<span class="about-down">Comprehensive Home Nursing Care:</span> Whether you require
+						specialized
+						care for a family member or need general nursing services, Book My Nurse 
+						has you
+						covered. Our wide range of services encompasses everything from care for 1-year-olds to 
+						100-year-olds.
+					</p>
+					<p class="mb-35 wow fadeInUp" data-wow-delay=".6s">
+						<span class="about-down">Experienced Nursing Team:</span> Our dedicated nursing team in
+						Chennai
+						is handpicked for their experience, compassion, and commitment to your well-being. We
+						understand
+						that every patient is unique, and our nurses are trained to provide personalized care
+						tailored to
+						individual needs.
+					</p>
+					<p class="mb-35 wow fadeInUp" data-wow-delay=".6s">
+						<span class="about-down">Accessible Care Across Chennai:</span> We understand that
+						convenience
+						is crucial, and we ensure that our services are accessible to families across Chennai.
+						No matter
+						where you are in the city, our compassionate nursing care is just a phone call away.
+					</p>
+					<p class="mb-35 wow fadeInUp" data-wow-delay=".6s">
+						<span class="about-down">Transparent and Honest Service:</span> At Book My Nurse,
+						we
+						believe in transparency and open communication. Our team is always ready to address your
+						concerns and provide honest guidance throughout your healthcare journey.
+					</p>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	<div id="services" class="about-img text-center">
+		
+		<img src="assets/img/ourstrength.png" alt="Our Strengths, Chennai Home Nursing" class="ourstrength">
+		<div ></div>
+	</div>
+	
+</section>
+
+
+
+<section  class="bg-white service-section pt-50">
+	<div class="container">
+		<div class="row">
+			<div class="col-xl-8 mx-auto">
+				<div class="section-title text-center mb-55">
+					<span class="wow fadeInDown" data-wow-delay=".2s"><b class="us">Services</b></span>
+					<h2 class="mb-15 wow fadeInUp" data-wow-delay=".4s"><b>BookMyNurse Services</b></h2>
+					<p class="wow fadeInUp" data-wow-delay=".6s">At BookMyNurse, we pride ourselves on offering
+						a holistic approach to home nursing. Our dedicated team includes skilled doctors,
+						nurses, physiotherapists, pharmacies, laboratories, and diagnostics centers, all working
+						seamlessly together. We also have strong partnerships with multispecialty hospitals,
+						ensuring that our patients receive the best care possible, right in the comfort of their
+						homes.</p>
+				</div>
+			</div>
+		</div>
+		<div class="row g-5">
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/elder-care.png" class="rounded service-img"
+							alt="Elder Care Services, Senior Care Services at Home">
+					</div>
+					<h4 style="color: #000;"><b>Elder Care</b></h4>
+					<p>"Providing compassionate elder care at home with medication management, daily support,
+						and assistance, ensuring seniors' comfort, safety, and overall well-being."</p>
+				</div>
+			</div>
+
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/bedridden-patient-care.png"
+							class="rounded service-img" alt="Bedridden Patient Care at Home, Book My Nurse">
+					</div>
+					<h4 style="color: #000;"><b>Bedridden Patient Care</b></h4>
+					<p>We provide complete care solutions to Bedridden Patients - Timely Care, Sponge baths,
+						Feeding, Medication, and vital signs, to maintain records and reports.</p>
+				</div>
+			</div>
+
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/stroke-patient-care.png" class="rounded service-img"
+							alt="Stroke Patient Care at Home">
+					</div>
+					<h4 style="color: #000;"><b>Stroke Patient Care</b></h4>
+					<p>We provide complete care solutions for stroke survivors – 
+						Timely care, mobility support, feeding, medication, and vital sign monitoring, 
+						maintaining records and reports.</p>
+				</div>
+			</div>
+
+			<!-- Second Line -->
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/tracheostomy-patient-care.png"
+							class="rounded service-img" alt="Tracheostomy Patient Care at Home">
+					</div>
+					<h4 style="color: #000;"><b>Tracheostomy Patient Care</b></h4>
+					<p>Expert care for tracheostomy patients at home. Our skilled nurses ensure comfort,
+						hygiene, and specialized medical attention, enhancing recovery and well-being.</p>
+				</div>
+			</div>
+
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/post-operative-care.png" class="rounded service-img"
+							alt="Post-Operative Care at Home">
+					</div>
+					<h4 style="color: #000;"><b>Post Operative Care</b></h4>
+					<p>Expert home care for patients after surgery. Our skilled nurses ensure comfort, hygiene,
+						and specialized attention, promoting recovery and well-being.</p>
+				</div>
+			</div>
+
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/icu-setup-at-home.png" class="rounded service-img"
+							alt="ICU Setup at Home">
+					</div>
+					<h4 style="color: #000;"><b>ICU Setup at Home</b></h4>
+					<p>Comprehensive ICU care at home with advanced medical equipment, expert nursing support,
+						and meticulous monitoring to ensure critical care and recovery.</p>
+				</div>
+			</div>
+
+			<!-- Third Line -->
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/physiotherapy-at-home.png"
+							class="rounded service-img" alt="Physiotherapy at Home">
+					</div>
+					<h4 style="color: #000;"><b>Physiotherapy at Home</b></h4>
+					<p>Experience expert physiotherapy at your home. Our specialized care promotes recovery,
+						mobility, and comfort, ensuring optimal health and convenience for you.</p>
+				</div>
+			</div>
+
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/travel-assists.png" class="rounded service-img"
+							alt="Travel Assists across the World">
+					</div>
+					<h4 style="color: #000;"><b>Travel Assists across World</b></h4>
+					<p>Travel Nurses deliver expert care wherever you go, ensuring your health and comfort with compassion, 
+						experience, and dedication to your needs.</p>
+				</div>
+			</div>
+
+			<!-- Fourth Line -->
+			<div class="col-lg-4 col-md-6 service-content">
+				<div class="service-item">
+					<div class="service-icon mb-4">
+						<img src="../../../../assets/service-images/doctors-visit-at-home.png"
+							class="rounded service-img" alt="Doctors Visit at Home">
+					</div>
+					<h4 style="color: #000;"><b>Doctor's Visit at Home</b></h4>
+					<p>Receive comprehensive medical care with home visits from our expert doctors. We
+						prioritize thorough health assessments and personalized treatments.</p><div id="FAQs"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="faq-section">
+	<b><h2 class="faq-heading" style="color: #000;">✨ Frequently Asked Questions ✨</h2></b>
+  
+	<div class="faq-container">
+	  <!-- Left Column -->
+	  <div class="faq-column">
+		<details class="faq-box">
+		  <summary>👩‍⚕️ How do I register as a nurse?</summary>
+		  <p>You can register by filling out the nurse registration form available on our platform. After verification, your profile will be activated.</p>
+		</details>
+  
+		<details class="faq-box">
+		  <summary>📜 How do I book a nurse?</summary>
+		  <p>To book a nurse, browse our available nurses, select your preferred option, and complete the booking process through the app or website.</p>
+		</details>
+	  </div>
+  
+	  <!-- Right Column -->
+	  <div class="faq-column">
+		<details class="faq-box">
+		  <summary>🕐 How long does it take to confirm a booking?</summary>
+		  <p>Booking confirmation is typically immediate. You'll receive a confirmation message via email or SMS after successful booking.</p>
+		</details>
+  
+		<details class="faq-box">
+		  <summary>🏠 Can I request a home visit nurse service?</summary>
+		  <p>Yes, we provide home visit nurse services. Choose the "Home Care" option during booking and provide your address details.</p>
+		</details>
+	  </div>
+	</div>
+  </section>
+  
+
+  <section style="background-color: #f0f8ff; padding: 50px 20px;">
+	<h2 class="digital"><div class="us" style="color: #000;">Our Digital Transformation Partner</div></h2>
+	<div class="underlines"></div>
+  
+	<div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 40px;">
+  
+	  <!-- Logo -->
+	  <div class="logos" style="flex: 0 1 100px; display: flex; justify-content: center;">
+		<img src="assets/ResQ Logo BLue - Lion Stay Alive.png" alt="ResQ Logo"
+		  style="max-width: 100%; max-height: 150px; object-fit: contain;" />
+	  </div>
+  
+	  <!-- Contact Info -->
+	  <div style="flex: 0 1 400px; text-align: left;">
+		<p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 12px;">
+		  📞 
+		  <a href="tel:9244009244" style="text-decoration: none; color: #333;">9244 00 9244</a> |
+		  <a href="tel:04447970529" style="text-decoration: none; color: #333;">044 4797 0529</a>
+		</p>
+		<p style="font-size: 1.1rem; color: #333; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+		  🌐 
+		  <a href="https://www.resq.sg" target="_blank" style="text-decoration: none; color: #333;"><b>www.ResQ.sg</b></a>
+		</p>
+		<p style="font-size: 1.1rem; color: #333; display: flex; align-items: center; gap: 8px;">
+		  📧<a href="mailto:Hi&#64;ResQ.Sg" style="text-decoration: none; color: #333;"><b>Hi&#64;ResQ.Sg</b></a>
+		</p>
+	  </div>
+  
+	</div>
+  </section>
+  
+  <section class="office-section">
+	<h2 class="office-heading">8 Physical Offices to Serve you Better</h2>
+	<div class="office-list">
+	  <a href="https://www.homenursingchennai.com/" target="_blank" class="office-item">Home Nursing in Chennai</a>	
+	  <a href="https://www.homenursingtrichy.com/" target="_blank" class="office-item">Home Nursing in Trichy</a>
+	  <a href="https://www.homenursingthanjavur.com/" target="_blank" class="office-item">Home Nursing in Thanjavur</a>
+	  <a href="https://www.homenursingmadurai.com/" target="_blank" class="office-item">Home Nursing in Madurai</a>
+	  <a href="https://www.homenursingcoimbatore.com/" target="_blank" class="office-item">Home Nursing in Coimbatore</a>
+	  <a href="https://www.homenursingtirunelveli.com/" target="_blank" class="office-item">Home Nursing in Tirunelveli</a>
+	  <a href="https://www.homenursingpondicherry.com/" target="_blank" class="office-item">Home Nursing in Pondicherry</a>
+	  <a href="https://www.homenursingtiruppur.com/" target="_blank" class="office-item">Home Nursing in Tiruppur</a>
+	</div>
+  </section>
+  
+  <div class="partner-slider-loop">
+	<h2 class="partner-header"><div class="us" style="color: #000;">Our Partners</div></h2>
+	<div class="slide-track-loop-1">
+	  <!-- Original Logos -->
+	  <div class="slide-loop-1"><img src="assets/preethi-hospitals-logo.png" alt="Logo 1" /></div>
+	  <div class="slide-loop-2"><img src="assets/avn-arogya-ayurvedic-hospital-logo.png" alt="Logo 2" /></div>
+	  <div class="slide-loop-3"><img src="assets/bella-premier-logo.png" alt="Logo 3" /></div>
+	  <div class="slide-loop-4"><img src="assets/csg-lighthouse-logo.png" alt="Logo 4" /></div>
+	  <div class="slide-loop-5"><img src="assets/glb-hospitals-logo.png" alt="Logo 5" /></div>
+	  <div class="slide-loop-6"><img src="assets/kauvery-hospital-logo.png" alt="Logo 6" /></div>
+  
+	  <!-- Duplicate for smooth infinite loop -->
+	  <div class="slide-loop-1"><img src="assets/preethi-hospitals-logo.png" alt="Logo 1" /></div>
+	  <div class="slide-loop-2"><img src="assets/avn-arogya-ayurvedic-hospital-logo.png" alt="Logo 2" /></div>
+	  <div class="slide-loop-3"><img src="assets/bella-premier-logo.png" alt="Logo 3" /></div>
+	  <div class="slide-loop-4"><img src="assets/csg-lighthouse-logo.png" alt="Logo 4" /></div>
+	  <div class="slide-loop-5"><img src="assets/glb-hospitals-logo.png" alt="Logo 5" /></div>
+	  <div class="slide-loop-6"><img src="assets/kauvery-hospital-logo.png" alt="Logo 6" /></div>
+	</div>
+  </div>
+
+
+<div id="successModalss" class="custom-modal">
+	<div class="custom-modal-content">
+		<img src="assets/img/BMN - Nurse.png" alt="Nurse" style="width: 150px; height: auto; margin-bottom: 15px;" />
+		<p style="color: #048990; font-size: 18px; font-weight: bold;">
+			Dear Sir/Madam,
+		</p>
+		<p style="color: #333; font-size: 16px;">
+			Thanks for your enquiry. BookMyNurse team will get back to you at the
+			earliest.
+		</p>
+		<button id="closeModal"
+			style="background-color: #f36302; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;"
+			(click)="redirectToNurse()">
+			Proceed
+		</button>
+	</div>
+</div>
+
+
+ <div class="chat-now" id="chatNowBtn">Chat<br>Now</div>
+
+
+<div class="floating-buttons" id="floatingBtns">
+	<a href="https://wa.me/9943234569" target="_blank" class="whatsapp-button">
+		<img src="assets/img/whatsapp-icon.jpeg" alt="WhatsApp">
+	</a>
+	<a href="tel:9943234569" class="phone-button">
+		<img src="assets/img/phone-icon.jpeg" alt="Call">
+	</a>
+	<button class="referral-button" id="referralBtn">
+		<img src="assets/img/referral-icon.jpeg" alt="Referral">
+	</button>
+</div>
+
+
+<!-- MODAL START -->
+<div class="modal-rel" id="modal-rel">
+	<div class="modal-content-rel">
+	  <div class="modal-header-rel">
+		<h3>Refer BookMyNurse</h3>
+		<span class="close-btn" id="closeBtn-rel">&times;</span>
+	  </div>
+	  <form class="modal-form-rel" id="referralForm" action="https://script.google.com/macros/s/AKfycbzWlXHxugjcpELizoH3BN6NdvhZz2fPx1jz0HSQBo3MgHw_uJXvHnNNNbP2WPAR0ynF/exec" method="post">
+		<input type="text" name="name" placeholder="Please enter your Name" pattern="[A-Za-z\s]+" title="Only letters allowed" required>
+		<input type="tel" name="phone" placeholder="Please enter your Friend’s Mobile No" pattern="\d{10}" maxlength="10" title="10-digit number only" required>
+		<input type="email" name="email" placeholder="Please enter your Friend’s Email ID" required>
+		<button type="submit">Submit</button>
+	  </form>
+	</div>
+  </div>
+  
+  <!-- THANK YOU POPUP OUTSIDE MODAL -->
+  <div id="thankYouPopup" class="popup-overlay" style="display: none;">
+	<div class="popup-content">
+	  <img src="assets/img/BMN - Nurse.png" alt="Nurse" class="nurse-image">
+	  <h2><span style="color: #0077b6;">Dear Sir/Madam,</span></h2>
+	  <p>We’ve received your referral details successfully.
+		Our team will review the information and reach out to the referred individual shortly.</p>
+	  <button id="closePopupBtn">Close</button>
+	</div>
+  </div>   
+<app-footer></app-footer>

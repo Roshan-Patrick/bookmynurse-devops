@@ -1,0 +1,274 @@
+.table-header{
+  background-color: lightgray; /* Primary color for the header */
+  color: #048990; /* Light text for contrast */
+  font-weight: 600;
+  border-bottom: 2px solid #004a52; /* Darker primary for separator */
+  padding: 10px; /* Slightly increased padding */
+  text-align: left;
+  font-size: 24px;
+  font-style: oblique;
+}
+
+.nurse-card{
+  background-color: white;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 
+  0px 8px 10px 1px rgba(0, 0, 0, 0.14), 
+  0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+th{
+  background-color: #e0f2f7; /* Light secondary for header background */
+  color: #048990; /* Primary color for header text */
+  border-bottom: 1px solid #ddd; 
+}
+th,td{
+  border: 1px solid #dee2e6; /* Consistent border for all cells */
+  padding: 10px; /* Adjust padding as needed */
+  vertical-align: middle; /* Align cell content vertically */
+}
+  
+  /* Button styling inside the table */
+  .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Space between buttons */
+  }
+  
+  button[cButton] {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px; /* Proportional button size */
+    font-size: 14px; /* Adjust button text size */
+    border-radius: 4px; /* Rounded corners for buttons */
+    transition: background-color 0.3s, transform 0.3s;
+  }
+
+  button[cButton]:hover {
+    transform: translateY(-2px);
+    background-color: #0056b3;
+  }
+  /* Modal Form Styles */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Adds space between rows */
+  }
+  
+  .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  
+  label {
+    flex: 1; /* Adjusts label width */
+    font-weight: 500;
+    font-size: 14px;
+    color: #495057;
+    text-align: right;
+    transition: color 0.3s, transform 0.3s;
+  }
+  
+  .form-input {
+    flex: 2; /* Adjusts input field width */
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  
+  /* Hover and Focus Effects */
+  .form-input:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+    outline: none;
+  }
+  
+  label:hover {
+    color: #007bff;
+    transform: scale(1.05);
+  }
+  
+  /* Form Actions */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+  
+  /* Button Styling */
+//   button[cButton] {
+//     padding: 8px 16px;
+//     border-radius: 4px;
+//     font-weight: bold;
+//     transition: background-color 0.3s, transform 0.3s;
+//   }
+  
+
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .form-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    label {
+      text-align: left;
+    }
+  }
+  
+  /* Responsive table adjustments */
+  @media (max-width: 768px) {
+    .table-styled {
+      font-size: 14px; /* Reduce font size on smaller screens */
+    }
+  
+    .button-container {
+      flex-direction: column; /* Stack buttons vertically on small screens */
+    }
+  }
+  
+  // .modal {
+  //   position: fixed;
+  //   top: 0;
+  //   left: 0;
+  //   width: 100%;
+  //   height: 100%;
+  //   background: rgba(0,0,0,0.5);
+  //   display: flex;
+  //   justify-content: center;
+  //   align-items: center;
+  //   z-index: 1000;
+  // }
+  
+  // .modal-content {
+  //   background: white;
+  //   padding: 20px;
+  //   border-radius: 8px;
+  //   min-width: 300px;
+  // }
+  
+  /* appointment.component.css */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+}
+
+  
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+// .modal-content {
+//   background: white;
+//   padding: 20px;
+//   border-radius: 8px;
+// }
+
+// ::ng-deep c-modal {
+//   z-index: 1050; /* Ensure it's on top */
+// }
+
+::ng-deep c-modal-body {
+  padding: 20px;
+  font-size: 15px;
+}
+
+::ng-deep c-modal-header h5 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+::ng-deep c-modal-header button {
+  font-size: 20px;
+  border: none;
+  background: transparent;
+}
+
+::ng-deep c-modal {
+  z-index: 1200 !important;
+}
+
+
+/* Modal container */
+c-modal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal header styling */
+c-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e3f2fd; /* Light blue elegant background */
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #cbd5e0;
+}
+
+/* Modal title */
+c-modal-header h5 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0d47a1; /* Deep blue */
+}
+
+// /* Close (X) button */
+// button[cButtonClose] {
+//   background: transparent;
+//   border: none;
+//   font-size: 1.5rem;
+//   font-weight: bold;
+//   color: black;
+//   cursor: pointer;
+//   transition: color 0.3s ease-in-out;
+//   line-height: 1;
+// }
+
+button[cButtonClose]:hover {
+  color: #d32f2f; /* Red on hover */
+}
+
+/* Modal body styling */
+c-modal-body {
+  padding: 1.5rem;
+  background: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Paragraph styling */
+c-modal-body p {
+  font-size: 1rem;
+  color: #37474f;
+  margin: 0.75rem 0;
+}
+
+/* Bold text (labels) */
+c-modal-body strong {
+  color: #263238;
+}
