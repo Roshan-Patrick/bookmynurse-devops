@@ -407,4 +407,10 @@
               - Docker: {{ docker_version.stdout }}
               - Kubernetes: {{ k8s_version }}
               - Nginx Ingress Controller: Installed
-              - Cert-Manager: Installe
+              - Cert-Manager: Installed
+              - MySQL: Configured
+              - Firewall: Configured
+
+              Next Steps:
+              - Apply Kubernetes manifests for application deployment.
+              - Configure DNS records for {{ domain_name }}
