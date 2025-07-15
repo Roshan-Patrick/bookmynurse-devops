@@ -68,10 +68,12 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Write extra vars file
+        env:
+          ENVIRONMENT: ${{ github.event.inputs.environment || 'testing' }}
         run: |
           echo "mysql_root_password: \"${{ secrets.MYSQL_ROOT_PASSWORD }}\"" > extra-vars.yml
           echo "mysql_app_password: \"${{ secrets.MYSQL_APP_PASSWORD }}\"" >> extra-vars.yml
-          echo "target_host_group: \"${{ github.event.inputs.environment }}\"" >> extra-vars.yml
+          echo "target_host_group: \"$ENVIRONMENT\"" >> extra-vars.yml
 
       - name: Run Ansible playbook
         env:
