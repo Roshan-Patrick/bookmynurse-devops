@@ -67,10 +67,18 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Write extra vars file
+        run: |
+          cat <<EOF > extra-vars.yml
+          mysql_root_password: "${{ secrets.MYSQL_ROOT_PASSWORD }}"
+          mysql_app_password: "${{ secrets.MYSQL_APP_PASSWORD }}"
+          target_host_group: "${{ github.event.inputs.environment }}"
+          EOF
+
       - name: Run Ansible playbook
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
         run: |
           echo "${{ secrets.ANSIBLE_INVENTORY }}" > inventory.ini
           echo "${{ secrets.ANSIBLE_PLAYBOOK }}" > playbook.yml
-          ansible-playbook -i inventory.ini playbook.yml --extra-vars "{\"mysql_root_password\": \"${{ secrets.MYSQL_ROOT_PASSWORD }}\", \"mysql_app_password\": \"${{ secrets.MYSQL_APP_PASSWORD }}\", \"target_host_group\": \"${{ github.event.inputs.environment }}\"}"
+          ansible-playbook -i inventory.ini playbook.yml --extra-vars "@extra-vars.yml"
