@@ -73,10 +73,10 @@ jobs:
           echo "mysql_app_password: \"${{ secrets.MYSQL_APP_PASSWORD }}\"" >> extra-vars.yml
           echo "target_host_group: \"${{ github.event.inputs.environment }}\"" >> extra-vars.yml
 
-      - name: Run Ansible playbook
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: false
-        run: |
-          echo "${{ secrets.ANSIBLE_INVENTORY }}" > inventory.ini
-          echo "${{ secrets.ANSIBLE_PLAYBOOK }}" > playbook.yml
-          ansible-playbook -i inventory.ini playbook.yml --extra-vars "@extra-vars.yml"
+          - name: Run Ansible playbook
+          env:
+            ANSIBLE_HOST_KEY_CHECKING: false
+          run: |
+            printf '%s' "${{ secrets.ANSIBLE_INVENTORY }}" > inventory.ini
+            printf '%s' "${{ secrets.ANSIBLE_PLAYBOOK }}" > playbook.yml
+            ansible-playbook -i inventory.ini playbook.yml --extra-vars "@extra-vars.yml"
