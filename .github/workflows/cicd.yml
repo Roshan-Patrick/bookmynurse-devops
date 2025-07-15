@@ -70,9 +70,11 @@ jobs:
       - name: Write extra vars file
         env:
           ENVIRONMENT: ${{ github.event.inputs.environment || 'testing' }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_APP_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
         run: |
-          echo "mysql_root_password: \"${{ secrets.MYSQL_ROOT_PASSWORD }}\"" > extra-vars.yml
-          echo "mysql_app_password: \"${{ secrets.MYSQL_APP_PASSWORD }}\"" >> extra-vars.yml
+          echo "mysql_root_password: \"$MYSQL_ROOT_PASSWORD\"" > extra-vars.yml
+          echo "mysql_app_password: \"$MYSQL_APP_PASSWORD\"" >> extra-vars.yml
           echo "target_host_group: \"$ENVIRONMENT\"" >> extra-vars.yml
 
       - name: Run Ansible playbook
