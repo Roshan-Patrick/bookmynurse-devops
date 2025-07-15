@@ -16,20 +16,27 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/auth', authRoutes);
-app.use('/nursing', nurseRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/nursing', nurseRoutes);
 // Use the registration routes
-app.use('/register', registrationRoutes);
-app.use('/clientauth',clientauthRoutes)
+app.use('/api/register', registrationRoutes);
+app.use('/api/clientauth',clientauthRoutes)
 
 // Serve uploaded files as static
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.get('/health', (req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+  });
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+ });
 
 
 setupSwagger(app);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0',() => {
     console.log(`Server running on port ${PORT}`);
 });
 // app.listen(3000,'103.91.186.102', () => {
