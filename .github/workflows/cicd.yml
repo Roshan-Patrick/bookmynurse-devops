@@ -73,9 +73,11 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_APP_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
         run: |
-          echo "mysql_root_password: \"${MYSQL_ROOT_PASSWORD}\"" > extra-vars.yml
-          echo "mysql_app_password: \"${MYSQL_APP_PASSWORD}\"" >> extra-vars.yml
-          echo "target_host_group: \"${ENVIRONMENT}\"" >> extra-vars.yml
+          cat <<EOF > extra-vars.yml
+          mysql_root_password: "${MYSQL_ROOT_PASSWORD}"
+          mysql_app_password: "${MYSQL_APP_PASSWORD}"
+          target_host_group: "${ENVIRONMENT}"
+          EOF
 
       - name: Run Ansible playbook
         env:
@@ -87,7 +89,7 @@ jobs:
           cat <<'EOF' > playbook.yml
           ${{ secrets.ANSIBLE_PLAYBOOK }}
           EOF
-          ansible-playbook -i inventory.ini playbook.yml --extra-vars "@extra-vars.yml"
+          ansible-playbook -i inventory.ini playbook.yml --extra-vars "@extra-vars.yml" --extra-vars "confirm_migration=yes"
 
       - name: Deploy to Kubernetes
         if: github.event.inputs.environment == 'production' || github.ref == 'refs/heads/main'
@@ -97,9 +99,11 @@ jobs:
             # Navigate to the project directory and pull the latest changes
             cd /root/bookmynurse-devops
             git pull
+
             # Update Kubernetes manifests with the new image tag
             sed -i 's|image: emmamyers/bmn-backend:.*|image: emmamyers/bmn-backend:${{ github.sha }}|' k8s/backend/deployment.yaml
             sed -i 's|image: emmamyers/bmn-frontend:.*|image: emmamyers/bmn-frontend:${{ github.sha }}|' k8s/frontend/deployment.yaml
+
             # Create namespace if not exists
             kubectl create namespace bookmynurse --dry-run=client -o yaml | kubectl apply -f -
             
