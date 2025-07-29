@@ -73,11 +73,9 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_APP_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
         run: |
-          cat <<EOF > extra-vars.yml
-          mysql_root_password: "${MYSQL_ROOT_PASSWORD}"
-          mysql_app_password: "${MYSQL_APP_PASSWORD}"
-          target_host_group: "${ENVIRONMENT}"
-          EOF
+          echo "mysql_root_password: \"${MYSQL_ROOT_PASSWORD}\"" > extra-vars.yml
+          echo "mysql_app_password: \"${MYSQL_APP_PASSWORD}\"" >> extra-vars.yml
+          echo "target_host_group: \"${ENVIRONMENT}\"" >> extra-vars.yml
 
       - name: Run Ansible playbook
         env:
