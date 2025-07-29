@@ -9,7 +9,7 @@ on:
       environment:
         description: 'Deployment Environment'
         required: true
-        default: 'testing'
+        default: 'production'
         type: choice
         options:
           - testing
@@ -40,7 +40,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: emmamyers/bmn-backend:latest
+          tags: emmamyers/bmn-backend:${{ github.sha }}
 
       - name: Build and push frontend
         uses: docker/build-push-action@v4
@@ -48,7 +48,7 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: emmamyers/bmn-frontend:latest
+          tags: emmamyers/bmn-frontend:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -69,7 +69,7 @@ jobs:
 
       - name: Write extra vars file
         env:
-          ENVIRONMENT: ${{ github.event.inputs.environment || 'testing' }}
+          ENVIRONMENT: ${{ github.event.inputs.environment || 'production' }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_APP_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
         run: |
@@ -83,4 +83,41 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
         run: |
-          ansible-playbook -i ansible/ansible_inventory.txt ansible/ansible_playbook.txt --extra-vars "@extra-vars.yml"
+          printf '%s' "${{ secrets.ANSIBLE_INVENTORY }}" > inventory.ini
+          printf '%s' "${{ secrets.ANSIBLE_PLAYBOOK }}" > playbook.yml
+          ansible-playbook -i inventory.ini playbook.yml --extra-vars "@extra-vars.yml"
+
+      - name: Deploy to Kubernetes
+        if: github.event.inputs.environment == 'production' || github.ref == 'refs/heads/main'
+        run: |
+          # SSH to production server and deploy Kubernetes manifests
+          ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << 'EOF'
+            # Navigate to the project directory and pull the latest changes
+            cd /root/bookmynurse-devops
+            git pull
+
+            # Update Kubernetes manifests with the new image tag
+            sed -i 's|image: emmamyers/bmn-backend:.*|image: emmamyers/bmn-backend:${{ github.sha }}|' k8s/backend/deployment.yaml
+            sed -i 's|image: emmamyers/bmn-frontend:.*|image: emmamyers/bmn-frontend:${{ github.sha }}|' k8s/frontend/deployment.yaml
+
+            # Create namespace if not exists
+            kubectl create namespace bookmynurse --dry-run=client -o yaml | kubectl apply -f -
+            
+            # Apply all Kubernetes manifests
+            kubectl apply -f k8s/namespace/ -n bookmynurse
+            kubectl apply -f k8s/secrets/ -n bookmynurse
+            kubectl apply -f k8s/mysql/ -n bookmynurse
+            kubectl apply -f k8s/backend/ -n bookmynurse
+            kubectl apply -f k8s/frontend/ -n bookmynurse
+            kubectl apply -f k8s/ingress/ -n bookmynurse
+            
+            # Wait for deployments to be ready
+            kubectl rollout status deployment/backend -n bookmynurse --timeout=300s
+            kubectl rollout status deployment/frontend -n bookmynurse --timeout=300s
+            
+            # Check deployment status
+            echo "=== Deployment Status ==="
+            kubectl get pods -n bookmynurse
+            kubectl get services -n bookmynurse
+            kubectl get ingress -n bookmynurse
+          EOF
