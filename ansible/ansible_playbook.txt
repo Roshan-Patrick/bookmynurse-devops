@@ -4,24 +4,18 @@
 
 - name: BookMyNurse DevOps Infrastructure Setup
   hosts: "{{ target_host_group }}"
-  vars_prompt:
-    - name: target_host_group
-      prompt: "Enter the target host group (e.g., 'production' or 'testing')"
-      private: no
   become: yes
   gather_facts: yes
-  vars_prompt:
-    - name: mysql_root_password
-      prompt: "Enter MySQL root password"
-      private: yes
-      confirm: yes
-    - name: mysql_app_password
-      prompt: "Enter MySQL application password"
-      private: yes
-      confirm: yes
-    - name: confirm_migration
-      prompt: "Are you sure you want to proceed with the migration? (yes/no)"
-      private: no
+
+  # Define all necessary variables here to ensure the playbook can run non-interactively.
+  vars:
+    app_name: "bookmynurse"
+    k8s_version: "1.28.1"
+    k8s_pod_network_cidr: "10.244.0.0/16" # Default for Flannel CNI
+    docker_users:
+      - root
+    letsencrypt_email: "your-email@example.com" # <-- IMPORTANT: Change this to your actual email
+    domain_name: "app.bookmynurse.com" # Used for summary, not configuration
 
   pre_tasks:
     - name: Verify migration confirmation
@@ -36,7 +30,6 @@
           IP: {{ ansible_host }}
           Port: {{ ansible_port }}
           OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
-          Domain: {{ domain_name }}
 
   tasks:
     # Phase 1: Backup and Preparation
@@ -48,13 +41,6 @@
             state: directory
             mode: '0755'
           register: backup_dir
-
-        # - name: Stop Apache service gracefully
-        #   systemd:
-        #     name: apache2
-        #     state: stopped
-        #   ignore_errors: yes
-        #   register: apache_stop
 
         - name: Backup Apache configuration
           copy:
@@ -87,7 +73,6 @@
           debug:
             msg: |
               Backup created: /backup/ansible_backup_{{ ansible_date_time.epoch }}.tar.gz
-              Apache service stopped: {{ apache_stop.changed }}
 
     # Phase 2: System Updates and Dependencies
     - name: Phase 2 - System Updates
@@ -414,3 +399,6 @@
               Next Steps:
               - Apply Kubernetes manifests for application deployment.
               - Configure DNS records for {{ domain_name }}
+  handlers:
+    - name: reload sysctl
+      command: sysctl --system
