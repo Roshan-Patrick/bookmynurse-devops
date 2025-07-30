@@ -172,6 +172,76 @@
             state: started
             enabled: yes
 
+        - name: Configure Docker daemon for CRI
+          copy:
+            content: |
+              {
+                "exec-opts": ["native.cgroupdriver=systemd"],
+                "log-driver": "json-file",
+                "log-opts": {
+                  "max-size": "100m"
+                },
+                "storage-driver": "overlay2"
+              }
+            dest: /etc/docker/daemon.json
+            mode: '0644'
+          notify: restart docker
+
+        - name: Create Docker service drop-in directory
+          file:
+            path: /etc/systemd/system/docker.service.d
+            state: directory
+            mode: '0755'
+
+        - name: Configure Docker service for CRI
+          copy:
+            content: |
+              [Service]
+              ExecStart=
+              ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+            dest: /etc/systemd/system/docker.service.d/override.conf
+            mode: '0644'
+          notify: restart docker
+
+        - name: Configure containerd for Docker
+          copy:
+            content: |
+              version = 2
+              [plugins."io.containerd.grpc.v1.cri"]
+                sandbox_image = "registry.k8s.io/pause:3.9"
+                stream_server_address = "127.0.0.1"
+                stream_server_port = "0"
+                enable_selinux = false
+                enable_tls_streaming = false
+                max_container_log_line_size = 16384
+                disable_cgroup = false
+                disable_apparmor = false
+                restrict_oom_score_adj = false
+                max_concurrent_downloads = 3
+                disable_proc_mount = false
+                unset_seccomp_profile = ""
+                tolerate_missing_hugetlb_controller = true
+                ignore_image_defined_volumes = false
+                [plugins."io.containerd.grpc.v1.cri".containerd]
+                  snapshotter = "overlayfs"
+                  default_runtime_name = "runc"
+                  disable_snapshot_annotations = true
+                  discard_unpacked_layers = false
+                  no_pivot = false
+                  disable = false
+                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+                    runtime_type = "io.containerd.runc.v2"
+                    runtime_engine = ""
+                    runtime_root = ""
+                    privileged_without_host_devices = false
+                    base_runtime_spec = ""
+                    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+                      SystemdCgroup = true
+            dest: /etc/containerd/config.toml
+            mode: '0644'
+          notify: restart containerd
+
         - name: Add users to docker group
           user:
             name: "{{ item }}"
@@ -486,3 +556,13 @@
   handlers:
     - name: reload sysctl
       command: sysctl --system
+
+    - name: restart docker
+      systemd:
+        name: docker
+        state: restarted
+
+    - name: restart containerd
+      systemd:
+        name: containerd
+        state: restarted
