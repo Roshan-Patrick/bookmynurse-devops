@@ -88,18 +88,31 @@ jobs:
       - name: Deploy to Kubernetes
         if: github.event.inputs.environment == 'production' || github.ref == 'refs/heads/main'
         run: |
+          # First, copy the repository to the production server
+          echo "Copying repository to production server..."
+          tar -czf repo.tar.gz --exclude='.git' .
+          scp -P ${{ secrets.PRODUCTION_SSH_PORT }} -o StrictHostKeyChecking=no repo.tar.gz root@${{ secrets.PRODUCTION_IP }}:/root/
+          
           # SSH to production server and deploy Kubernetes manifests
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << 'EOF'
-            # Check if project directory exists, if not clone it
+            # Extract the repository if it doesn't exist
             if [ ! -d "/root/bookmynurse-devops" ]; then
-              echo "Project directory not found. Cloning repository..."
+              echo "Extracting repository..."
               cd /root
-              git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git bookmynurse-devops
+              tar -xzf repo.tar.gz -C /root/
+              mv /root/* /root/bookmynurse-devops/ 2>/dev/null || true
+              rm -f repo.tar.gz
+            else
+              echo "Updating existing repository..."
+              cd /root
+              rm -rf bookmynurse-devops
+              tar -xzf repo.tar.gz -C /root/
+              mv /root/* /root/bookmynurse-devops/ 2>/dev/null || true
+              rm -f repo.tar.gz
             fi
             
-            # Navigate to the project directory and pull the latest changes
+            # Navigate to the project directory
             cd /root/bookmynurse-devops
-            git pull origin main
             
             # Verify required directories exist
             echo "Verifying project structure..."
