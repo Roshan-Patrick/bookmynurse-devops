@@ -240,7 +240,26 @@
                       SystemdCgroup = true
             dest: /etc/containerd/config.toml
             mode: '0644'
-          notify: restart containerd
+
+        - name: Force restart Docker and containerd services
+          systemd:
+            name: "{{ item }}"
+            state: restarted
+            daemon_reload: yes
+          loop:
+            - docker
+            - containerd
+
+        - name: Verify CRI is working
+          shell: |
+            crictl info
+            echo "CRI verification completed"
+          register: cri_verification
+          ignore_errors: yes
+
+        - name: Debug CRI verification
+          debug:
+            var: cri_verification
 
         - name: Add users to docker group
           user:
@@ -312,6 +331,7 @@
                 - "kubelet={{ k8s_version }}.*"
                 - "kubeadm={{ k8s_version }}.*"
                 - "kubectl={{ k8s_version }}.*"
+                - crictl
             state: present
             update_cache: yes
 
@@ -341,19 +361,54 @@
             systemctl restart kubelet || true
           ignore_errors: yes
 
+        - name: Remove .kube directory
+          file:
+            path: /root/.kube
+            state: absent
+
+        - name: Ensure swap is disabled
+          command: swapoff -a
+          ignore_errors: yes
+
+        - name: Remove swap entry from fstab
+          replace:
+            path: /etc/fstab
+            regexp: '^\s*([^#].*\sswap\s.*)$'
+            replace: '# \1'
+          ignore_errors: yes
+
+        - name: Verify kernel modules are loaded
+          modprobe:
+            name: "{{ item }}"
+            state: present
+          loop:
+            - overlay
+            - br_netfilter
+
+        - name: Verify sysctl parameters
+          sysctl:
+            name: "{{ item.name }}"
+            value: "{{ item.value }}"
+            state: present
+            reload: yes
+          loop:
+            - { name: 'net.bridge.bridge-nf-call-iptables', value: '1' }
+            - { name: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
+            - { name: 'net.ipv4.ip_forward', value: '1' }
+
         - name: Initialize Kubernetes cluster
           command: kubeadm init --pod-network-cidr={{ k8s_pod_network_cidr }}
           register: kubeadm_output
-          failed_when: kubeadm_output.rc != 0
+          ignore_errors: yes
 
-        - name: Debug kubeadm output
+        - name: Debug full kubeadm output
           debug:
-            msg: "Kubeadm stdout: {{ kubeadm_output.stdout_lines }}"
+            var: kubeadm_output
           when: kubeadm_output.rc != 0
 
-        - name: Debug kubeadm error
-          debug:
-            msg: "Kubeadm stderr: {{ kubeadm_output.stderr_lines }}"
+        - name: Fail if kubeadm failed
+          fail:
+            msg: "Kubeadm initialization failed with return code {{ kubeadm_output.rc }}"
           when: kubeadm_output.rc != 0
 
         - name: Create .kube directory
