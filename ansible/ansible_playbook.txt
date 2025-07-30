@@ -331,9 +331,15 @@
                 - "kubelet={{ k8s_version }}.*"
                 - "kubeadm={{ k8s_version }}.*"
                 - "kubectl={{ k8s_version }}.*"
-                - crictl
             state: present
             update_cache: yes
+
+        - name: Install crictl manually
+          shell: |
+            VERSION="v1.30.0"
+            wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+            sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+            rm -f crictl-$VERSION-linux-amd64.tar.gz
 
         - name: Hold Kubernetes packages
           dpkg_selections:
