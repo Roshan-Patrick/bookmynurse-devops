@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: health-check-deployment
-  namespace: default
+  namespace: bookmynurse
   labels:
     app: health-check
 spec:

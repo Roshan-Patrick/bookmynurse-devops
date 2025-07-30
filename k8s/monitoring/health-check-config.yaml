@@ -6,7 +6,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: health-check-config
-  namespace: default
+  namespace: bookmynurse
 data:
   default.conf: |
     server {

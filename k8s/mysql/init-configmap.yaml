@@ -6,7 +6,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mysql-init-scripts
-  namespace: default
+  namespace: bookmynurse
 data:
   # Add your nursingBackend.sql content here
   init-db.sql: |
