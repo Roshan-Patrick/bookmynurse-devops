@@ -83,13 +83,7 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
         run: |
-          cat <<'EOF' > inventory.ini
-          ${{ secrets.ANSIBLE_INVENTORY }}
-          EOF
-          cat <<'EOF' > playbook.yml
-          ${{ secrets.ANSIBLE_PLAYBOOK }}
-          EOF
-          ansible-playbook -i inventory.ini playbook.yml --extra-vars "@extra-vars.yml" --extra-vars "confirm_migration=yes"
+          ansible-playbook -i ansible/ansible_inventory.txt ansible/ansible_playbook.txt --extra-vars "@extra-vars.yml" --extra-vars "confirm_migration=yes"
 
       - name: Deploy to Kubernetes
         if: github.event.inputs.environment == 'production' || github.ref == 'refs/heads/main'
@@ -100,7 +94,7 @@ jobs:
             if [ ! -d "/root/bookmynurse-devops" ]; then
               echo "Project directory not found. Cloning repository..."
               cd /root
-              git clone https://github.com/${{ github.repository }}.git bookmynurse-devops
+              git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git bookmynurse-devops
             fi
             
             # Navigate to the project directory and pull the latest changes
@@ -111,12 +105,22 @@ jobs:
             echo "Verifying project structure..."
             if [ ! -d "k8s" ]; then
               echo "ERROR: k8s directory not found!"
+              ls -la
               exit 1
             fi
             
             if [ ! -d "k8s/backend" ] || [ ! -d "k8s/frontend" ] || [ ! -d "k8s/ingress" ]; then
               echo "ERROR: Required k8s subdirectories not found!"
               ls -la k8s/
+              exit 1
+            fi
+            
+            # Verify required files exist
+            if [ ! -f "k8s/backend/deployment.yaml" ] || [ ! -f "k8s/frontend/deployment.yaml" ] || [ ! -f "k8s/ingress/ingress.yaml" ]; then
+              echo "ERROR: Required k8s manifest files not found!"
+              echo "Backend deployment: $(ls -la k8s/backend/deployment.yaml 2>/dev/null || echo 'MISSING')"
+              echo "Frontend deployment: $(ls -la k8s/frontend/deployment.yaml 2>/dev/null || echo 'MISSING')"
+              echo "Ingress: $(ls -la k8s/ingress/ingress.yaml 2>/dev/null || echo 'MISSING')"
               exit 1
             fi
             
