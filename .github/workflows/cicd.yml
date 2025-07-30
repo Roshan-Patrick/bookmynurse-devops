@@ -90,29 +90,42 @@ jobs:
         run: |
           # First, copy the repository to the production server
           echo "Copying repository to production server..."
+          echo "=== Current directory contents ==="
+          ls -la
+          echo "=== k8s directory contents ==="
+          ls -la k8s/ || echo "k8s directory not found"
+          echo "=== Creating tar archive ==="
           tar -czf repo.tar.gz --exclude='.git' .
+          echo "=== Archive created, size: ==="
+          ls -lh repo.tar.gz
+          echo "=== Archive contents ==="
+          tar -tzf repo.tar.gz | head -20
           scp -P ${{ secrets.PRODUCTION_SSH_PORT }} -o StrictHostKeyChecking=no repo.tar.gz root@${{ secrets.PRODUCTION_IP }}:/root/
           
           # SSH to production server and deploy Kubernetes manifests
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << 'EOF'
-            # Extract the repository if it doesn't exist
-            if [ ! -d "/root/bookmynurse-devops" ]; then
-              echo "Extracting repository..."
-              cd /root
-              tar -xzf repo.tar.gz -C /root/
-              mv /root/* /root/bookmynurse-devops/ 2>/dev/null || true
-              rm -f repo.tar.gz
-            else
-              echo "Updating existing repository..."
-              cd /root
-              rm -rf bookmynurse-devops
-              tar -xzf repo.tar.gz -C /root/
-              mv /root/* /root/bookmynurse-devops/ 2>/dev/null || true
-              rm -f repo.tar.gz
-            fi
+            # Extract the repository
+            echo "Extracting repository..."
+            cd /root
+            rm -rf bookmynurse-devops
+            mkdir -p bookmynurse-devops
+            tar -xzf repo.tar.gz -C bookmynurse-devops/
+            rm -f repo.tar.gz
             
             # Navigate to the project directory
             cd /root/bookmynurse-devops
+            
+            # Debug: Show what was extracted
+            echo "=== Extracted files ==="
+            ls -la
+            echo "=== k8s directory contents ==="
+            ls -la k8s/ || echo "k8s directory not found"
+            echo "=== backend directory contents ==="
+            ls -la k8s/backend/ || echo "backend directory not found"
+            echo "=== frontend directory contents ==="
+            ls -la k8s/frontend/ || echo "frontend directory not found"
+            echo "=== ingress directory contents ==="
+            ls -la k8s/ingress/ || echo "ingress directory not found"
             
             # Verify required directories exist
             echo "Verifying project structure..."
