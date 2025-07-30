@@ -77,9 +77,9 @@ spec:
             - -p$(MYSQL_ROOT_PASSWORD)
             - -e
             - "SELECT 1"
-          initialDelaySeconds: 5
-          periodSeconds: 2
-          timeoutSeconds: 1
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
         resources:
           requests:
             memory: "512Mi"
