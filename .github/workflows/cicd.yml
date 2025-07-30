@@ -79,6 +79,24 @@ jobs:
           target_host_group: "${ENVIRONMENT}"
           EOF
 
+      - name: Prepare repository archive
+        run: |
+          echo "=== Current directory contents ==="
+          ls -la
+          echo "=== k8s directory contents ==="
+          ls -la k8s/ || echo "k8s directory not found"
+          echo "=== Creating targeted tar archive ==="
+          # Create archive with only necessary files to avoid tar errors
+          tar -czf repo.tar.gz --exclude='.git' k8s/ backend/ frontend/ ansible/ .github/ README.md .gitignore
+          echo "=== Archive created, size: ==="
+          ls -lh repo.tar.gz
+          echo "=== Archive contents ==="
+          tar -tzf repo.tar.gz | head -20
+
+      - name: Copy repository to production server
+        run: |
+          scp -P ${{ secrets.PRODUCTION_SSH_PORT }} -o StrictHostKeyChecking=no repo.tar.gz root@${{ secrets.PRODUCTION_IP }}:/root/
+
       - name: Run Ansible playbook
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
@@ -87,23 +105,12 @@ jobs:
 
       - name: Deploy to Kubernetes
         if: github.event.inputs.environment == 'production' || github.ref == 'refs/heads/main'
+        env:
+          GITHUB_SHA: ${{ github.sha }}
         run: |
-          # First, copy the repository to the production server
-          echo "Copying repository to production server..."
-          echo "=== Current directory contents ==="
-          ls -la
-          echo "=== k8s directory contents ==="
-          ls -la k8s/ || echo "k8s directory not found"
-          echo "=== Creating tar archive ==="
-          tar -czf repo.tar.gz --exclude='.git' .
-          echo "=== Archive created, size: ==="
-          ls -lh repo.tar.gz
-          echo "=== Archive contents ==="
-          tar -tzf repo.tar.gz | head -20
-          scp -P ${{ secrets.PRODUCTION_SSH_PORT }} -o StrictHostKeyChecking=no repo.tar.gz root@${{ secrets.PRODUCTION_IP }}:/root/
           
           # SSH to production server and deploy Kubernetes manifests
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << EOF
             # Extract the repository
             echo "Extracting repository..."
             cd /root
@@ -116,6 +123,7 @@ jobs:
             cd /root/bookmynurse-devops
             
             # Debug: Show what was extracted
+            echo "=== Current directory: \$(pwd) ==="
             echo "=== Extracted files ==="
             ls -la
             echo "=== k8s directory contents ==="
@@ -153,8 +161,8 @@ jobs:
             echo "Project structure verified successfully!"
 
             # Update Kubernetes manifests with the new image tag
-            sed -i 's|image: emmamyers/bmn-backend:.*|image: emmamyers/bmn-backend:${{ github.sha }}|' k8s/backend/deployment.yaml
-            sed -i 's|image: emmamyers/bmn-frontend:.*|image: emmamyers/bmn-frontend:${{ github.sha }}|' k8s/frontend/deployment.yaml
+            sed -i "s|image: emmamyers/bmn-backend:.*|image: emmamyers/bmn-backend:${GITHUB_SHA}|" k8s/backend/deployment.yaml
+            sed -i "s|image: emmamyers/bmn-frontend:.*|image: emmamyers/bmn-frontend:${GITHUB_SHA}|" k8s/frontend/deployment.yaml
 
             # Create namespace if not exists
             kubectl create namespace bookmynurse --dry-run=client -o yaml | kubectl apply -f -
