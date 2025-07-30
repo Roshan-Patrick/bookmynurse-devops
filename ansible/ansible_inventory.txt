@@ -15,7 +15,7 @@ app_name=bookmynurse
 app_env=production
 
 # Kubernetes configuration
-k8s_version=1.28
+k8s_version=1.30
 k8s_pod_network_cidr=10.244.0.0/16
 
 # Docker configuration
@@ -42,7 +42,7 @@ app_name=bookmynurse-test
 app_env=testing
 
 # Kubernetes configuration
-k8s_version=1.28
+k8s_version=1.30
 k8s_pod_network_cidr=10.244.0.0/16
 
 # Docker configuration

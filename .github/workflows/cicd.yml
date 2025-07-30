@@ -96,9 +96,31 @@ jobs:
         run: |
           # SSH to production server and deploy Kubernetes manifests
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << 'EOF'
+            # Check if project directory exists, if not clone it
+            if [ ! -d "/root/bookmynurse-devops" ]; then
+              echo "Project directory not found. Cloning repository..."
+              cd /root
+              git clone https://github.com/${{ github.repository }}.git bookmynurse-devops
+            fi
+            
             # Navigate to the project directory and pull the latest changes
             cd /root/bookmynurse-devops
-            git pull
+            git pull origin main
+            
+            # Verify required directories exist
+            echo "Verifying project structure..."
+            if [ ! -d "k8s" ]; then
+              echo "ERROR: k8s directory not found!"
+              exit 1
+            fi
+            
+            if [ ! -d "k8s/backend" ] || [ ! -d "k8s/frontend" ] || [ ! -d "k8s/ingress" ]; then
+              echo "ERROR: Required k8s subdirectories not found!"
+              ls -la k8s/
+              exit 1
+            fi
+            
+            echo "Project structure verified successfully!"
 
             # Update Kubernetes manifests with the new image tag
             sed -i 's|image: emmamyers/bmn-backend:.*|image: emmamyers/bmn-backend:${{ github.sha }}|' k8s/backend/deployment.yaml

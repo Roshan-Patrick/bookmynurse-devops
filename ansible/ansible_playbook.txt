@@ -10,7 +10,7 @@
   # Define all necessary variables here to ensure the playbook can run non-interactively.
   vars:
     app_name: "bookmynurse"
-    k8s_version: "1.28.1"
+    k8s_version: "1.30"
     k8s_pod_network_cidr: "10.244.0.0/16" # Default for Flannel CNI
     docker_users:
       - root
@@ -82,11 +82,18 @@
             update_cache: yes
             cache_valid_time: 3600
 
-        - name: Upgrade system packages
+        - name: Fix broken dependencies if any
+          shell: DEBIAN_FRONTEND=noninteractive apt-get install -f -y
+
+        - name: Configure any partially installed packages
+          shell: DEBIAN_FRONTEND=noninteractive dpkg --configure -a
+
+        - name: Upgrade system packages (dist-upgrade)
           apt:
             upgrade: dist
-            autoremove: yes
-            autoclean: yes
+            update_cache: yes
+          environment:
+            DEBIAN_FRONTEND: noninteractive
 
         - name: Install required packages
           apt:
@@ -119,15 +126,34 @@
               - runc
             state: absent
 
-        - name: Add Docker GPG key
-          apt_key:
+        - name: Download Docker GPG key
+          get_url:
             url: https://download.docker.com/linux/ubuntu/gpg
-            state: present
+            dest: /usr/share/keyrings/docker-archive-keyring.gpg
+            mode: '0644'
 
-        - name: Add Docker repository
+        - name: Remove ALL conflicting Docker apt repository entries (before adding correct one)
+          file:
+            path: "/etc/apt/sources.list.d/docker.list"
+            state: absent
+
+        - name: Remove Docker repo from /etc/apt/sources.list
+          lineinfile:
+            path: /etc/apt/sources.list
+            regexp: '^deb .*download.docker.com.*$'
+            state: absent
+
+        - name: Remove old Docker apt repository if present
           apt_repository:
             repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+            state: absent
+            filename: 'docker'
+
+        - name: Add Docker apt repository
+          apt_repository:
+            repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
             state: present
+            filename: 'docker'
 
         - name: Install Docker
           apt:
@@ -167,7 +193,7 @@
         - name: Disable swap
           shell: |
             swapoff -a
-            sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+            sed -i '/ swap / s/^\\(.*\\)$/#\\1/g' /etc/fstab
 
         - name: Load kernel modules
           modprobe:
@@ -193,22 +219,29 @@
               net.ipv4.ip_forward                 = 1
           notify: reload sysctl
 
-        - name: Add Kubernetes repository key
-          apt_key:
-            url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-            state: present
+        - name: Remove legacy Kubernetes repo source if present
+          file:
+            path: /etc/apt/sources.list.d/kubernetes.list
+            state: absent
 
-        - name: Add Kubernetes repository
+        - name: Download Kubernetes GPG key
+          get_url:
+            url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
+            dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+            mode: '0644'
+
+        - name: Add Kubernetes apt repository
           apt_repository:
-            repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+            repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /"
             state: present
+            filename: 'kubernetes.list'
 
         - name: Install Kubernetes components
           apt:
             name:
-              - kubelet={{ k8s_version }}*
-              - kubeadm={{ k8s_version }}*
-              - kubectl={{ k8s_version }}*
+                - "kubelet={{ k8s_version }}.*"
+                - "kubeadm={{ k8s_version }}.*"
+                - "kubectl={{ k8s_version }}.*"
             state: present
             update_cache: yes
 
@@ -333,7 +366,7 @@
             policy: deny
             direction: incoming
 
-        - name: Configure UFW rules
+        - name: Configure basic UFW rules
           ufw:
             rule: allow
             port: "{{ item }}"
@@ -343,7 +376,30 @@
             - "80"
             - "443"
             - "6443"
-            - "30000:32767"
+
+        - name: Check if NodePort TCP rule exists
+          shell: ufw status numbered | grep "30000:32767/tcp" || echo "NOT_FOUND"
+          register: tcp_rule_check
+          changed_when: false
+
+        - name: Allow Kubernetes NodePort range (TCP)
+          ufw:
+            rule: allow
+            port: "30000:32767"
+            proto: tcp
+          when: "'NOT_FOUND' in tcp_rule_check.stdout"
+
+        - name: Check if NodePort UDP rule exists
+          shell: ufw status numbered | grep "30000:32767/udp" || echo "NOT_FOUND"
+          register: udp_rule_check
+          changed_when: false
+
+        - name: Allow Kubernetes NodePort range (UDP)
+          ufw:
+            rule: allow
+            port: "30000:32767"
+            proto: udp
+          when: "'NOT_FOUND' in udp_rule_check.stdout"
 
         - name: Allow Docker subnet
           ufw:
