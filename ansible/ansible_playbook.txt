@@ -254,6 +254,23 @@
             - kubeadm
             - kubectl
 
+        - name: Check disk space and memory before kubeadm
+          shell: |
+            df -h
+            free -m
+          register: sys_resources
+
+        - name: Debug system resources
+          debug:
+            var: sys_resources.stdout_lines
+
+        - name: Reset any existing Kubernetes cluster
+          shell: |
+            kubeadm reset -f || true
+            systemctl restart docker || true
+            systemctl restart kubelet || true
+          ignore_errors: yes
+
         - name: Initialize Kubernetes cluster
           command: kubeadm init --pod-network-cidr={{ k8s_pod_network_cidr }}
           register: kubeadm_output
@@ -261,7 +278,12 @@
 
         - name: Debug kubeadm output
           debug:
-            msg: "Kubeadm output: {{ kubeadm_output.stdout_lines }}"
+            msg: "Kubeadm stdout: {{ kubeadm_output.stdout_lines }}"
+          when: kubeadm_output.rc != 0
+
+        - name: Debug kubeadm error
+          debug:
+            msg: "Kubeadm stderr: {{ kubeadm_output.stderr_lines }}"
           when: kubeadm_output.rc != 0
 
         - name: Create .kube directory
@@ -381,6 +403,7 @@
             - "80"
             - "443"
             - "6443"
+            - "10250"
 
         - name: Check if NodePort TCP rule exists
           shell: ufw status numbered | grep "30000:32767/tcp" || echo "NOT_FOUND"
