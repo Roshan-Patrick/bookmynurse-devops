@@ -257,7 +257,12 @@
         - name: Initialize Kubernetes cluster
           command: kubeadm init --pod-network-cidr={{ k8s_pod_network_cidr }}
           register: kubeadm_output
-          failed_when: false
+          failed_when: kubeadm_output.rc != 0
+
+        - name: Debug kubeadm output
+          debug:
+            msg: "Kubeadm output: {{ kubeadm_output.stdout_lines }}"
+          when: kubeadm_output.rc != 0
 
         - name: Create .kube directory
           file:
