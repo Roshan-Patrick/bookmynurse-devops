@@ -250,17 +250,6 @@
             - docker
             - containerd
 
-        - name: Verify CRI is working
-          shell: |
-            crictl info
-            echo "CRI verification completed"
-          register: cri_verification
-          ignore_errors: yes
-
-        - name: Debug CRI verification
-          debug:
-            var: cri_verification
-
         - name: Add users to docker group
           user:
             name: "{{ item }}"
@@ -333,13 +322,6 @@
                 - "kubectl={{ k8s_version }}.*"
             state: present
             update_cache: yes
-
-        - name: Install crictl manually
-          shell: |
-            VERSION="v1.30.0"
-            wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
-            sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
-            rm -f crictl-$VERSION-linux-amd64.tar.gz
 
         - name: Hold Kubernetes packages
           dpkg_selections:
@@ -449,9 +431,7 @@
         - name: Install Nginx Ingress Controller
           shell: |
             kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/baremetal/deploy.yaml
-            sed -i 's/hostPort: 80/hostPort: 8080/g' /tmp/ingress-deploy.yaml
-            sed -i 's/hostPort: 443/hostPort: 8443/g' /tmp/ingress-deploy.yaml
-            kubectl apply -f /tmp/ingress-deploy.yaml
+            kubectl patch service ingress-nginx-controller -n ingress-nginx --type='json' -p='[{"op": "replace", "path": "/spec/ports/0/port", "value":8080}, {"op": "replace", "path": "/spec/ports/1/port", "value":8443}]'
           when: kubeadm_output.rc == 0
 
         - name: Wait for Nginx Ingress Controller to be ready
