@@ -44,6 +44,8 @@ spec:
         volumeMounts:
         - name: mysql-init-scripts
           mountPath: /docker-entrypoint-initdb.d
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
       containers:
       - name: mysql
         image: mysql:8.0
