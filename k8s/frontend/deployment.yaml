@@ -11,7 +11,7 @@ metadata:
     app: frontend
     tier: web
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
@@ -27,7 +27,7 @@ spec:
         image: emmamyers/bmn-frontend:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 8080
           name: http
         # Health checks for Nginx
         livenessProbe:
