@@ -33,14 +33,14 @@ spec:
         livenessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 8080
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /
-            port: 80
+            port: 8080
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 3
@@ -62,8 +62,13 @@ spec:
           mountPath: /var/cache/nginx
         - name: nginx-pid
           mountPath: /var/run
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/conf.d
       volumes:
       - name: nginx-cache
         emptyDir: {}
       - name: nginx-pid
         emptyDir: {}
+      - name: nginx-config-volume
+        configMap:
+          name: frontend-nginx-config
