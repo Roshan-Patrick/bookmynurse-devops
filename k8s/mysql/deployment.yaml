@@ -22,30 +22,8 @@ spec:
         app: mysql
         tier: database
     spec:
-      initContainers:
-      - name: init-db
-        image: mysql:8.0
-        command:
-        - "bash"
-        - "-c"
-        - |
-          echo "Waiting for MySQL to be ready..."
-          until mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1"; do
-            sleep 2
-          done
-          echo "MySQL is ready. Loading data..."
-          mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" bookmynurse < /docker-entrypoint-initdb.d/init-db.sql
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: mysql-root-password
-        volumeMounts:
-        - name: mysql-init-scripts
-          mountPath: /docker-entrypoint-initdb.d
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
+      # Removed init container to resolve circular dependency
+      # MySQL will automatically load SQL files from /docker-entrypoint-initdb.d/
       containers:
       - name: mysql
         image: mysql:8.0
