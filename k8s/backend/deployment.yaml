@@ -11,6 +11,8 @@ metadata:
     app: backend
     tier: api
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
@@ -82,7 +84,7 @@ spec:
           failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /ready
+            path: /health
             port: 3000
           initialDelaySeconds: 5
           periodSeconds: 5

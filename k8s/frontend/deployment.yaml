@@ -11,6 +11,8 @@ metadata:
     app: frontend
     tier: web
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
