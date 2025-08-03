@@ -40,8 +40,8 @@ spec:
             port:
               number: 30008
       # Health check for backend - specific path
-      - path: /health
-        pathType: Exact
+      - path: /(health)
+        pathType: Prefix
         backend:
           service:
             name: backend-service
@@ -49,7 +49,7 @@ spec:
               number: 30008
       # Frontend routes - catch all other paths
       - path: /(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: frontend-service
