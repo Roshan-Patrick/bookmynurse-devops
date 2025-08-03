@@ -42,13 +42,13 @@ spec:
         image: emmamyers/bmn-backend:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 3000
+        - containerPort: 30008
           name: http
         env:
         - name: NODE_ENV
           value: "production"
         - name: PORT
-          value: "3000"
+          value: "30008"
         - name: DB_HOST
           value: "mysql-service"
         - name: DB_PORT
@@ -77,7 +77,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 3000
+            port: 30008
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -85,7 +85,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /health
-            port: 3000
+            port: 30008
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 3
