@@ -39,6 +39,14 @@ spec:
             name: backend-service
             port:
               number: 3000
+      # Health check for backend - specific path
+      - path: /health
+        pathType: Exact
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 3000
       # Frontend routes - catch all other paths
       - path: /(.*)
         pathType: Prefix
