@@ -167,8 +167,14 @@ jobs:
             # Create namespace if not exists
             kubectl create namespace bookmynurse --dry-run=client -o yaml | kubectl apply -f -
             
+            # Ensure /mnt/data directory exists for PersistentVolume
+            echo "Ensuring /mnt/data directory exists..."
+            sudo mkdir -p /mnt/data
+            sudo chmod 755 /mnt/data
+            
             # Apply all Kubernetes manifests
             kubectl apply -f k8s/namespace/ -n bookmynurse
+            kubectl apply -f k8s/storage/ -n bookmynurse # Apply storage infrastructure
             kubectl apply -f k8s/secrets/ -n bookmynurse
             kubectl apply -f k8s/mysql/ -n bookmynurse
             kubectl apply -f k8s/backend/ -n bookmynurse
