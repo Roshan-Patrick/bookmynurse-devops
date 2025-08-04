@@ -31,10 +31,9 @@ npm test
 ```
 
 ## Architecture
-- **Frontend**: React/Vue.js with Nginx
+- **Frontend**: Angular with Nginx
 - **Backend**: Node.js with Express
 - **Database**: MySQL 8.0
 - **Orchestration**: Kubernetes
 - **CI/CD**: GitHub Actions
 - **Monitoring**: Prometheus + Grafana
-# Redeploy

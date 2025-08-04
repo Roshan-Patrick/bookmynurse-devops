@@ -3,18 +3,22 @@ require("dotenv").config();
 const Regis = require('../models/nursingRegistration.model');
 const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false, // Prevent SSL certificate issues
-  },
-});
+// Create transporter only if SMTP configuration is available
+let transporter = null;
+if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT || 587,
+    secure: false, // Use TLS instead of SSL
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false, // Prevent SSL certificate issues
+    },
+  });
+}
 
 
 // Handle user registration
@@ -48,40 +52,44 @@ const nursingController = {
       const registrationId = await Regis.insertRegistration(registrationData);
 
       // Try to send email, but don't let it affect the registration process
-      try {
-        const mailOptions = {
-          from: process.env.SMTP_FROM || '"ResQ Consultants" <noreply@bookmynurse.com>',
-          to: email,
-          subject: "Nurse Registration Acknowledgment - BookMyNurse",
-          html: `<p>Dear Sir/Madam,</p>
-                 <p><b>Greetings from BookMyNurse.Com</b></p>
-                 <p>Thanks for registering with <b>BookMyNurse.Com</b>. Our operations team will get back to you shortly for verification.</p>
-                 <p>In the meantime, please download our <b>BookMyNurse</b> mobile app to stay connected with us.</p>
-                 <p><b>URL:</b> <a href="https://drive.google.com/file/d/1jnbBn6TMOeyZ2WScG5Ikg3Dm84mretrk/view?usp=sharing" target="_blank">Download App</a></p>
-                 <p><b>QR Code:</b></p>
-                 <p><img src="cid:qrcode" alt="QR Code" style="width:150px; height:150px;"></p>
-                 <p>Regards,</p>
-                 <p><b>Team BookMyNurse.Com</b></p>`,
-          headers: {
-            "X-Priority": "1 (Highest)",
-            "X-MSMail-Priority": "High",
-            Importance: "High",
-          },
-          attachments: [
-            {
-              filename: 'bmn-app-qr.png',
-              path: 'assets/img/bmn-app-qr.png',
-              cid: 'qrcode' // This CID is used in the email body
-            }
-          ]
-        };
+      if (transporter) {
+        try {
+          const mailOptions = {
+            from: process.env.SMTP_FROM || '"ResQ Consultants" <noreply@bookmynurse.com>',
+            to: email,
+            subject: "Nurse Registration Acknowledgment - BookMyNurse",
+            html: `<p>Dear Sir/Madam,</p>
+                   <p><b>Greetings from BookMyNurse.Com</b></p>
+                   <p>Thanks for registering with <b>BookMyNurse.Com</b>. Our operations team will get back to you shortly for verification.</p>
+                   <p>In the meantime, please download our <b>BookMyNurse</b> mobile app to stay connected with us.</p>
+                   <p><b>URL:</b> <a href="https://drive.google.com/file/d/1jnbBn6TMOeyZ2WScG5Ikg3Dm84mretrk/view?usp=sharing" target="_blank">Download App</a></p>
+                   <p><b>QR Code:</b></p>
+                   <p><img src="cid:qrcode" alt="QR Code" style="width:150px; height:150px;"></p>
+                   <p>Regards,</p>
+                   <p><b>Team BookMyNurse.Com</b></p>`,
+            headers: {
+              "X-Priority": "1 (Highest)",
+              "X-MSMail-Priority": "High",
+              Importance: "High",
+            },
+            attachments: [
+              {
+                filename: 'bmn-app-qr.png',
+                path: 'assets/img/bmn-app-qr.png',
+                cid: 'qrcode' // This CID is used in the email body
+              }
+            ]
+          };
 
-        await transporter.sendMail(mailOptions);
-        console.log("Acknowledgment Email Sent");
-      } catch (emailError) {
-        // Log the email error but don't fail the registration
-        console.error('Failed to send registration email:', emailError);
-        // Continue with the registration process
+          await transporter.sendMail(mailOptions);
+          console.log("Acknowledgment Email Sent");
+        } catch (emailError) {
+          // Log the email error but don't fail the registration
+          console.error('Failed to send registration email:', emailError);
+          // Continue with the registration process
+        }
+      } else {
+        console.log('SMTP not configured, skipping email notification');
       }
 
       res.status(201).json({ 
