@@ -9,7 +9,7 @@ export const environment = {
   production: false,
   // 'P&6J@2TDP&#%'
   // APIEndpoint: "http://localhost:3000/"
-  APIEndpoint: "https://app.bookmynurse.com/api/" 
+  APIEndpoint: "/api/"
   // APIEndpoint: "http://103.91.186.102/api/" 
 };
 /*
