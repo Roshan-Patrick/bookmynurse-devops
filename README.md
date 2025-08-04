@@ -37,3 +37,4 @@ npm test
 - **Orchestration**: Kubernetes
 - **CI/CD**: GitHub Actions
 - **Monitoring**: Prometheus + Grafana
+# Redeploy
