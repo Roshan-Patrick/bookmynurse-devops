@@ -139,6 +139,15 @@
             state: started
             enabled: yes
 
+        - name: Verify Docker installation
+          command: docker --version
+          register: docker_version
+          changed_when: false
+
+        - name: Display Docker version
+          debug:
+            msg: "Docker installed: {{ docker_version.stdout }}"
+
     # Phase 4: Kubernetes Installation
     - name: Phase 4 - Kubernetes Installation
       block:
