@@ -1,21 +1,13 @@
-# =============================================================================
-# k8s/mysql/service.yaml
-# MySQL Service (ClusterIP for internal access)
-# =============================================================================
 apiVersion: v1
 kind: Service
 metadata:
   name: mysql-service
   namespace: bookmynurse
-  labels:
-    app: mysql
-    tier: database
 spec:
-  type: ClusterIP
-  ports:
-  - port: 3306
-    targetPort: 3306
-    protocol: TCP
+  clusterIP: None
   selector:
     app: mysql
-    tier: database
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

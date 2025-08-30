@@ -104,8 +104,13 @@ spec:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
         volumeMounts:
+        - name: uploads-storage
+          mountPath: /app/uploads
         - name: temp-volume
           mountPath: /tmp
       volumes:
+      - name: uploads-storage
+        persistentVolumeClaim:
+          claimName: uploads-pvc
       - name: temp-volume
         emptyDir: {}

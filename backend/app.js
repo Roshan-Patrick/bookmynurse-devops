@@ -22,8 +22,15 @@ app.use('/api/nursing', nurseRoutes);
 app.use('/api/register', registrationRoutes);
 app.use('/api/clientauth',clientauthRoutes)
 
-// Serve uploaded files as static
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve uploaded files as static                                            │     
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve uploaded files based on environment
+const uploadsPath = process.env.NODE_ENV === 'production' 
+    ? '/app/uploads' 
+    : path.join(__dirname, 'uploads');
+
+app.use('/api/uploads', express.static(uploadsPath));
 
 app.get('/health', (req, res) => {
     res.json({ status: 'healthy', timestamp: new Date().toISOString() });

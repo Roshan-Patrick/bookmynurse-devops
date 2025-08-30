@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-
+import { environment } from '../../../../environments/environment';
 
 declare var $: any;
 
@@ -142,7 +142,7 @@ getAllApproved() {
       .filter((user: any) => user.availability !== 'Pending') 
       .map((user: any) => ({
         ...user,
-        photoUrl: `https://app.bookmynurse.com/api/${user.file_path}`,
+        photoUrl: `${environment.APIEndpoint}/${user.file_path}`,
         charges: user.charges || null,
         languages: Array.isArray(user.languages) ? user.languages : [],
         serviceopt: Array.isArray(user.serviceopt) ? user.serviceopt : [],
@@ -209,5 +209,3 @@ getAllApproved() {
   // }
 
   }
-
-

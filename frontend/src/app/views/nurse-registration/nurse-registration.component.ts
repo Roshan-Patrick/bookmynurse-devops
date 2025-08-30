@@ -6,6 +6,7 @@ import { IconModule } from '@coreui/icons-angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-nurse-registration',
@@ -51,7 +52,7 @@ constructor(private nurseService:NurseRegService, private router: Router,private
     this.nurseService.nurseRegistered().subscribe((res:any)=>{
       this.users = res.data.map((user: any) => ({
         ...user,
-        photoUrl: `https://app.bookmynurse.com/api/${user.file_path}`, 
+        photoUrl: `${environment.APIEndpoint}/${user.file_path}`,
         // photoUrl: `http://localhost:3000/${user.file_path}`,
       }));
     })

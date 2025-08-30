@@ -6,6 +6,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { Renderer2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-page404',
@@ -136,7 +137,7 @@ export class Page404Component {
         // console.log(res)
         this.users = res.data.map((user: any) => ({
           ...user,
-          photoUrl: `https://app.bookmynurse.com/api/${user.file_path}`, 
+          photoUrl: `${environment.APIEndpoint}/${user.file_path}`,
           // photoUrl: `http://localhost:3000/${user.file_path}`,
         }));
       })
