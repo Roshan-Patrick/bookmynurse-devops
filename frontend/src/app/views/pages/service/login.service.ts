@@ -15,7 +15,7 @@ export class LoginService {
   constructor(private http: HttpClient, private router: Router) { }
 
   adminLogin(register: any): Observable<any> {
-    return this.http.post(this.baseUrl + 'auth/login', register, { headers: this.headers })
+    return this.http.post(this.baseUrl + '/auth/login', register, { headers: this.headers })
       .pipe(
         catchError(this.errorHandler)
       );
@@ -25,7 +25,7 @@ export class LoginService {
   
 
   clientLogin(register: any): Observable<any> {
-    return this.http.post(this.baseUrl + 'clientauth/login', register, { headers: this.headers })
+    return this.http.post(this.baseUrl + '/clientauth/login', register, { headers: this.headers })
       .pipe(
         catchError(this.errorHandler)
       );   
@@ -33,7 +33,7 @@ export class LoginService {
   }
 
   clientRegistration(register: any): Observable<any> {
-    return this.http.post(this.baseUrl + 'clientauth/register', register, { headers: this.headers })
+    return this.http.post(this.baseUrl + '/clientauth/register', register, { headers: this.headers })
       .pipe(
         catchError(this.errorHandler)
       );   

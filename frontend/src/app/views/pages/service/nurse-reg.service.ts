@@ -15,14 +15,14 @@ export class NurseRegService {
   constructor(private http: HttpClient, private router: Router) { }
 
   nurseRegistration(register: any): Observable<any> {
-    return this.http.post(this.baseUrl + 'nursing/bookings', register, { headers: this.headers })
+    return this.http.post(this.baseUrl + '/nursing/bookings', register, { headers: this.headers })
       .pipe(
         catchError(this.errorHandler)
       );
   }
   getAllRegistered(approvalStatus?: string): Observable<any> {
 
-    let url = `${this.baseUrl}nursing/getBookings`;
+    let url = `${this.baseUrl}/nursing/getBookings`;
     if (approvalStatus) {
       url += `?approval_status=${approvalStatus}`;
     }
@@ -33,21 +33,21 @@ export class NurseRegService {
   }
 
   updateBooking(data: any): Observable<any> {
-    return this.http.put(this.baseUrl + 'nursing/updateBooking', data, { headers: this.headers })
+    return this.http.put(this.baseUrl + '/nursing/updateBooking', data, { headers: this.headers })
       .pipe(
         catchError(this.errorHandler)
       );
   }
 
   deleteBooking(id: any): Observable<any> {
-    return this.http.delete(this.baseUrl + `nursing/deleteBookings/${id}`, { headers: this.headers })
+    return this.http.delete(this.baseUrl + `/nursing/deleteBookings/${id}`, { headers: this.headers })
       .pipe(
         catchError(this.errorHandler)
       );
   }
 
   updateNurseApprovalStatus(id: number, status: 'Ongoing' | 'Complete'): Observable<any> {
-    return this.http.put(this.baseUrl + 'nursing/updateNurseApproval', { id, status })
+    return this.http.put(this.baseUrl + '/nursing/updateNurseApproval', { id, status })
       .pipe(
         catchError(this.errorHandler)
       );
@@ -55,7 +55,7 @@ export class NurseRegService {
   }
 
   nurseRegistrationDetails(formData: FormData): Observable<any> {
-    return this.http.post(this.baseUrl + 'register/registerNurse', formData)
+    return this.http.post(this.baseUrl + '/register/registerNurse', formData)
       .pipe(
         catchError(this.errorHandler)
       );
@@ -63,7 +63,7 @@ export class NurseRegService {
 
   nurseRegistered(approvalStatus?: string): Observable<any> {
 
-    let url = `${this.baseUrl}register/registrations`;
+    let url = `${this.baseUrl}/register/registrations`;
     if (approvalStatus) {
       url += `?approval_status=${approvalStatus}`;
     }
@@ -76,7 +76,7 @@ export class NurseRegService {
 
 
   updateApprovalStatus(id: number, status: 'Approved' | 'Rejected'): Observable<any> {
-    return this.http.put(this.baseUrl + 'register/updateApproval', { id, status })
+    return this.http.put(this.baseUrl + '/register/updateApproval', { id, status })
       .pipe(
         catchError(this.errorHandler)
       );
@@ -86,7 +86,7 @@ export class NurseRegService {
 
 
   updateAvailableStatus(id: number, status: 'Available' | 'Busy'): Observable<any> {
-    return this.http.put(this.baseUrl + 'register/updateAvailable', { id, status })
+    return this.http.put(this.baseUrl + '/register/updateAvailable', { id, status })
       .pipe(
         catchError(this.errorHandler)
       );
@@ -94,35 +94,35 @@ export class NurseRegService {
   }
 
   setChargesType(id: string, chargesType: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}register/set-charges-type/${id}`, { chargesType }, { headers: this.headers })
+    return this.http.put(`${this.baseUrl}/register/set-charges-type/${id}`, { chargesType }, { headers: this.headers })
       .pipe(catchError(this.errorHandler));
   }
 
 
   // ✅ Revert approval status to "Pending"
   revertApprovalStatus(id: number): Observable<any> {
-    return this.http.put(this.baseUrl + 'register/revertApproval', { id })
+    return this.http.put(this.baseUrl + '/register/revertApproval', { id })
       .pipe(
         catchError(this.errorHandler)
       );
   }
 
   editNurse(id: any, formData: any): Observable<any> {
-    return this.http.put(this.baseUrl + `register/editNurse/${id}`, formData).pipe(
+    return this.http.put(this.baseUrl + `/register/editNurse/${id}`, formData).pipe(
       catchError(this.errorHandler)
     );
   }
 
   setNurseCharges(id: string, charges: number, charges_type: string) {
-    return this.http.patch(this.baseUrl + `register/${id}/charges`, { charges, charges_type });
+    return this.http.patch(this.baseUrl + `/register/${id}/charges`, { charges, charges_type });
   }
 
   addNurseDetails(nurse: any) {
-    return this.http.patch(this.baseUrl + `register/update-nurse`, nurse);
+    return this.http.patch(this.baseUrl + `/register/update-nurse`, nurse);
   }
 
   getAllNurseDetails(id: number) {
-    return this.http.get(this.baseUrl + `register/nurse-details/${id}`);
+    return this.http.get(this.baseUrl + `/register/nurse-details/${id}`);
   }
 
 
