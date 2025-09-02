@@ -8,7 +8,6 @@ metadata:
   name: mysql-init-scripts
   namespace: bookmynurse
 data:
-  # Add your nursingBackend.sql content here
   init-db.sql: |
     /*
     SQLyog Community v13.3.0 (64 bit)
@@ -18,15 +17,16 @@ data:
 
     /*!40101 SET NAMES utf8 */;
 
-    /*!40101 SET SQL_MODE='''''';
+    /*!40101 SET SQL_MODE=''*/;
 
     /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
     /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-    /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='''''NO_AUTO_VALUE_ON_ZERO'''' */;
+    /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
     /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-    CREATE DATABASE /*!32312 IF NOT EXISTS*/`bookmynurse` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION=''''N'''' */;
 
-    USE `bookmynurse`;
+    -- The database 'bookmynurse' is created by the MySQL container's entrypoint
+    -- script based on the MYSQL_DATABASE environment variable.
+    -- Tables will be created directly within that database.
 
     /*Table structure for table `bookings` */
 
@@ -42,15 +42,21 @@ data:
       `preferences` varchar(50) NOT NULL,
       `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
       `enquiryno` varchar(50) NOT NULL,
-      PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+      `nurse_id` int DEFAULT NULL,
+      `approval_status` enum('Ongoing','Complete') DEFAULT 'Ongoing',
+      PRIMARY KEY (`id`),
+      KEY `fk_nurse` (`nurse_id`),
+      CONSTRAINT `fk_nurse` FOREIGN KEY (`nurse_id`) REFERENCES `registration` (`id`) ON DELETE SET NULL
+    ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
     /*Data for the table `bookings` */
 
-    insert  into `bookings`(`id`,`name`,`mobile`,`nurseType`,`location`,`services`,`preferences`,`created_at`,`enquiryno`) values 
-    (1,''''Messi'''',''''9856325412'''',''''Male'''',''''Bangalore'''',''''Elder Care'''',''''24hrs'''',''''2025-01-06 17:45:38'''',''''ED-1747585452146''''),
-    (4,''''Neymar'''',''''9595965911'''',''''Male'''',''''Spain'''',''''Tracheostomy Patient Care'''',''''12hrs'''',''''2025-01-08 13:11:32'''',''''TP-1758652365896''''),
-    (13,''''Pedri'''',''''9857458885'''',''''Male'''',''''Madurai'''',''''Elder Care'''',''''24hrs'''',''''2025-03-19 10:52:46'''',''''ED-1742361766524'''');
+    insert  into `bookings`(`id`,`name`,`mobile`,`nurseType`,`location`,`services`,`preferences`,`created_at`,`enquiryno`,`nurse_id`,`approval_status`) values 
+    (1,'Messi','9856325412','Male','Bangalore','Elder Care','24hrs','2025-01-06 17:45:38','ED-1747585452146',NULL,'Ongoing'),
+    (2,'Oasys','9854563254','Male','Chennai','Travel Nurse','12hrs','2025-01-07 12:20:40','TN-1785854125244',NULL,'Ongoing'),
+    (4,'Neymar','9595965911','Male','Spain','Tracheostomy Patient Care','12hrs','2025-01-08 13:11:32','TP-1758652365896',NULL,'Ongoing'),
+    (13,'Pedri','9857458885','Male','Madurai','Elder Care','24hrs','2025-03-19 10:52:46','ED-1742361766524',NULL,'Complete'),
+    (19,'Roshan Patrick','9856525635','Male','Chennai','Bedridden Patient Care','12hrs','2025-05-23 16:04:00','BP-1747996440682',7,'Complete');
 
     /*Table structure for table `clientusers` */
 
@@ -64,12 +70,19 @@ data:
       `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (`id`),
       UNIQUE KEY `email` (`email`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
     /*Data for the table `clientusers` */
 
     insert  into `clientusers`(`id`,`email`,`phone_number`,`password`,`created_at`) values 
-    (1,''''messi@gmail.com'''',''''9876543212'''',''''$2a$10$uAC220ZXQMmN5kf5DD.7BOD5fPni59.eftso9OYNV3P2qwvX03IsC'''',''''2025-03-18 23:09:16'''');
+    (1,'messi@gmail.com','9876543212','$2a$10$uAC220ZXQMmN5kf5DD.7BOD5fPni59.eftso9OYNV3P2qwvX03IsC','2025-03-18 23:09:16'),
+    (2,'roshrrcb@gmail.com','9896525254','$2a$10$xA.Ug23VPWygKsCcga.JIeAn1sA/vIzaJV28/Cj7gCsTMAZ2KwEdC','2025-03-18 23:47:10'),
+    (3,'neymar@gmail.com','9854465541','$2a$10$9UY2Uy/tpIKt2/UoQzOpAejj.cJDOp2eW7bXqb1GQbEtmlGeMsRIW','2025-03-19 11:28:21'),
+    (6,'chandru@gmail.com','6516515615','$2a$10$nXcNEAezZjU767z5XSpKbexVnK1C4kFi9DVlaypfeY1nOFVEX4rxO','2025-03-19 13:07:23'),
+    (7,'babu@gmail.com','6846465466','$2a$10$ZQ/ynUOnv4zQogPTuHKHIOd/VOxm42Z2zlAIETX2ItnbsrHlJCTFi','2025-03-19 13:09:32'),
+    (8,'naveen@gmail.com','6846416516','$2a$10$fnY35MzTcgrwdHf96Z57te3MQRrY/o/2o.rXUvIdeT68cBVXpw7PK','2025-03-19 13:10:51'),
+    (9,'shiby@gmail.com','6468468168','$2a$10$F0stLmz2w4nwtCy0eSZ2M..xPpllixd4Y18FFBs0BJ7amtTXQ9Qtm','2025-03-19 13:15:11'),
+    (10,'subbu@gmail.com','6484864688','$2a$10$53IoWpt4TiE2tAl1CHFb2uPqrsAKKaWpMl1CAdmk4I6vj4uRSay56','2025-03-19 13:16:14');
 
     /*Table structure for table `images` */
 
@@ -80,23 +93,24 @@ data:
       `file_path` varchar(255) NOT NULL,
       `uploaded_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    ) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
     /*Data for the table `images` */
 
     insert  into `images`(`id`,`file_path`,`uploaded_at`) values 
-    (10,''''uploads\1738231760637-60360103.png'''',''''2025-01-30 15:39:20''''),
-    (11,''''uploads\1738231921298-479094622.jpeg'''',''''2025-01-30 15:42:01''''),
-    (12,''''uploads\1738656037979-548052802.jpg'''',''''2025-02-04 13:30:38''''),
-    (13,''''uploads\1738674105875-7875530.jpeg'''',''''2025-02-04 18:31:45''''),
-    (14,''''uploads\1738674774770-148508176.jpeg'''',''''2025-02-04 18:42:54''''),
-    (15,''''uploads\1738734308367-513574658.jpeg'''',''''2025-02-05 11:15:08''''),
-    (16,''''uploads\1739184925861-348638238.png'''',''''2025-02-10 16:25:26''''),
-    (17,''''uploads\1739185035405-858299321.png'''',''''2025-02-10 16:27:15''''),
-    (18,''''uploads\1739790382468-517659713.jpeg'''',''''2025-02-17 16:36:22''''),
-    (19,''''uploads\1739790813365-810962880.jpeg'''',''''2025-02-17 16:43:33''''),
-    (20,''''uploads\1739877400050-637262909.jpeg'''',''''2025-02-18 16:46:40''''),
-    (21,''''uploads\1739967884464-211754781.jpg'''',''''2025-02-19 17:54:44'''');
+    (10,'uploads\\1738231760637-60360103.png','2025-01-30 15:39:20'),
+    (11,'uploads\\1738231921298-479094622.jpeg','2025-01-30 15:42:01'),
+    (12,'uploads\\1738656037979-548052802.jpg','2025-02-04 13:30:38'),
+    (13,'uploads\\1738674105875-7875530.jpeg','2025-02-04 18:31:45'),
+    (14,'uploads\\1738674774770-148508176.jpeg','2025-02-04 18:42:54'),
+    (15,'uploads\\1738734308367-513574658.jpeg','2025-02-05 11:15:08'),
+    (16,'uploads\\1739184925861-348638238.png','2025-02-10 16:25:26'),
+    (17,'uploads\\1739185035405-858299321.png','2025-02-10 16:27:15'),
+    (18,'uploads\\1739790382468-517659713.jpeg','2025-02-17 16:36:22'),
+    (19,'uploads\\1739790813365-810962880.jpeg','2025-02-17 16:43:33'),
+    (20,'uploads\\1739877400050-637262909.jpeg','2025-02-18 16:46:40'),
+    (21,'uploads\\1739967884464-211754781.jpg','2025-02-19 17:54:44'),
+    (22,'uploads\\1744265986253-140383918.png','2025-04-10 11:49:46');
 
     /*Table structure for table `registration` */
 
@@ -104,11 +118,11 @@ data:
 
     CREATE TABLE `registration` (
       `id` int NOT NULL AUTO_INCREMENT,
-      `name` varchar(255) NOT NULL DEFAULT ''''''',
+      `name` varchar(255) NOT NULL DEFAULT '',
       `aadhaar` varchar(12) NOT NULL,
       `mobile` varchar(10) NOT NULL,
       `email` varchar(255) NOT NULL,
-      `gender` enum(''''male'''',''''female'''') NOT NULL,
+      `gender` enum('male','female') NOT NULL,
       `dob` date NOT NULL,
       `education` varchar(255) NOT NULL,
       `experience` int NOT NULL,
@@ -117,25 +131,27 @@ data:
       `address` text NOT NULL,
       `base_location` varchar(255) NOT NULL,
       `image_id` int NOT NULL,
-      `approval_status` enum(''''Pending'''',''''Approved'''',''''Rejected'''') DEFAULT ''''Pending'''',
+      `approval_status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
       `serviceopt` json DEFAULT NULL,
-      `from_time` varchar(10) NOT NULL,
-      `to_time` varchar(10) NOT NULL,
-      `availability` enum(''''Available'''',''''Busy'''',''''Pending'''') DEFAULT ''''Pending'''',
+      `availability` enum('Available','Unavailable','Pending') DEFAULT 'Pending',
+      `charges` decimal(10,2) DEFAULT '0.00',
+      `charges_type` enum('per_day','per_week','per_month') DEFAULT 'per_day',
       PRIMARY KEY (`id`),
       UNIQUE KEY `aadhaar` (`aadhaar`),
       KEY `image_id` (`image_id`),
       CONSTRAINT `registration_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE
-    ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
     /*Data for the table `registration` */
 
-    insert  into `registration`(`id`,`name`,`aadhaar`,`mobile`,`email`,`gender`,`dob`,`education`,`experience`,`languages`,`specialization`,`address`,`base_location`,`image_id`,`approval_status`,`serviceopt`,`from_time`,`to_time`,`availability`) values 
-    (5,''''Messi'''',''''101452563999'''',''''9854785698'''',''''messi@gmail.com'''',''''male'''',''''1987-06-24'''',''''B.Sc.,'''',10,''''["English", "Hindi"]'''',''''Elder Care Specialist'''',''''Argentina'''',''''Barcelona'''',11,''''Pending'''',''''["24 Hours"]'''',''''9:00 AM'''',''''6:00 PM'''',''''Available''''),
-    (7,''''Alexia'''',''''985874525632'''',''''9854589658'''',''''messi@gmail.com'''',''''female'''',''''1996-08-14'''',''''B.Sc.,'''',3,''''["Tamil", "English"]'''',''''Elder Care Specialist'''',''''Nungampaakam, Chennai'''',''''Chennai'''',13,''''Approved'''',''''["12 Hours"]'''',''''8:00 AM'''',''''12:30 PM'''',''''Available''''),
-    (8,''''Ms Dhoni'''',''''857456525411'''',''''9854525632'''',''''messi.22cs@licet.ac.in'''',''''male'''',''''1981-07-07'''',''''M.Sc.,'''',7,''''["Tamil", "English", "Hindi"]'''',''''Tracheostomy Specialist'''',''''Chennai'''',''''Chennai'''',14,''''Approved'''',''''["8 Hours"]'''',''''10:00 AM'''',''''5:30 PM'''',''''Available''''),
-    (9,''''Messi'''',''''985452563254'''',''''9854565854'''',''''messi@gmail.com'''',''''male'''',''''1987-06-24'''',''''A.N.M.,'''',12,''''["Tamil", "Hindi"]'''',''''ICU Setup Specialist'''',''''Chennai'''',''''Chennai'''',15,''''Pending'''',''''["4 Hours"]'''',''''8:30 AM'''',''''5:00 PM'''',''''Pending''''),
-    (12,''''Pedri'''',''''956325425555'''',''''7854125633'''',''''service@gmail.com'''',''''male'''',''''1965-04-24'''',''''Diploma Nursing,'''',6,''''["Tamil", "Hindi"]'''',''''ICU Setup Specialist'''',''''Nungambakam'''',''''Chennai'''',19,''''Approved'''',''''["6 Hours"]'''',''''10:30 AM'''',''''7:00 PM'''',''''Busy'''');
+    insert  into `registration`(`id`,`name`,`aadhaar`,`mobile`,`email`,`gender`,`dob`,`education`,`experience`,`languages`,`specialization`,`address`,`base_location`,`image_id`,`approval_status`,`serviceopt`,`availability`,`charges`,`charges_type`) values 
+    (5,'Messi','101452563999','9854785698','messi@gmail.com','male','1987-06-24','B.Sc.,',10,'["English", "Hindi"]','Elder Care Specialist','Argentina','Barcelona',11,'Approved','["24 Hours"]','Available',5000.00,NULL),
+    (7,'Alexia','985874525632','9854589658','roshrrcb@gmail.com','female','1996-08-14','B.Sc.,',3,'["Tamil", "English"]','Elder Care Specialist','Nungampaakam, Chennai','Chennai',13,'Approved','["12 Hours"]','Available',2000.00,'per_week'),
+    (8,'Ms Dhoni','857456525411','9854525632','msdhoni@licet.ac.in','male','1981-07-07','M.Sc.,',7,'["Tamil", "English", "Hindi"]','Tracheostomy Specialist','Chennai','Chennai',14,'Approved','["8 Hours"]','Unavailable',0.00,NULL),
+    (9,'Messi','985452563254','9854565854','messi@gmail.com','male','1987-06-24','A.N.M.,',12,'["Tamil", "Hindi"]','ICU Setup Specialist','Chennai','Chennai',15,'Pending','["4 Hours"]','Pending',0.00,NULL),
+    (12,'Pedri','956325425555','7854125633','service@gmail.com','male','1965-04-24','Diploma Nursing,',6,'["Tamil", "Hindi"]','ICU Setup Specialist','Nungambakam','Chennai',19,'Approved','["6 Hours"]','Available',2500.00,NULL),
+    (13,'Roshan','677893968585','9856325412','roshrrcb@gmail.com','male','2000-10-24','Diploma Nursing,',4,'["English", "Hindi"]','ICU Setup Specialist','Nungambakam','Chennai',20,'Approved','["24 Hours"]','Available',1800.00,NULL),
+    (14,'Chandru','985632541225','8574589659','chandru.1596@gmail.com','male','1996-07-15','Diploma Nursing,',8,'["English", "Tamil", "Hindi"]','Children Care Specialist','St.Thomas Mount','Chennai',21,'Rejected','["12 Hours", "8 Hours"]','Pending',0.00,NULL);
 
     /*Table structure for table `users` */
 
@@ -145,15 +161,16 @@ data:
       `id` int NOT NULL AUTO_INCREMENT,
       `username` varchar(255) NOT NULL,
       `password` varchar(255) NOT NULL,
-      `role` enum(''''user'''',''''admin'''') NOT NULL DEFAULT ''''user'''',
+      `role` enum('admin','user') NOT NULL DEFAULT 'user',
       PRIMARY KEY (`id`),
       UNIQUE KEY `username` (`username`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
     /*Data for the table `users` */
 
     insert  into `users`(`id`,`username`,`password`,`role`) values 
-    (1,''''messi'''',''''$2a$10$oiPhWogFeRFg3nAkmJxeHO3d219repa.ahwMlD9OSE6Ixu0ewWitq'''',''''admin'''');
+    (1,'messi','$2a$10$oiPhWogFeRFg3nAkmJxeHO3d219repa.ahwMlD9OSE6Ixu0ewWitq','admin'),
+    (2,'bmn','$2a$10$uVD8VsRPc5TSYU9YeJda4uT.ahQdHs5eFrhuDcfmRTOwuVKR0Y0xe','admin');
 
     /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
     /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

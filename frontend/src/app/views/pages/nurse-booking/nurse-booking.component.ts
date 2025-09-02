@@ -142,7 +142,7 @@ getAllApproved() {
       .filter((user: any) => user.availability !== 'Pending') 
       .map((user: any) => ({
         ...user,
-        photoUrl: `${environment.APIEndpoint}/${user.file_path}`,
+        photoUrl: `${environment.APIEndpoint}/uploads/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`,
         charges: user.charges || null,
         languages: Array.isArray(user.languages) ? user.languages : [],
         serviceopt: Array.isArray(user.serviceopt) ? user.serviceopt : [],

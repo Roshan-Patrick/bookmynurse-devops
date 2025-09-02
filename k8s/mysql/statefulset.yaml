@@ -46,7 +46,8 @@ spec:
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql
             - name: mysql-initdb
-              mountPath: /docker-entrypoint-initdb.d
+              mountPath: /docker-entrypoint-initdb.d/init-db.sql
+              subPath: init-db.sql
       volumes:
         - name: mysql-initdb
           configMap:
@@ -57,6 +58,9 @@ spec:
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "local-storage"
+      selector:
+        matchLabels:
+          type: mysql-db
       resources:
         requests:
           storage: 1Gi

@@ -166,8 +166,7 @@ saveCharges() {
       console.log(res)
       this.users = res.data.map((user: any) => ({
         ...user,
-        photoUrl: `${environment.APIEndpoint}/${user.file_path}`,
-        // photoUrl: `http://localhost:3000/${user.file_path}`,
+        photoUrl: `${environment.APIEndpoint}/uploads/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`, // photoUrl: `http://localhost:3000/${user.file_path}`, 
       }));
     })
   }
