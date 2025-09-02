@@ -23,8 +23,7 @@ const nursingController = require('../controllers/nursingRegistration.controller
  *                 format: binary
  *               name:
  *                 type: string
- *               aadhaar:
- *                 type: string
+
  *               mobile:
  *                 type: string
  *               email:

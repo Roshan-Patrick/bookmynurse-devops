@@ -172,7 +172,7 @@ const nursingController = {
     try {
       const { id } = req.params;
       const {
-        name, aadhaar, mobile, email, gender, dob, education, experience,
+        name, mobile, email, gender, dob, education, experience,
         languages, specialization, address, base_location, serviceopt
       } = req.body;
 
@@ -184,7 +184,7 @@ const nursingController = {
       const parsedServiceopt = Array.isArray(serviceopt) ? JSON.stringify(serviceopt) : serviceopt;
 
       await Regis.updateNurse(id, {
-        name, aadhaar, mobile, email, gender, dob, education, experience,
+        name, mobile, email, gender, dob, education, experience,
         languages: parsedLanguages, specialization, address, base_location, serviceopt: parsedServiceopt
       });
 

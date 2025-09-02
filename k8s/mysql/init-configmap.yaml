@@ -119,7 +119,7 @@ data:
     CREATE TABLE `registration` (
       `id` int NOT NULL AUTO_INCREMENT,
       `name` varchar(255) NOT NULL DEFAULT '',
-      `aadhaar` varchar(12) NOT NULL,
+      `aadhaar` varchar(12) DEFAULT NULL,
       `mobile` varchar(10) NOT NULL,
       `email` varchar(255) NOT NULL,
       `gender` enum('male','female') NOT NULL,
