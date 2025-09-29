@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: redis-backup
+  namespace: bookmynurse
+  labels:
+    app: redis-backup
+    component: backup
+spec:
+  # Run daily at 3:00 AM (1 hour after MySQL backup)
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: redis-backup
+            image: redis:7.0-alpine
+            command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              echo "Starting Redis backup at $(date)..."
+              
+              # Create backup directory
+              mkdir -p /backup/redis
+              
+              # Generate backup filename with timestamp
+              BACKUP_FILE="/backup/redis/redis-backup-$(date +%Y%m%d-%H%M%S).rdb"
+              
+              # Trigger Redis BGSAVE to create RDB snapshot
+              echo "Triggering Redis BGSAVE..."
+              redis-cli -h redis-service -p 6379 BGSAVE
+              
+              # Wait for BGSAVE to complete
+              echo "Waiting for BGSAVE to complete..."
+              while [ "$(redis-cli -h redis-service -p 6379 LASTSAVE)" = "$(redis-cli -h redis-service -p 6379 LASTSAVE)" ]; do
+                sleep 1
+              done
+              
+              # Copy the RDB file from Redis data directory
+              echo "Copying RDB file..."
+              redis-cli -h redis-service -p 6379 --rdb $BACKUP_FILE
+              
+              # Compress the backup
+              echo "Compressing backup..."
+              gzip $BACKUP_FILE
+              
+              # Remove backups older than 7 days
+              echo "Cleaning up old backups..."
+              find /backup/redis -name "*.rdb.gz" -mtime +7 -delete
+              
+              # Show backup size
+              BACKUP_SIZE=$(du -h $BACKUP_FILE.gz | cut -f1)
+              echo "Backup completed successfully. Size: $BACKUP_SIZE"
+              echo "Backup file: $BACKUP_FILE.gz"
+              
+              # List current backups
+              echo "Current backups:"
+              ls -lh /backup/redis/
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-pvc
+          restartPolicy: OnFailure

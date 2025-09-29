@@ -1,0 +1,57 @@
+# =============================================================================
+# k8s/redis/configmap.yaml
+# Redis Configuration
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: bookmynurse
+data:
+  redis.conf: |
+    # Redis Enterprise Configuration
+    # Memory Management
+    maxmemory 256mb
+    maxmemory-policy allkeys-lru
+    
+    # RDB Persistence Configuration
+    save 900 1
+    save 300 10
+    save 60 10000
+    
+    # AOF Persistence for Enterprise Durability
+    appendonly yes
+    appendfsync everysec
+    appendfilename "appendonly.aof"
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+    
+    # Security
+    protected-mode yes
+    
+    # Performance Tuning
+    tcp-keepalive 300
+    timeout 0
+    
+    # Logging
+    loglevel notice
+    
+    # Network
+    bind 0.0.0.0
+    port 6379
+    
+    # Database
+    databases 16
+    
+    # Slow Log
+    slowlog-log-slower-than 10000
+    slowlog-max-len 128
+    
+    # Client Management
+    maxclients 10000
+    
+    # Advanced Configuration
+    hash-max-ziplist-entries 512
+    hash-max-ziplist-value 64
+    list-max-ziplist-size -2
+    list-compress-depth 0

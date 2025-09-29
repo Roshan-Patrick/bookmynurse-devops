@@ -1,0 +1,16 @@
+# =============================================================================
+# k8s/monitoring/grafana-pvc.yaml
+# Grafana Persistent Volume Claim
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-pvc
+  namespace: bookmynurse
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: local-storage

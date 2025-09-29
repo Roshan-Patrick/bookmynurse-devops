@@ -1,0 +1,18 @@
+# =============================================================================
+# k8s/backend/pdb.yaml
+# Pod Disruption Budget for Backend
+# =============================================================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-pdb
+  namespace: bookmynurse
+  labels:
+    app: backend
+    tier: api
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: backend
+      tier: api

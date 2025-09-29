@@ -1,21 +1,39 @@
 version: '3.8'
+
+networks:
+  mdm-net:
+    driver: bridge
+
 services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: localpass
-      MYSQL_DATABASE: bookmynurse
-      MYSQL_USER: app_user
-      MYSQL_PASSWORD: apppass
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-localpass}
+      MYSQL_DATABASE: ${DB_NAME:-bookmynurse}
+      MYSQL_USER: ${DB_USER:-app_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-apppass}
     ports:
-      - "3306:3306"
+      - "3306:3306" # Exposed for local client access, in prod this might be removed
     volumes:
       - mysql_data:/var/lib/mysql
       - /mnt/d/BMN/FULL STACK/nursingBackend.sql:/docker-entrypoint-initdb.d/nursingBackend.sql
+    networks:
+      - mdm-net
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plocalpass"]
       interval: 5s
       timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:6-alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    networks:
+      - mdm-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 2s
       retries: 5
 
   backend:
@@ -26,12 +44,19 @@ services:
       NODE_ENV: development
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: bookmynurse
-      DB_USER: app_user
-      DB_PASSWORD: apppass
+      DB_NAME: ${DB_NAME:-bookmynurse}
+      DB_USER: ${DB_USER:-app_user}
+      DB_PASSWORD: ${DB_PASSWORD:-apppass}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - mdm-net
 
   frontend:
     build: ../frontend

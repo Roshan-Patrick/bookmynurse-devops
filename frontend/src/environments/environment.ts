@@ -8,10 +8,12 @@ export const environment = {
   appVersion: packageInfo.version,
   production: false,
   // 'P&6J@2TDP&#%'
-  // APIEndpoint: "http://localhost:3000/"
-  APIEndpoint: "/api/"
+   apiUrl: 'http://localhost:3008/api',
+   APIEndpoint: "http://localhost:3008/"
+  //  APIEndpoint: "/api/"
   // APIEndpoint: "http://103.91.186.102/api/" 
 };
+
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

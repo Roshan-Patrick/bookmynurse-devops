@@ -1,0 +1,67 @@
+# =============================================================================
+# k8s/security/rbac.yaml
+# Role-Based Access Control for BookMyNurse Application
+# =============================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookmynurse-sa
+  namespace: bookmynurse
+  labels:
+    app: bookmynurse
+    component: security
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bookmynurse-role
+  namespace: bookmynurse
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bookmynurse-rolebinding
+  namespace: bookmynurse
+subjects:
+- kind: ServiceAccount
+  name: bookmynurse-sa
+  namespace: bookmynurse
+roleRef:
+  kind: Role
+  name: bookmynurse-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bookmynurse-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "persistentvolumes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bookmynurse-cluster-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: bookmynurse-sa
+  namespace: bookmynurse
+roleRef:
+  kind: ClusterRole
+  name: bookmynurse-cluster-role
+  apiGroup: rbac.authorization.k8s.io

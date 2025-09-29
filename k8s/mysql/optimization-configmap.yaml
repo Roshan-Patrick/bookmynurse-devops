@@ -1,0 +1,78 @@
+# =============================================================================
+# k8s/mysql/optimization-configmap.yaml
+# Database Optimization Scripts for Healthcare Schema
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-optimization-scripts
+  namespace: bookmynurse
+data:
+  optimization.sql: |
+    -- =============================================================================
+    -- Healthcare Database Optimization Scripts
+    -- Enterprise-level indexing strategy for BookMyNurse application
+    -- =============================================================================
+
+    -- Performance indexes for bookings table
+    CREATE INDEX idx_bookings_created_at ON bookings(created_at);
+    CREATE INDEX idx_bookings_nurse_id ON bookings(nurse_id);
+    CREATE INDEX idx_bookings_approval_status ON bookings(approval_status);
+    CREATE INDEX idx_bookings_nurse_type ON bookings(nurseType);
+    CREATE INDEX idx_bookings_location ON bookings(location);
+    
+    -- Composite index for common booking queries
+    CREATE INDEX idx_bookings_composite ON bookings(approval_status, nurse_id, created_at);
+    
+    -- Full-text index for location and services search
+    CREATE FULLTEXT INDEX ft_idx_bookings_location_services ON bookings(location, services);
+
+    -- Performance indexes for registration table
+    CREATE INDEX idx_registration_approval_status ON registration(approval_status);
+    CREATE INDEX idx_registration_availability ON registration(availability);
+    CREATE INDEX idx_registration_specialization ON registration(specialization);
+    CREATE INDEX idx_registration_base_location ON registration(base_location);
+    CREATE INDEX idx_registration_charges ON registration(charges);
+    
+    -- Composite index for nurse matching queries
+    CREATE INDEX idx_registration_matching ON registration(specialization, availability, base_location);
+    
+    -- Full-text index for specialization search
+    CREATE FULLTEXT INDEX ft_idx_registration_specialization ON registration(specialization);
+
+    -- Performance indexes for clientusers table
+    CREATE INDEX idx_clientusers_email ON clientusers(email);
+    CREATE INDEX idx_clientusers_created_at ON clientusers(created_at);
+
+    -- Performance indexes for images table
+    CREATE INDEX idx_images_uploaded_at ON images(uploaded_at);
+
+    -- Performance indexes for users table
+    CREATE INDEX idx_users_role ON users(role);
+
+    -- Query optimization suggestions:
+    -- 1. Use EXPLAIN ANALYZE to check query execution plans
+    -- 2. Monitor slow query log for performance bottlenecks
+    -- 3. Consider partitioning for large tables by date ranges
+    -- 4. Implement connection pooling (already using mysql2)
+    -- 5. Regular ANALYZE TABLE for index statistics
+
+    -- Sample optimized queries for common operations:
+    -- 
+    -- Get available nurses by specialization and location:
+    -- SELECT * FROM registration 
+    -- WHERE specialization = ? AND availability = 'Available' 
+    -- AND base_location LIKE ? 
+    -- ORDER BY charges ASC;
+    --
+    -- Get recent bookings with nurse details:
+    -- SELECT b.*, r.name as nurse_name, r.specialization 
+    -- FROM bookings b 
+    -- LEFT JOIN registration r ON b.nurse_id = r.id 
+    -- WHERE b.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+    -- ORDER BY b.created_at DESC;
+    --
+    -- Search nurses by specialization (using full-text search):
+    -- SELECT * FROM registration 
+    -- WHERE MATCH(specialization) AGAINST('ICU Care' IN BOOLEAN MODE)
+    -- AND availability = 'Available';

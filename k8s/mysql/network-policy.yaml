@@ -1,0 +1,28 @@
+# =============================================================================
+# k8s/mysql/network-policy.yaml
+# Zero-Trust Network Policy for MySQL
+# =============================================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-allow-backend
+  namespace: bookmynurse
+  labels:
+    app: mysql
+    tier: database
+spec:
+  podSelector:
+    matchLabels:
+      app: mysql
+      tier: database
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: backend
+          tier: api
+    ports:
+    - protocol: TCP
+      port: 3306

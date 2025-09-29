@@ -1,0 +1,133 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mysql-external-backup
+  namespace: bookmynurse
+  labels:
+    app: mysql-external-backup
+    component: backup
+spec:
+  # Run weekly on Sunday at 1:00 AM for external backup
+  schedule: "0 1 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mysql-external-backup
+            image: mysql:8.0
+            command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              echo "Starting MySQL external backup at $(date)..."
+              
+              # Create backup directory
+              mkdir -p /backup/external/mysql
+              
+              # Generate backup filename with timestamp
+              BACKUP_FILE="/backup/external/mysql/mysql-external-backup-$(date +%Y%m%d-%H%M%S).sql"
+              
+              # Perform MySQL dump
+              echo "Creating MySQL dump for external backup..."
+              mysqldump -h mysql-service -u $MYSQL_USER -p$MYSQL_PASSWORD \
+                --single-transaction \
+                --routines \
+                --triggers \
+                --events \
+                --hex-blob \
+                --opt \
+                $MYSQL_DATABASE > $BACKUP_FILE
+              
+              # Compress the backup
+              echo "Compressing external backup..."
+              gzip $BACKUP_FILE
+              
+              # Copy to external storage (USB drive or network storage)
+              echo "Copying backup to external storage..."
+              
+              # Option 1: USB Drive (if mounted)
+              if [ -d "/mnt/usb" ]; then
+                echo "Copying to USB drive..."
+                cp $BACKUP_FILE.gz /mnt/usb/mysql-backups/
+                echo "USB backup completed"
+              fi
+              
+              # Option 2: Network Storage (if available)
+              if [ -n "$NETWORK_STORAGE_PATH" ]; then
+                echo "Copying to network storage..."
+                rsync -av $BACKUP_FILE.gz $NETWORK_STORAGE_PATH/mysql-backups/
+                echo "Network backup completed"
+              fi
+              
+              # Option 3: Cloud Storage (if AWS credentials available)
+              if [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
+                echo "Uploading to AWS S3..."
+                aws s3 cp $BACKUP_FILE.gz s3://$S3_BUCKET/mysql/external/
+                echo "S3 backup completed"
+              fi
+              
+              # Clean up local external backup after successful copy
+              echo "Cleaning up local external backup..."
+              rm -f $BACKUP_FILE.gz
+              
+              # Show backup status
+              echo "External backup completed successfully at $(date)"
+              
+              # List external backup locations
+              echo "External backup locations:"
+              if [ -d "/mnt/usb" ]; then
+                echo "USB Drive: /mnt/usb/mysql-backups/"
+                ls -lh /mnt/usb/mysql-backups/ | tail -5
+              fi
+              if [ -n "$NETWORK_STORAGE_PATH" ]; then
+                echo "Network Storage: $NETWORK_STORAGE_PATH/mysql-backups/"
+                ls -lh $NETWORK_STORAGE_PATH/mysql-backups/ | tail -5
+              fi
+            env:
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            - name: NETWORK_STORAGE_PATH
+              value: ""  # Set to network storage path if available
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: backup-s3-secret
+                  key: aws-access-key-id
+                  optional: true
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backup-s3-secret
+                  key: aws-secret-access-key
+                  optional: true
+            - name: S3_BUCKET
+              value: "bookmynurse-backups"
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+            - name: usb-storage
+              mountPath: /mnt/usb
+              optional: true
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-pvc
+          - name: usb-storage
+            hostPath:
+              path: /mnt/usb
+              type: DirectoryOrCreate
+          restartPolicy: OnFailure

@@ -1,0 +1,26 @@
+# =============================================================================
+# k8s/storage/redis-pv.yaml
+# Redis PersistentVolume for Linux Server Storage
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv
+  namespace: bookmynurse
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /mnt/redis-data  # Linux server storage path
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - server.bookmynurse.com  # Your Linux server hostname

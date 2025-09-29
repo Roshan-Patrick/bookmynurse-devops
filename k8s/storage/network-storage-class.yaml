@@ -1,0 +1,17 @@
+# =============================================================================
+# k8s/storage/network-storage-class.yaml
+# Network-Based Storage Class for High Availability
+# =============================================================================
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: network-storage
+  namespace: bookmynurse
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+parameters:
+  type: nfs
+  server: nfs-server.example.com
+  path: /data/redis
+reclaimPolicy: Retain

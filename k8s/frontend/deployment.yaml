@@ -12,8 +12,11 @@ metadata:
     tier: web
 spec:
   strategy:
-    type: Recreate
-  replicas: 1
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 2
   selector:
     matchLabels:
       app: frontend
@@ -26,7 +29,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: emmamyers/bmn-frontend:latest
+        image: emmamyers/bmn-frontend:${GITHUB_SHA}
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

@@ -1,0 +1,18 @@
+# =============================================================================
+# k8s/frontend/pdb.yaml
+# Pod Disruption Budget for Frontend
+# =============================================================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  namespace: bookmynurse
+  labels:
+    app: frontend
+    tier: web
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: frontend
+      tier: web

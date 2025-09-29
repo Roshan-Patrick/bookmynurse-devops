@@ -6,9 +6,9 @@ import { CardModule, GridModule, NavModule, TabsModule, ModalModule, PopoverModu
 import { IconModule } from "@coreui/icons-angular";
 import { CommonModule, DatePipe } from "@angular/common";
 import { ToastrService } from "ngx-toastr";
-import { environment } from "../../../environments/environment";
+import { environment } from "../../../environments/environment.prod";
 
-@Component({
+@Component({  
   selector: "app-approved",
   standalone: true,
   imports: [CardModule, DropdownModule, NavModule, IconModule, TabsModule, CommonModule, GridModule, ModalModule, PopoverModule, ProgressModule, TableModule, ReactiveFormsModule,
@@ -166,7 +166,9 @@ saveCharges() {
       console.log(res)
       this.users = res.data.map((user: any) => ({
         ...user,
-        photoUrl: `${environment.APIEndpoint}/uploads/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`, // photoUrl: `http://localhost:3000/${user.file_path}`, 
+        photoUrl: `${environment.s3BaseUrl}/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`,
+        // photoUrl: `${environment.APIEndpoint}/uploads/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`,
+        // photoUrl: `http://localhost:3000/${user.file_path}`, 
       }));
     })
   }

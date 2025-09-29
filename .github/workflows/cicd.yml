@@ -34,6 +34,26 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+
+      - name: Run Backend Tests
+        run: |
+          cd backend
+          npm ci
+          npm test -- --coverage --watchAll=false
+
+      - name: Run Frontend Tests
+        run: |
+          cd frontend
+          npm ci
+          npm run test -- --coverage --watch=false
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
       - name: Build and push backend
         uses: docker/build-push-action@v4
         with:
@@ -42,6 +62,15 @@ jobs:
           push: true
           tags: emmamyers/bmn-backend:${{ github.sha }}
 
+      - name: Run Trivy vulnerability scanner on backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'emmamyers/bmn-backend:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+          exit-code: '1'
+          severity: 'HIGH,CRITICAL'
+
       - name: Build and push frontend
         uses: docker/build-push-action@v4
         with:
@@ -49,6 +78,23 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: emmamyers/bmn-frontend:${{ github.sha }}
+
+      - name: Run Trivy vulnerability scanner on frontend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'emmamyers/bmn-frontend:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+          exit-code: '1'
+          severity: 'HIGH,CRITICAL'
+
+      - name: Build and push Redis image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./k8s/redis/Dockerfile
+          push: true
+          tags: emmamyers/bmn-redis:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -163,31 +209,156 @@ jobs:
             # Update Kubernetes manifests with the new image tag
             sed -i "s|image: emmamyers/bmn-backend:.*|image: emmamyers/bmn-backend:${GITHUB_SHA}|" k8s/backend/deployment.yaml
             sed -i "s|image: emmamyers/bmn-frontend:.*|image: emmamyers/bmn-frontend:${GITHUB_SHA}|" k8s/frontend/deployment.yaml
-
-            # Create namespace if not exists
-            kubectl create namespace bookmynurse --dry-run=client -o yaml | kubectl apply -f -
             
-            # Ensure /mnt/data directory exists for PersistentVolume
-            echo "Ensuring /mnt/data directory exists..."
+            # Verify monitoring images use specific versions (not :latest)
+            echo "Verifying monitoring image versions..."
+            grep -q "image: prom/prometheus:v" k8s/monitoring/prometheus-deployment.yaml || (echo "Prometheus image not pinned!" && exit 1)
+            grep -q "image: grafana/grafana:10" k8s/monitoring/grafana-deployment.yaml || (echo "Grafana image not pinned!" && exit 1)
+            echo "✅ All monitoring images use specific versions"
+
+            # Create secrets from GitHub Actions secrets
+            kubectl create secret generic redis-secret \
+              --from-literal=redis-password="${{ secrets.REDIS_PASSWORD }}" \
+              -n bookmynurse \
+              --dry-run=client -o yaml | kubectl apply -f -
+            
+            kubectl create secret generic jwt-secret \
+              --from-literal=jwt-secret="${{ secrets.JWT_SECRET }}" \
+              -n bookmynurse \
+              --dry-run=client -o yaml | kubectl apply -f -
+            
+            # Ensure storage directories exist for PersistentVolumes
+            echo "Ensuring storage directories exist..."
             sudo mkdir -p /mnt/data
+            sudo mkdir -p /mnt/uploads
+            sudo mkdir -p /mnt/redis-data
             sudo chmod 755 /mnt/data
+            sudo chmod 755 /mnt/uploads
+            sudo chmod 755 /mnt/redis-data
             
             # Apply all Kubernetes manifests
             kubectl apply -f k8s/namespace/ -n bookmynurse
             kubectl apply -f k8s/storage/ -n bookmynurse # Apply storage infrastructure
             kubectl apply -f k8s/secrets/ -n bookmynurse
             kubectl apply -f k8s/mysql/ -n bookmynurse
+            kubectl apply -f k8s/redis/ -n bookmynurse  # Deploy Redis StatefulSet
+            kubectl apply -f k8s/monitoring/ -n bookmynurse  # Deploy monitoring stack
             kubectl apply -f k8s/backend/ -n bookmynurse
             kubectl apply -f k8s/frontend/ -n bookmynurse
             kubectl apply -f k8s/ingress/ -n bookmynurse
             
             # Wait for deployments to be ready
-            kubectl rollout status deployment/backend -n bookmynurse --timeout=300s
-            kubectl rollout status deployment/frontend -n bookmynurse --timeout=300s
+            kubectl rollout status statefulset/redis-statefulset -n bookmynurse --timeout=300s
+            kubectl rollout status deployment/prometheus-deployment -n bookmynurse --timeout=300s
+            kubectl rollout status deployment/grafana-deployment -n bookmynurse --timeout=300s
+            kubectl rollout status deployment/backend-deployment -n bookmynurse --timeout=300s
+            kubectl rollout status deployment/frontend-deployment -n bookmynurse --timeout=300s
             
             # Check deployment status
             echo "=== Deployment Status ==="
             kubectl get pods -n bookmynurse
             kubectl get services -n bookmynurse
             kubectl get ingress -n bookmynurse
+            
+            # Verify deployment health
+            echo "=== Health Check ==="
+            kubectl get pods -n bookmynurse | grep -E "(backend|frontend)" | awk '{print $1}' | while read pod; do
+              echo "Checking health of $pod..."
+              kubectl exec -n bookmynurse $pod -- curl -f http://localhost:3000/health || echo "Health check failed for $pod"
+            done
           EOF
+
+      - name: Rollback on Deployment Failure
+        if: failure()
+        run: |
+          echo "🚨 Deployment failed - Initiating automated rollback!"
+          ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << 'EOF'
+            echo "🔄 Rolling back backend and frontend deployments to the previous stable version..."
+            # Execute rollback
+            kubectl rollout undo deployment/backend-deployment -n bookmynurse
+            kubectl rollout undo deployment/frontend-deployment -n bookmynurse
+            echo "⏳ Waiting for rollback to complete and deployments to stabilize..."
+            # Verify rollback status and handle errors
+            if ! kubectl rollout status deployment/backend-deployment -n bookmynurse --timeout=300s; then
+              echo "❌ Backend rollback failed!"
+              exit 1
+            fi
+            if ! kubectl rollout status deployment/frontend-deployment -n bookmynurse --timeout=300s; then
+              echo "❌ Frontend rollback failed!"
+              exit 1
+            fi
+            echo "✅ Rollback successful. Application is now running the previous stable version."
+            echo "=== Post-Rollback Status ==="
+            kubectl get pods -n bookmynurse
+          EOF
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: always()
+    steps:
+      - name: Determine Job Status
+        id: job_status
+        run: |
+          if [ "${{ needs.deploy.result }}" == "success" ]; then
+            echo "status_message=✅ Deployment Succeeded" >> $GITHUB_ENV
+            echo "status_color=#2EB67D" >> $GITHUB_ENV
+          else
+            echo "status_message=❌ Deployment Failed" >> $GITHUB_ENV
+            echo "status_color=#E01E5A" >> $GITHUB_ENV
+          fi
+      - name: Send Slack Notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "attachments": [
+                {
+                  "color": "${{ env.status_color }}",
+                  "blocks": [
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "${{ env.status_message }} on ${{ github.event.inputs.environment || 'production' }}"
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "fields": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Repository:*\n${{ github.repository }}"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Branch:*\n${{ github.ref_name }}"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Commit:*\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha_short }}>"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Triggered by:*\n${{ github.actor }}"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "actions",
+                      "elements": [
+                        {
+                          "type": "button",
+                          "text": {
+                            "type": "plain_text",
+                            "text": "View Workflow Run"
+                          },
+                          "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }

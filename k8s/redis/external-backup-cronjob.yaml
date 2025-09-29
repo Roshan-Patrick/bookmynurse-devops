@@ -1,0 +1,121 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: redis-external-backup
+  namespace: bookmynurse
+  labels:
+    app: redis-external-backup
+    component: backup
+spec:
+  # Run weekly on Sunday at 2:00 AM for external backup (1 hour after MySQL)
+  schedule: "0 2 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: redis-external-backup
+            image: redis:7.0-alpine
+            command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              echo "Starting Redis external backup at $(date)..."
+              
+              # Create backup directory
+              mkdir -p /backup/external/redis
+              
+              # Generate backup filename with timestamp
+              BACKUP_FILE="/backup/external/redis/redis-external-backup-$(date +%Y%m%d-%H%M%S).rdb"
+              
+              # Trigger Redis BGSAVE to create RDB snapshot
+              echo "Triggering Redis BGSAVE for external backup..."
+              redis-cli -h redis-service -p 6379 BGSAVE
+              
+              # Wait for BGSAVE to complete
+              echo "Waiting for BGSAVE to complete..."
+              while [ "$(redis-cli -h redis-service -p 6379 LASTSAVE)" = "$(redis-cli -h redis-service -p 6379 LASTSAVE)" ]; do
+                sleep 1
+              done
+              
+              # Copy the RDB file from Redis data directory
+              echo "Copying RDB file for external backup..."
+              redis-cli -h redis-service -p 6379 --rdb $BACKUP_FILE
+              
+              # Compress the backup
+              echo "Compressing external backup..."
+              gzip $BACKUP_FILE
+              
+              # Copy to external storage (USB drive or network storage)
+              echo "Copying backup to external storage..."
+              
+              # Option 1: USB Drive (if mounted)
+              if [ -d "/mnt/usb" ]; then
+                echo "Copying to USB drive..."
+                cp $BACKUP_FILE.gz /mnt/usb/redis-backups/
+                echo "USB backup completed"
+              fi
+              
+              # Option 2: Network Storage (if available)
+              if [ -n "$NETWORK_STORAGE_PATH" ]; then
+                echo "Copying to network storage..."
+                rsync -av $BACKUP_FILE.gz $NETWORK_STORAGE_PATH/redis-backups/
+                echo "Network backup completed"
+              fi
+              
+              # Option 3: Cloud Storage (if AWS credentials available)
+              if [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
+                echo "Uploading to AWS S3..."
+                aws s3 cp $BACKUP_FILE.gz s3://$S3_BUCKET/redis/external/
+                echo "S3 backup completed"
+              fi
+              
+              # Clean up local external backup after successful copy
+              echo "Cleaning up local external backup..."
+              rm -f $BACKUP_FILE.gz
+              
+              # Show backup status
+              echo "External backup completed successfully at $(date)"
+              
+              # List external backup locations
+              echo "External backup locations:"
+              if [ -d "/mnt/usb" ]; then
+                echo "USB Drive: /mnt/usb/redis-backups/"
+                ls -lh /mnt/usb/redis-backups/ | tail -5
+              fi
+              if [ -n "$NETWORK_STORAGE_PATH" ]; then
+                echo "Network Storage: $NETWORK_STORAGE_PATH/redis-backups/"
+                ls -lh $NETWORK_STORAGE_PATH/redis-backups/ | tail -5
+              fi
+            env:
+            - name: NETWORK_STORAGE_PATH
+              value: ""  # Set to network storage path if available
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: backup-s3-secret
+                  key: aws-access-key-id
+                  optional: true
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backup-s3-secret
+                  key: aws-secret-access-key
+                  optional: true
+            - name: S3_BUCKET
+              value: "bookmynurse-backups"
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+            - name: usb-storage
+              mountPath: /mnt/usb
+              optional: true
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-pvc
+          - name: usb-storage
+            hostPath:
+              path: /mnt/usb
+              type: DirectoryOrCreate
+          restartPolicy: OnFailure

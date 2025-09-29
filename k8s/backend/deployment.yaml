@@ -12,8 +12,11 @@ metadata:
     tier: api
 spec:
   strategy:
-    type: Recreate
-  replicas: 1
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  replicas: 2
   selector:
     matchLabels:
       app: backend
@@ -23,6 +26,11 @@ spec:
       labels:
         app: backend
         tier: api
+      annotations:
+        # Prometheus monitoring annotations
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "30008"
+        prometheus.io/path: "/metrics"
     spec:
       # Init container to wait for MySQL to be ready
       initContainers:
@@ -39,7 +47,7 @@ spec:
           echo "MySQL is ready!"
       containers:
       - name: backend
-        image: emmamyers/bmn-backend:latest
+        image: emmamyers/bmn-backend:${GITHUB_SHA}
         imagePullPolicy: Always
         ports:
         - containerPort: 30008
@@ -68,6 +76,15 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: mysql-database
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: redis-password
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:

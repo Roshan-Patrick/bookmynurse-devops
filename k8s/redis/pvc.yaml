@@ -1,0 +1,16 @@
+# =============================================================================
+# k8s/redis/pvc.yaml
+# Redis Persistent Volume Claim
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: bookmynurse
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-storage

@@ -1,0 +1,81 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mysql-backup
+  namespace: bookmynurse
+  labels:
+    app: mysql-backup
+    component: backup
+spec:
+  # Run daily at 2:00 AM
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mysql-backup
+            image: mysql:8.0
+            command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              echo "Starting MySQL backup at $(date)..."
+              
+              # Create backup directory
+              mkdir -p /backup/mysql
+              
+              # Generate backup filename with timestamp
+              BACKUP_FILE="/backup/mysql/mysql-backup-$(date +%Y%m%d-%H%M%S).sql"
+              
+              # Perform MySQL dump
+              echo "Creating MySQL dump..."
+              mysqldump -h mysql-service -u $MYSQL_USER -p$MYSQL_PASSWORD \
+                --single-transaction \
+                --routines \
+                --triggers \
+                --events \
+                --hex-blob \
+                --opt \
+                $MYSQL_DATABASE > $BACKUP_FILE
+              
+              # Compress the backup
+              echo "Compressing backup..."
+              gzip $BACKUP_FILE
+              
+              # Remove backups older than 7 days
+              echo "Cleaning up old backups..."
+              find /backup/mysql -name "*.sql.gz" -mtime +7 -delete
+              
+              # Show backup size
+              BACKUP_SIZE=$(du -h $BACKUP_FILE.gz | cut -f1)
+              echo "Backup completed successfully. Size: $BACKUP_SIZE"
+              echo "Backup file: $BACKUP_FILE.gz"
+              
+              # List current backups
+              echo "Current backups:"
+              ls -lh /backup/mysql/
+            env:
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-pvc
+          restartPolicy: OnFailure
