@@ -1,32 +1,32 @@
 const RedisService = require('../services/RedisService');
 const EventEmitter = require('events');
 
-// Create a mock ioredis class that we can control by emitting events
-class MockIORedis extends EventEmitter {
-    constructor(config) {
-        super();
-        this.config = config;
-        this.status = 'disconnected';
-        // If lazyConnect is false, simulate an immediate connection attempt that fails
-        if (config.lazyConnect === false) {
-            process.nextTick(() => this.emit('error', new Error('Connection failed')));
-        }
-    }
-    connect = jest.fn().mockResolvedValue(undefined);
-    get = jest.fn();
-    setex = jest.fn();
-    del = jest.fn();
-    flushdb = jest.fn();
-    quit = jest.fn().mockResolvedValue('OK');
-}
-
 // Tell Jest to use our MockIORedis whenever 'ioredis' is imported
-jest.mock('ioredis', () => MockIORedis);
+jest.mock('ioredis', () => {
+    // Create a mock class that we can control by emitting events
+    return class MockIORedis extends EventEmitter {
+        constructor(config) {
+            super();
+            this.config = config;
+            this.status = 'disconnected';
+            // If lazyConnect is false, simulate an immediate connection attempt that fails
+            if (config.lazyConnect === false) {
+                process.nextTick(() => this.emit('error', new Error('Connection failed')));
+            }
+        }
+        connect = jest.fn().mockResolvedValue(undefined);
+        get = jest.fn();
+        setex = jest.fn();
+        del = jest.fn();
+        flushdb = jest.fn();
+        quit = jest.fn().mockResolvedValue('OK');
+    };
+});
 
 describe('Redis Connection Resilience Tests', () => {
     let service;
 
-    afterEach(async () => {
+  afterEach(async () => {
         if (service) {
             await service.disconnect();
         }
@@ -53,5 +53,5 @@ describe('Redis Connection Resilience Tests', () => {
 
         // Assert: The service should now be in a permanent error state.
         expect(service.status).toBe('error');
-    });
+  });
 });

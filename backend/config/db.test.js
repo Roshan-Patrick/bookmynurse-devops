@@ -1,17 +1,20 @@
 const mysql = require('mysql2');
 
 // Mock the mysql2 module ENTIRELY before any imports
-jest.mock('mysql2', () => ({
-  createPool: jest.fn(() => ({
-    query: jest.fn(),
-    end: jest.fn((callback) => callback()),
-    on: jest.fn(),
-    promise: () => ({
+jest.mock('mysql2', () => {
+    const mockPool = {
         query: jest.fn(),
-        getConnection: jest.fn(),
-    }),
-  })),
-}));
+        end: jest.fn((callback) => callback()),
+        on: jest.fn(),
+        promise: jest.fn(() => ({
+            query: jest.fn().mockResolvedValue([[{ id: 1 }]]), // Returns array of results for destructuring
+            getConnection: jest.fn(),
+        })),
+    };
+    return {
+        createPool: jest.fn(() => mockPool),
+    };
+});
 
 describe('Database Configuration Unit Tests', () => {
   let db;
@@ -20,19 +23,10 @@ describe('Database Configuration Unit Tests', () => {
   beforeEach(() => {
     // Reset modules to ensure db.js is re-evaluated with a fresh mock
     jest.resetModules();
-    // Re-import mysql2 to get the fresh mock
-    const mysql = require('mysql2');
+    const mysql = require('mysql2'); // Re-import to get the fresh mock
 
     // Create a fresh mock pool for each test
-    mockPool = {
-      query: jest.fn((sql, values, callback) => callback(null, [{ id: 1 }])),
-      end: jest.fn((callback) => callback()),
-      on: jest.fn(),
-      promise: () => ({ query: jest.fn(), getConnection: jest.fn() }),
-    };
-
-    // Set the default mock implementation for createPool
-    mysql.createPool.mockReturnValue(mockPool);
+    mockPool = mysql.createPool(); // This will now use our mock
 
     // IMPORTANT: Require the module under test AFTER the mock is set up
     db = require('./db');

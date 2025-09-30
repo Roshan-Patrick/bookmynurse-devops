@@ -65,7 +65,7 @@ describe('Authentication Controller Unit Tests', () => {
       expect(bcrypt.compare).toHaveBeenCalledWith('password123', 'hashedpassword');
       expect(jwt.sign).toHaveBeenCalledWith(
         { id: 1, role: 'admin' },
-        'your_jwt_secret',
+        'test-jwt-secret', // CORRECT: Use the secret from the test environment
         { expiresIn: '1hr' }
       );
       expect(res.json).toHaveBeenCalledWith({
