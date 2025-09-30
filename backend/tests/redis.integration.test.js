@@ -50,6 +50,12 @@ describe('Redis Cache Integration Tests', () => {
   });
 
   it('should cache a GET response and register a hit on the second call', async () => {
+    // Mock auth middleware
+    jest.doMock('../middleware/auth', () => (req, res, next) => {
+      req.user = { id: 1, role: 'admin' };
+      next();
+    });
+
     // Act: First request
     const res1 = await request(app).get('/api/nursing/getBookings');
 

@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../app');
 const db = require('../config/db');
 
-jest.mock('../config/db');
+jest.mock('../config/db', () => ({ query: jest.fn() }));
 jest.mock('../middleware/auth', () => (req, res, next) => {
     req.user = { id: 1, role: 'admin' }; // Mock a logged-in admin user
     next();
@@ -11,17 +11,26 @@ jest.mock('../middleware/auth', () => (req, res, next) => {
 describe('Nursing API Integration Tests', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        // Mock database responses
+        db.query.mockImplementation((sql, params) => {
+            if (sql.includes('INSERT INTO bookings')) {
+                return Promise.resolve({ insertId: 1 });
+            }
+            if (sql.includes('SELECT * FROM bookings')) {
+                return Promise.resolve([{ id: 1, name: 'Test' }]);
+            }
+            return Promise.resolve([]);
+        });
     });
 
     it('should create a new booking successfully', async () => {
-        db.query.mockResolvedValue([{ insertId: 1 }]);
         const bookingData = { 
             name: 'Test', 
             mobile: '1234567890', 
-            nurseType: 'RN', 
+            nurseType: 'Registered Nurse', 
             location: 'City', 
-            services: 'Care', 
-            preferences: 'Day', 
+            services: 'General Care', 
+            preferences: 'Day shift', 
             enquiryno: 'ENQ1' 
         };
         const response = await request(app).post('/api/nursing/bookings').send(bookingData);

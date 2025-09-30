@@ -1,8 +1,8 @@
 const RedisService = require('../services/RedisService');
-const EventEmitter = require('events');
 
 // Tell Jest to use our MockIORedis whenever 'ioredis' is imported
 jest.mock('ioredis', () => {
+    const EventEmitter = require('events'); // REQUIRE inside the mock factory
     // Create a mock class that we can control by emitting events
     return class MockIORedis extends EventEmitter {
         constructor(config) {

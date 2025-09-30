@@ -7,11 +7,18 @@ const jwt = require('jsonwebtoken');
 jest.mock('../models/userModel');
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
+jest.mock('../config/db', () => ({
+  query: jest.fn().mockResolvedValue([{ test: 1 }])
+}));
 
 describe('Authentication API Integration Tests', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         process.env.JWT_SECRET = 'test-jwt-secret';
+        
+        // Mock database query that controller makes
+        const db = require('../config/db');
+        db.query.mockResolvedValue([{ test: 1 }]);
     });
 
     describe('POST /api/auth/login', () => {

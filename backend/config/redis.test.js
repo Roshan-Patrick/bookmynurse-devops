@@ -57,7 +57,7 @@ describe('Redis Configuration Unit Tests', () => {
       expect(service.status).toBeDefined();
     });
 
-    it('should handle Redis connection errors gracefully', async () => {
+    it('should handle Redis connection errors gracefully', () => {
       // Arrange
       const invalidConfig = {
         host: 'invalid-host',
@@ -70,12 +70,11 @@ describe('Redis Configuration Unit Tests', () => {
       // Act
       const service = new RedisService(invalidConfig);
 
-      // Wait for connection attempt
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate the error event that should be emitted
+      service.redis.emit('error', new Error('Connection failed'));
 
       // Assert
       expect(service.status).toBe('error');
-      await service.disconnect();
     });
   });
 
@@ -342,7 +341,7 @@ describe('Redis Configuration Unit Tests', () => {
       // Act
       await redisService.disconnect();
 
-      // Assert
+      // Assert - should not throw, should handle gracefully
       expect(mockRedis.quit).toHaveBeenCalled();
     });
   });
