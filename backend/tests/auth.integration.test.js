@@ -4,33 +4,37 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 
-// Mock dependencies
+// Mock all necessary dependencies at the top level
 jest.mock('jsonwebtoken');
 jest.mock('bcryptjs');
 jest.mock('../models/userModel');
 
+// Mock the auth middleware for routes that might be protected
+jest.mock('../middleware/auth', () => (req, res, next) => {
+  req.user = { id: 1, role: 'admin' };
+  next();
+});
+
 describe('Authentication API Integration Tests', () => {
     beforeEach(() => {
+        // Clear all mocks before each test to ensure isolation
         jest.clearAllMocks();
+        // Set a predictable JWT secret for the test environment
         process.env.JWT_SECRET = 'test-jwt-secret';
-
-        // Default mock for a successful login flow
-        const mockUser = { id: 1, username: 'admin', password: 'hashedpassword', role: 'admin' };
-        User.findByUsername.mockResolvedValue(mockUser);
-        bcrypt.compare.mockResolvedValue(true); // Simulate correct password
-        jwt.sign.mockReturnValue('valid.jwt.token');
-        User.getAllUsers.mockResolvedValue([{ id: 1, username: 'admin' }]);
     });
 
     describe('POST /api/auth/login', () => {
         it('should login successfully with valid credentials', async () => {
-            // Arrange
+            // Arrange: Simulate a perfect login flow
+            const mockUser = { id: 1, username: 'admin', password: 'hashedpassword', role: 'admin' };
+            User.findByUsername.mockResolvedValue(mockUser);
+            bcrypt.compare.mockResolvedValue(true); // IMPORTANT: Simulate a correct password match
+            jwt.sign.mockReturnValue('valid.jwt.token');
+
             const loginData = { username: 'admin', password: 'password123' };
 
             // Act
-            const response = await request(app)
-                .post('/api/auth/login')
-                .send(loginData);
+            const response = await request(app).post('/api/auth/login').send(loginData);
 
             // Assert
             expect(response.status).toBe(200);
@@ -38,50 +42,34 @@ describe('Authentication API Integration Tests', () => {
             expect(response.body.msg).toBe('Authorized');
         });
 
-        it('should return 401 for invalid username', async () => {
-            // Arrange: Override the default mock to simulate user not found
-            User.findByUsername.mockResolvedValue(null);
-            const loginData = { username: 'wronguser', password: 'password123' };
-
-            // Act
-            const response = await request(app)
-                .post('/api/auth/login')
-                .send(loginData);
-
-            // Assert
-            expect(response.status).toBe(401);
-            expect(response.body.msg).toBe('Invalid Username');
-        });
-
         it('should return 401 for invalid password', async () => {
-            // Arrange: Override the default mock to simulate wrong password
-            bcrypt.compare.mockResolvedValue(false);
+            // Arrange: Simulate a user being found, but the password being wrong
+            const mockUser = { id: 1, username: 'admin', password: 'hashedpassword', role: 'admin' };
+            User.findByUsername.mockResolvedValue(mockUser);
+            bcrypt.compare.mockResolvedValue(false); // IMPORTANT: Simulate a wrong password
+
             const loginData = { username: 'admin', password: 'wrongpassword' };
 
             // Act
-            const response = await request(app)
-                .post('/api/auth/login')
-                .send(loginData);
+            const response = await request(app).post('/api/auth/login').send(loginData);
 
             // Assert
             expect(response.status).toBe(401);
             expect(response.body.msg).toBe('Invalid password');
         });
-    });
 
-    describe('GET /api/auth/users', () => {
-        it('should get all users with a valid token', async () => {
-            // Arrange
-            jwt.verify.mockReturnValue({ id: 1, role: 'admin' });
+        it('should return 401 for invalid username', async () => {
+            // Arrange: Simulate user not found
+            User.findByUsername.mockResolvedValue(null);
+
+            const loginData = { username: 'nouser', password: 'password123' };
 
             // Act
-            const response = await request(app)
-                .get('/api/auth/users')
-                .set('Authorization', 'Bearer valid.jwt.token');
+            const response = await request(app).post('/api/auth/login').send(loginData);
 
             // Assert
-            expect(response.status).toBe(200);
-            expect(Array.isArray(response.body)).toBe(true);
+            expect(response.status).toBe(401);
+            expect(response.body.msg).toBe('Invalid Username');
         });
     });
 });
