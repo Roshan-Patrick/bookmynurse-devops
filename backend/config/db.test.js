@@ -1,42 +1,41 @@
 const mysql = require('mysql2');
 
-// Mock the mysql2 module at the top level
-jest.mock('mysql2', () => {
-    const mockPool = {
-        query: jest.fn(),
-        end: jest.fn((callback) => callback()),
-        on: jest.fn(),
-        promise: () => ({
-            query: jest.fn().mockResolvedValue([[]]), // Default to resolving empty
-            getConnection: jest.fn(),
-        }),
-    };
-    return {
-        createPool: jest.fn(() => mockPool),
-    };
-});
+// Define the mock at the top level
+jest.mock('mysql2');
 
 describe('Database Configuration Unit Tests', () => {
     let db;
     let mockPool;
 
     beforeEach(() => {
-        jest.resetModules(); // CRITICAL: Clears the cache for db.js
+        // Reset modules to clear cache
+        jest.resetModules();
+        // Re-import mysql2 to get the fresh mock for this test
         const mysql = require('mysql2');
-        mockPool = mysql.createPool(); // Gets the mocked pool
-        db = require('./db'); // require() db module AFTER mock is set up
+        // Define a fresh mock pool for every test
+        mockPool = {
+            query: jest.fn(),
+            on: jest.fn(),
+            promise: () => ({
+                query: jest.fn().mockResolvedValue([[]]), // Default to resolving empty
+            }),
+        };
+        // Configure the createPool mock to return our fresh pool
+        mysql.createPool.mockReturnValue(mockPool);
+        // Now, require the module under test. It will use the mock we just set up.
+        db = require('./db');
     });
 
     it('should create connection pool with correct configuration', () => {
         expect(mysql.createPool).toHaveBeenCalledWith(expect.objectContaining({
             host: 'localhost',
-            user: 'bnmuser',
+            user: 'bnmuser'
         }));
     });
 
     it('should execute queries successfully', async () => {
         const promiseQuery = mockPool.promise().query;
-        promiseQuery.mockResolvedValue([['result']]);
+        promiseQuery.mockResolvedValue([['result']]); // Set specific return value for this test
         const result = await db.query('SELECT * FROM test');
         expect(promiseQuery).toHaveBeenCalledWith('SELECT * FROM test', undefined);
         expect(result).toEqual(['result']);
