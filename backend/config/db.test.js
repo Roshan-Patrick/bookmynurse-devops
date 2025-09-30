@@ -4,7 +4,11 @@ const db = require('./db');
 // Mock mysql2
 jest.mock('mysql2', () => ({
   createPool: jest.fn(() => ({
-    query: jest.fn(),
+    query: jest.fn((sql, values, callback) => {
+      if (callback) {
+        callback(null, [{ test: 1 }]);
+      }
+    }),
     end: jest.fn(),
     on: jest.fn(),
     promise: jest.fn(() => ({

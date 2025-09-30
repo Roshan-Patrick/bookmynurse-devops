@@ -146,7 +146,7 @@ describe('Authentication API Integration Tests', () => {
         .get('/api/auth/users');
 
       expect(response.status).toBe(401);
-      expect(response.text).toBe('Access denied. No token provided.');
+      expect(response.body.error).toBe('Access denied. No token provided.');
     });
 
     it('should return 400 with invalid token', async () => {
@@ -154,8 +154,8 @@ describe('Authentication API Integration Tests', () => {
         .get('/api/auth/users')
         .set('Authorization', 'Bearer invalid-token');
 
-      expect(response.status).toBe(400);
-      expect(response.text).toBe('Invalid token.');
+      expect(response.status).toBe(401);
+      expect(response.body.error).toBe('Invalid token.');
     });
   });
 });

@@ -39,20 +39,21 @@ describe('Redis Cache Integration Tests', () => {
       return Promise.resolve([]);
     });
 
-    // Mock Redis service
-    const mockRedisService = {
-      get: jest.fn().mockResolvedValue(null),
-      set: jest.fn().mockResolvedValue(true),
-      clear: jest.fn().mockResolvedValue(true),
-      clearByPattern: jest.fn().mockResolvedValue(true),
-      getStats: jest.fn().mockReturnValue({
-        status: 'connected',
-        totalCacheHits: 0,
-        totalCacheMisses: 0,
-        hitRatio: 'N/A'
-      }),
-      disconnect: jest.fn().mockResolvedValue(true)
-    };
+           // Mock Redis service
+           const mockRedisService = {
+             get: jest.fn().mockResolvedValue(null),
+             set: jest.fn().mockResolvedValue(true),
+             clear: jest.fn().mockResolvedValue(true),
+             clearByPattern: jest.fn().mockResolvedValue(true),
+             clearAllCache: jest.fn().mockResolvedValue(true),
+             getStats: jest.fn().mockReturnValue({
+               status: 'connected',
+               totalCacheHits: 0,
+               totalCacheMisses: 0,
+               hitRatio: 'N/A'
+             }),
+             disconnect: jest.fn().mockResolvedValue(true)
+           };
     
     RedisService.mockImplementation(() => mockRedisService);
     redisService = mockRedisService;

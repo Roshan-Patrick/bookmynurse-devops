@@ -3,6 +3,11 @@ const nursingModel = require('../models/nursing.model');
 const nursingRegistrationModel = require('../models/nursingRegistration.model');
 const userModel = require('../models/userModel');
 
+// Mock bcryptjs
+jest.mock('bcryptjs', () => ({
+  hash: jest.fn((password, salt) => Promise.resolve('hashedpassword'))
+}));
+
 // Mock the database
 jest.mock('../config/db', () => ({
   query: jest.fn(),

@@ -37,12 +37,7 @@ class RedisService {
             console.log('🔄 Redis reconnecting...');
         });
 
-        // Force connection attempt if not using lazyConnect
-        if (!config.lazyConnect && config.lazyConnect !== undefined) {
-            this.redis.connect().catch(() => {
-                // Connection will fail for invalid configs, which is expected
-            });
-        }
+
     }
 
     /**

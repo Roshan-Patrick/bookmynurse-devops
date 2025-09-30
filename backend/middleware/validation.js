@@ -127,31 +127,37 @@ const validateRegistration = (req, res, next) => {
 
 const validateUser = (req, res, next) => {
     const { username, password, role } = req.body;
-    
+
     // Check for missing required fields
     const missingFields = [];
     if (!username) missingFields.push('username');
     if (!password) missingFields.push('password');
-    
+
     if (missingFields.length > 0) {
         return res.status(400).json({
             error: `Missing required fields: ${missingFields.join(', ')}`
         });
     }
-    
+
     // Check for empty fields
-    if (username.trim() === '' || password.trim() === '') {
+    if (username && username.trim() === '') {
         return res.status(400).json({
             error: 'Required fields cannot be empty'
         });
     }
-    
-    if (password.length < 6) {
+
+    if (password && password.trim() === '') {
+        return res.status(400).json({
+            error: 'Required fields cannot be empty'
+        });
+    }
+
+    if (password && password.length < 6) {
         return res.status(400).json({
             error: 'Password must be at least 6 characters long'
         });
     }
-    
+
     // Role validation (if provided)
     if (role) {
         const validRoles = ['admin', 'user', 'manager'];
@@ -161,15 +167,17 @@ const validateUser = (req, res, next) => {
             });
         }
     }
-    
+
     // Username validation (alphanumeric and underscore only)
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
-    if (!usernameRegex.test(username)) {
-        return res.status(400).json({
-            error: 'Username can only contain letters, numbers, and underscores'
-        });
+    if (username) {
+        const usernameRegex = /^[a-zA-Z0-9_]+$/;
+        if (!usernameRegex.test(username)) {
+            return res.status(400).json({
+                error: 'Username can only contain letters, numbers, and underscores'
+            });
+        }
     }
-    
+
     next();
 };
 
