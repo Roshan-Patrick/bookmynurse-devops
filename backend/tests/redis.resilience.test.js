@@ -15,10 +15,6 @@ jest.mock('ioredis', () => {
             }
         }
         connect = jest.fn().mockResolvedValue(undefined);
-        get = jest.fn();
-        setex = jest.fn();
-        del = jest.fn();
-        flushdb = jest.fn();
         quit = jest.fn().mockResolvedValue('OK');
     };
 });
@@ -26,32 +22,23 @@ jest.mock('ioredis', () => {
 describe('Redis Connection Resilience Tests', () => {
     let service;
 
-  afterEach(async () => {
+    afterEach(async () => {
         if (service) {
             await service.disconnect();
         }
     });
 
     it('should handle invalid Redis configuration by entering an error state', () => {
-        // Arrange: Create a service with an invalid host and non-lazy connect.
-        // The mock constructor will see lazyConnect:false and immediately emit an 'error'.
         service = new RedisService({ host: 'invalid-host', lazyConnect: false });
-
-        // Assert: The service's 'error' listener should have set the status correctly.
         expect(service.status).toBe('error');
     });
 
-    it('should handle a timeout by moving from reconnecting to error state', () => {
-        // Arrange
+    it('should transition from reconnecting to error state on timeout', () => {
         service = new RedisService({ lazyConnect: true });
         const mockRedisInstance = service.redis;
-
-        // Act: Simulate the event lifecycle of a failed reconnection
         mockRedisInstance.emit('reconnecting');
         expect(service.status).toBe('reconnecting');
         mockRedisInstance.emit('error', new Error('Connection timeout'));
-
-        // Assert: The service should now be in a permanent error state.
         expect(service.status).toBe('error');
-  });
+    });
 });

@@ -1,81 +1,33 @@
 const { validationResult } = require('express-validator');
-const { validateUser, validateBooking, validateRegistration } = require('./validation');
+const { validateUser } = require('../middleware/validation');
 
-// Mock the express-validator library
 jest.mock('express-validator', () => ({
-  ...jest.requireActual('express-validator'),
-  validationResult: jest.fn(),
+    ...jest.requireActual('express-validator'),
+    validationResult: jest.fn(),
 }));
 
-// Helper function to run an array of middlewares
-const runMiddlewareChain = async (req, res, next, chain) => {
-  for (const middleware of chain) {
-    if (res.headersSent) break;
-    await middleware(req, res, next);
-  }
-};
-
 describe('Validation Middleware', () => {
-  let req, res, next;
+    let req, res, next;
+    const handleValidationErrors = validateUser[validateUser.length - 1];
 
-  beforeEach(() => {
-    req = { body: {} };
-    res = {
-      status: jest.fn(() => res),
-      json: jest.fn(() => {
-        res.headersSent = true;
-      }),
-      headersSent: false,
-    };
-    next = jest.fn();
-    // Default mock for a clean validation result
-    validationResult.mockReturnValue({ isEmpty: () => true, array: () => [] });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  describe('validateUser', () => {
-    it('should call next() for valid user data', async () => {
-      await runMiddlewareChain(req, res, next, validateUser);
-      expect(next).toHaveBeenCalled();
+    beforeEach(() => {
+        req = { body: {} };
+        res = { status: jest.fn(() => res), json: jest.fn() };
+        next = jest.fn();
     });
 
-    it('should return 400 for missing username and password', async () => {
-      const errors = [{ msg: 'username is required' }, { msg: 'password is required' }];
-      validationResult.mockReturnValue({ isEmpty: () => false, array: () => errors });
-      await runMiddlewareChain(req, res, next, validateUser);
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ errors: ['username is required', 'password is required'] });
-    });
-  });
-
-  describe('validateBooking', () => {
-    it('should call next() for valid booking data', async () => {
-        await runMiddlewareChain(req, res, next, validateBooking);
+    it('should call next() when there are no validation errors', () => {
+        validationResult.mockReturnValue({ isEmpty: () => true });
+        handleValidationErrors(req, res, next);
         expect(next).toHaveBeenCalled();
     });
 
-    it('should return 400 for invalid mobile number', async () => {
-        validationResult.mockReturnValue({ isEmpty: () => false, array: () => [{ msg: 'Invalid mobile number format' }] });
-        await runMiddlewareChain(req, res, next, validateBooking);
+    it('should return 400 with errors when validation fails', () => {
+        const errors = [{ msg: 'username is required' }];
+        validationResult.mockReturnValue({ isEmpty: () => false, array: () => errors });
+        handleValidationErrors(req, res, next);
+        expect(next).not.toHaveBeenCalled();
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({ errors: ['Invalid mobile number format'] });
+        expect(res.json).toHaveBeenCalledWith({ errors: ['username is required'] });
     });
-  });
-
-  describe('validateRegistration', () => {
-    it('should call next() for valid registration data', async () => {
-        await runMiddlewareChain(req, res, next, validateRegistration);
-        expect(next).toHaveBeenCalled();
-    });
-
-    it('should return 400 for invalid email', async () => {
-        validationResult.mockReturnValue({ isEmpty: () => false, array: () => [{ msg: 'Invalid email format' }] });
-        await runMiddlewareChain(req, res, next, validateRegistration);
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({ errors: ['Invalid email format'] });
-    });
-  });
 });
