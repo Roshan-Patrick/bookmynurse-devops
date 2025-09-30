@@ -6,7 +6,11 @@ jest.mock('mysql2', () => ({
   createPool: jest.fn(() => ({
     query: jest.fn(),
     end: jest.fn(),
-    on: jest.fn()
+    on: jest.fn(),
+    promise: jest.fn(() => ({
+      query: jest.fn(),
+      getConnection: jest.fn()
+    }))
   }))
 }));
 

@@ -6,7 +6,13 @@ jest.mock('../config/db', () => ({
   query: jest.fn()
 }));
 
+// Mock bcryptjs
+jest.mock('bcryptjs', () => ({
+  hash: jest.fn((password, salt) => Promise.resolve(`hashed_${password}`))
+}));
+
 const db = require('../config/db');
+const bcrypt = require('bcryptjs');
 
 describe('Client Authentication Model Unit Tests', () => {
   beforeEach(() => {
@@ -20,12 +26,13 @@ describe('Client Authentication Model Unit Tests', () => {
       db.query.mockResolvedValue(mockResult);
 
       // Act
-      const result = await clientauthModel.create('user@example.com', '1234567890', 'hashedpassword');
+      const result = await clientauthModel.create('user@example.com', '1234567890', 'password123');
 
       // Assert
+      expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
       expect(db.query).toHaveBeenCalledWith(
         'INSERT INTO clientusers (email, phone_number, password) VALUES (?, ?, ?)',
-        ['user@example.com', '1234567890', 'hashedpassword']
+        ['user@example.com', '1234567890', 'hashed_password123']
       );
       expect(result).toEqual(mockResult);
     });

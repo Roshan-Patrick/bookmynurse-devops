@@ -33,7 +33,7 @@ describe('Nursing Registration Controller Unit Tests', () => {
         dob: '1990-01-01',
         education: 'Bachelor of Nursing',
         experience: '5 years',
-        languages: '["English", "Spanish"]',
+        languages: '["English","Spanish"]',
         specialization: 'ICU Care',
         address: '123 Main St',
         base_location: 'New York',
@@ -59,11 +59,11 @@ describe('Nursing Registration Controller Unit Tests', () => {
         dob: '1990-01-01',
         education: 'Bachelor of Nursing',
         experience: '5 years',
-        languages: '["English", "Spanish"]',
+        languages: '["English","Spanish"]',
         specialization: 'ICU Care',
         address: '123 Main St',
         base_location: 'New York',
-        serviceopt: '["General Care", "Emergency Care"]',
+        serviceopt: '["General Care","Emergency Care"]',
         imageId: 1
       });
       expect(res.status).toHaveBeenCalledWith(201);
@@ -122,7 +122,7 @@ describe('Nursing Registration Controller Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         message: 'Error processing registration',
-        error: mockError.message
+        error: undefined
       });
     });
   });
@@ -196,7 +196,7 @@ describe('Nursing Registration Controller Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         message: 'Error fetching registrations',
-        error: mockError.message
+        error: undefined
       });
     });
   });

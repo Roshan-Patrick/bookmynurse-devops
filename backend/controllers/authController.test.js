@@ -8,6 +8,9 @@ const bcrypt = require('bcryptjs');
 jest.mock('../models/userModel');
 jest.mock('jsonwebtoken');
 jest.mock('bcryptjs');
+jest.mock('../config/db', () => ({
+  query: jest.fn()
+}));
 
 describe('Authentication Controller Unit Tests', () => {
   let req, res;
@@ -44,6 +47,10 @@ describe('Authentication Controller Unit Tests', () => {
       User.findByUsername.mockResolvedValue(mockUser);
       bcrypt.compare.mockResolvedValue(true);
       jwt.sign.mockReturnValue(mockToken);
+      
+      // Mock the database query that's called in the controller
+      const db = require('../config/db');
+      db.query.mockResolvedValue([{ test: 1 }]);
 
       // Act
       await authController.login(req, res);

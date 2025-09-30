@@ -6,7 +6,13 @@ jest.mock('../config/db', () => ({
   query: jest.fn()
 }));
 
+// Mock bcryptjs
+jest.mock('bcryptjs', () => ({
+  hash: jest.fn((password, salt) => Promise.resolve(`hashed_${password}`))
+}));
+
 const db = require('../config/db');
+const bcrypt = require('bcryptjs');
 
 describe('User Model Unit Tests', () => {
   beforeEach(() => {
@@ -20,12 +26,13 @@ describe('User Model Unit Tests', () => {
       db.query.mockResolvedValue(mockResult);
 
       // Act
-      const result = await userModel.create('newuser', 'hashedpassword', 'admin');
+      const result = await userModel.create('newuser', 'password123', 'admin');
 
       // Assert
+      expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
       expect(db.query).toHaveBeenCalledWith(
         'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
-        ['newuser', 'hashedpassword', 'admin']
+        ['newuser', 'hashed_password123', 'admin']
       );
       expect(result).toEqual(mockResult);
     });
@@ -36,12 +43,13 @@ describe('User Model Unit Tests', () => {
       db.query.mockResolvedValue(mockResult);
 
       // Act
-      const result = await userModel.create('newuser', 'hashedpassword');
+      const result = await userModel.create('newuser', 'password123');
 
       // Assert
+      expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
       expect(db.query).toHaveBeenCalledWith(
         'INSERT INTO users (username, password) VALUES (?, ?)',
-        ['newuser', 'hashedpassword']
+        ['newuser', 'hashed_password123']
       );
       expect(result).toEqual(mockResult);
     });

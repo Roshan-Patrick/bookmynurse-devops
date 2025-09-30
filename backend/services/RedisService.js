@@ -190,4 +190,4 @@ class RedisService {
     }
 }
 
-module.exports = new RedisService();
+module.exports = RedisService;
