@@ -2,7 +2,16 @@
 const request = require('supertest');
 const express = require('express');
 const nursingRoutes = require('../routes/nursing.routes');
+
+// Mock RedisService
+jest.mock('../services/RedisService');
 const RedisService = require('../services/RedisService');
+
+// Mock database
+jest.mock('../config/db', () => ({
+  query: jest.fn()
+}));
+const db = require('../config/db');
 
 // Mock the auth middleware for performance tests
 jest.mock('../middleware/auth', () => (req, res, next) => {
@@ -19,13 +28,42 @@ describe('Redis Performance Tests', () => {
   let redisService;
 
   beforeAll(async () => {
-    redisService = new RedisService();
-    // Wait for Redis connection
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Mock database responses
+    db.query.mockImplementation((sql, params) => {
+      if (sql.includes('SELECT * FROM bookings')) {
+        return Promise.resolve([{ id: 1, name: 'John Doe', mobile: '1234567890' }]);
+      }
+      if (sql.includes('INSERT INTO bookings')) {
+        return Promise.resolve({ insertId: 1 });
+      }
+      return Promise.resolve([]);
+    });
+
+    // Mock Redis service
+    const mockRedisService = {
+      get: jest.fn().mockResolvedValue(null),
+      set: jest.fn().mockResolvedValue(true),
+      clear: jest.fn().mockResolvedValue(true),
+      clearByPattern: jest.fn().mockResolvedValue(true),
+      getStats: jest.fn().mockReturnValue({
+        status: 'connected',
+        totalCacheHits: 0,
+        totalCacheMisses: 0,
+        hitRatio: 'N/A'
+      }),
+      disconnect: jest.fn().mockResolvedValue(true)
+    };
+    
+    RedisService.mockImplementation(() => mockRedisService);
+    redisService = mockRedisService;
   });
 
   afterAll(async () => {
     await redisService.disconnect();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   beforeEach(async () => {

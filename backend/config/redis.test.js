@@ -63,7 +63,8 @@ describe('Redis Configuration Unit Tests', () => {
         host: 'invalid-host',
         port: 9999,
         connectTimeout: 1000,
-        retryDelayOnFailover: 100
+        retryDelayOnFailover: 100,
+        lazyConnect: false
       };
 
       // Act

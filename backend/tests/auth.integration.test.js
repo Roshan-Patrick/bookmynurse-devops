@@ -2,7 +2,38 @@
 const request = require('supertest');
 const app = require('../app');
 
+// Mock database
+jest.mock('../config/db', () => ({
+  query: jest.fn()
+}));
+
+const db = require('../config/db');
+
 describe('Authentication API Integration Tests', () => {
+  beforeEach(() => {
+    // Set JWT secret for testing
+    process.env.JWT_SECRET = 'test-jwt-secret';
+    
+    // Mock database responses
+    db.query.mockImplementation((sql, params) => {
+      if (sql.includes('SELECT * FROM users WHERE username')) {
+        return Promise.resolve([{ id: 1, username: 'admin', password: 'hashedpassword', role: 'admin' }]);
+      }
+      if (sql.includes('INSERT INTO users')) {
+        return Promise.resolve({ insertId: 1 });
+      }
+      if (sql.includes('SELECT * FROM users')) {
+        return Promise.resolve([{ id: 1, username: 'admin', role: 'admin' }]);
+      }
+      return Promise.resolve([]);
+    });
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    delete process.env.JWT_SECRET;
+  });
+
   describe('POST /api/auth/login', () => {
     it('should login successfully with valid credentials', async () => {
       const loginData = {

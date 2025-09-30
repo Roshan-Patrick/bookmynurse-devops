@@ -2,10 +2,40 @@
 const request = require('supertest');
 const app = require('../app');
 
+// Mock database
+jest.mock('../config/db', () => ({
+  query: jest.fn()
+}));
+
+const db = require('../config/db');
+
 describe('Nursing API Integration Tests', () => {
   let authToken;
 
   beforeAll(async () => {
+    // Set JWT secret for testing
+    process.env.JWT_SECRET = 'test-jwt-secret';
+    
+    // Mock database responses
+    db.query.mockImplementation((sql, params) => {
+      if (sql.includes('SELECT * FROM users WHERE username')) {
+        return Promise.resolve([{ id: 1, username: 'admin', password: 'hashedpassword', role: 'admin' }]);
+      }
+      if (sql.includes('INSERT INTO bookings')) {
+        return Promise.resolve({ insertId: 1 });
+      }
+      if (sql.includes('SELECT * FROM bookings')) {
+        return Promise.resolve([{ id: 1, name: 'John Doe', mobile: '1234567890' }]);
+      }
+      if (sql.includes('UPDATE bookings SET')) {
+        return Promise.resolve({ affectedRows: 1 });
+      }
+      if (sql.includes('DELETE FROM bookings')) {
+        return Promise.resolve({ affectedRows: 1 });
+      }
+      return Promise.resolve([]);
+    });
+
     // Get authentication token for protected routes
     const loginResponse = await request(app)
       .post('/api/auth/login')
@@ -15,6 +45,14 @@ describe('Nursing API Integration Tests', () => {
       });
     
     authToken = loginResponse.body.token;
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    delete process.env.JWT_SECRET;
   });
 
   describe('POST /api/nursing/bookings', () => {

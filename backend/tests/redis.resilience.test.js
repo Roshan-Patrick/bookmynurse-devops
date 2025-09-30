@@ -36,7 +36,8 @@ describe('Redis Connection Resilience Tests', () => {
         host: 'invalid-host',
         port: 9999,
         connectTimeout: 1000,
-        retryDelayOnFailover: 100
+        retryDelayOnFailover: 100,
+        lazyConnect: false
       });
 
       // Wait for connection attempt
@@ -283,7 +284,8 @@ describe('Redis Connection Resilience Tests', () => {
         port: 9999,
         connectTimeout: 1000,
         retryDelayOnFailover: 100,
-        maxRetriesPerRequest: 1
+        maxRetriesPerRequest: 1,
+        lazyConnect: false
       });
 
       // Wait for connection attempt

@@ -8,8 +8,11 @@ jest.mock('mysql2', () => ({
     end: jest.fn(),
     on: jest.fn(),
     promise: jest.fn(() => ({
-      query: jest.fn(),
-      getConnection: jest.fn()
+      query: jest.fn().mockResolvedValue([{ test: 1 }]),
+      getConnection: jest.fn().mockResolvedValue({
+        ping: jest.fn().mockResolvedValue(true),
+        release: jest.fn()
+      })
     }))
   }))
 }));
@@ -37,16 +40,19 @@ describe('Database Configuration Unit Tests', () => {
       // Assert
       expect(mysql.createPool).toHaveBeenCalledWith({
         host: process.env.DB_HOST || 'localhost',
-        user: process.env.DB_USER || 'root',
-        password: process.env.DB_PASSWORD || '',
-        database: process.env.DB_NAME || 'nursing_db',
-        port: process.env.DB_PORT || 3306,
+        user: process.env.DB_USER || 'bnmuser',
+        password: process.env.DB_PASSWORD || 'bnmpassword',
+        database: process.env.DB_NAME || 'bookmynurse',
         waitForConnections: true,
-        connectionLimit: 10,
+        connectionLimit: 20,
         queueLimit: 0,
-        acquireTimeout: 60000,
-        timeout: 60000,
-        reconnect: true
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000,
+        connectTimeout: 10000,
+        idleTimeout: 300000,
+        timezone: 'Z',
+        charset: 'utf8mb4',
+        debug: process.env.NODE_ENV === 'development'
       });
     });
 
@@ -216,13 +222,16 @@ describe('Database Configuration Unit Tests', () => {
         user: 'test-user',
         password: 'test-password',
         database: 'test-database',
-        port: '3307',
         waitForConnections: true,
-        connectionLimit: 10,
+        connectionLimit: 20,
         queueLimit: 0,
-        acquireTimeout: 60000,
-        timeout: 60000,
-        reconnect: true
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000,
+        connectTimeout: 10000,
+        idleTimeout: 300000,
+        timezone: 'Z',
+        charset: 'utf8mb4',
+        debug: process.env.NODE_ENV === 'development'
       });
 
       // Restore original environment
@@ -247,16 +256,19 @@ describe('Database Configuration Unit Tests', () => {
       // Assert
       expect(mysql.createPool).toHaveBeenCalledWith({
         host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'nursing_db',
-        port: 3306,
+        user: 'bnmuser',
+        password: 'bnmpassword',
+        database: 'bookmynurse',
         waitForConnections: true,
-        connectionLimit: 10,
+        connectionLimit: 20,
         queueLimit: 0,
-        acquireTimeout: 60000,
-        timeout: 60000,
-        reconnect: true
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000,
+        connectTimeout: 10000,
+        idleTimeout: 300000,
+        timezone: 'Z',
+        charset: 'utf8mb4',
+        debug: process.env.NODE_ENV === 'development'
       });
 
       // Restore original environment
@@ -281,11 +293,14 @@ describe('Database Configuration Unit Tests', () => {
       expect(mysql.createPool).toHaveBeenCalledWith(
         expect.objectContaining({
           waitForConnections: true,
-          connectionLimit: 10,
+          connectionLimit: 20,
           queueLimit: 0,
-          acquireTimeout: 60000,
-          timeout: 60000,
-          reconnect: true
+          enableKeepAlive: true,
+          keepAliveInitialDelay: 10000,
+          connectTimeout: 10000,
+          idleTimeout: 300000,
+          timezone: 'Z',
+          charset: 'utf8mb4'
         })
       );
     });
@@ -324,9 +339,9 @@ describe('Database Configuration Unit Tests', () => {
       const result = require('./db');
 
       // Assert
-      expect(result.pool).toBeDefined();
-      expect(result.pool.end).toBeDefined();
-      expect(typeof result.pool.end).toBe('function');
+      expect(result.originalPool).toBeDefined();
+      expect(result.originalPool.end).toBeDefined();
+      expect(typeof result.originalPool.end).toBe('function');
     });
 
     it('should handle pool cleanup errors', async () => {
@@ -348,7 +363,7 @@ describe('Database Configuration Unit Tests', () => {
       const result = require('./db');
 
       // Assert
-      await expect(result.pool.end()).rejects.toThrow('Cleanup failed');
+      await expect(result.originalPool.end()).rejects.toThrow('Cleanup failed');
     });
   });
 });

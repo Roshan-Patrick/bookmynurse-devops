@@ -56,32 +56,37 @@ pool.on('error', (err) => {
     }
 });
 
-// Add periodic connection check using promise pool
-setInterval(async () => {
-    try {
-        const connection = await promisePool.getConnection();
-        await connection.ping();
-        connection.release();
-        console.log('Database connection is alive');
-    } catch (err) {
-        console.error('Periodic connection check failed:', err);
-    }
-}, 300000);
+// Add periodic connection check using promise pool (only in non-test environments)
+if (process.env.NODE_ENV !== 'test') {
+    setInterval(async () => {
+        try {
+            const connection = await promisePool.getConnection();
+            await connection.ping();
+            connection.release();
+            console.log('Database connection is alive');
+        } catch (err) {
+            console.error('Periodic connection check failed:', err);
+        }
+    }, 300000);
+}
 
-// Test the connection using promise pool
-(async () => {
-    try {
-        const connection = await promisePool.getConnection();
-        console.log('Successfully connected to database.');
-        connection.release();
-    } catch (err) {
-        console.error('Error connecting to the database:', err);
-    }
-})();
+// Test the connection using promise pool (only in non-test environments)
+if (process.env.NODE_ENV !== 'test') {
+    (async () => {
+        try {
+            const connection = await promisePool.getConnection();
+            console.log('Successfully connected to database.');
+            connection.release();
+        } catch (err) {
+            console.error('Error connecting to the database:', err);
+        }
+    })();
+}
 
 // Export the promise pool and a simplified query function
 module.exports = {
     pool: promisePool, // Export the promise pool as the main pool
+    originalPool: pool, // Export the original pool for cleanup
     query: async (sql, values) => {
         try {
             const [results] = await promisePool.query(sql, values);

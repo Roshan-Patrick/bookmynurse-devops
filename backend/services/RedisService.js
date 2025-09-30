@@ -1,14 +1,15 @@
 const Redis = require('ioredis');
 
 class RedisService {
-    constructor() {
+    constructor(config = {}) {
         this.redis = new Redis({
-            host: process.env.REDIS_HOST || 'localhost',
-            port: process.env.REDIS_PORT || 6379,
-            password: process.env.REDIS_PASSWORD || undefined,
-            retryDelayOnFailover: 100,
-            maxRetriesPerRequest: 3,
-            lazyConnect: true
+            host: config.host || process.env.REDIS_HOST || 'localhost',
+            port: config.port || process.env.REDIS_PORT || 6379,
+            password: config.password || process.env.REDIS_PASSWORD || undefined,
+            retryDelayOnFailover: config.retryDelayOnFailover || 100,
+            maxRetriesPerRequest: config.maxRetriesPerRequest || 3,
+            lazyConnect: config.lazyConnect !== undefined ? config.lazyConnect : true,
+            connectTimeout: config.connectTimeout || 10000
         });
 
         this.status = 'disconnected';
@@ -35,6 +36,13 @@ class RedisService {
             this.status = 'reconnecting';
             console.log('🔄 Redis reconnecting...');
         });
+
+        // Force connection attempt if not using lazyConnect
+        if (!config.lazyConnect && config.lazyConnect !== undefined) {
+            this.redis.connect().catch(() => {
+                // Connection will fail for invalid configs, which is expected
+            });
+        }
     }
 
     /**
@@ -185,6 +193,7 @@ class RedisService {
     async disconnect() {
         if (this.status === 'connected' || this.status === 'reconnecting') {
             await this.redis.quit();
+            this.status = 'disconnected';
             console.log('👋 Disconnected from Redis');
         }
     }

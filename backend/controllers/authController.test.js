@@ -24,7 +24,12 @@ describe('Authentication Controller Unit Tests', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis()
     };
+    process.env.JWT_SECRET = 'test-jwt-secret';
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    delete process.env.JWT_SECRET;
   });
 
   describe('login', () => {

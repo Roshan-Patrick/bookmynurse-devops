@@ -71,7 +71,7 @@ describe('Authentication Middleware Unit Tests', () => {
       auth(req, res, next);
 
       // Assert
-      expect(jwt.verify).toHaveBeenCalledWith(token, 'test_jwt_secret');
+      expect(jwt.verify).toHaveBeenCalledWith('valid.jwt.token', 'test_jwt_secret');
       expect(req.user).toEqual(mockUser);
       expect(next).toHaveBeenCalled();
     });
@@ -84,7 +84,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'No token, authorization denied' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Access denied. No token provided.' });
       expect(next).not.toHaveBeenCalled();
       expect(req.user).toBeNull();
     });
@@ -98,7 +98,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'No token, authorization denied' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Access denied. No token provided.' });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -114,7 +114,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -131,7 +131,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -148,7 +148,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -165,7 +165,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
   });
@@ -185,7 +185,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -200,7 +200,7 @@ describe('Authentication Middleware Unit Tests', () => {
       auth(req, res, next);
 
       // Assert
-      expect(jwt.verify).toHaveBeenCalledWith(token, 'test_jwt_secret');
+      expect(jwt.verify).toHaveBeenCalledWith('valid.jwt.token', 'test_jwt_secret');
       expect(req.user).toEqual(mockUser);
       expect(next).toHaveBeenCalled();
     });
@@ -218,7 +218,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -235,7 +235,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -252,7 +252,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
   });
@@ -321,7 +321,7 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Assert
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ msg: 'Token is not valid' });
+      expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token.' });
       expect(next).not.toHaveBeenCalled();
     });
 
