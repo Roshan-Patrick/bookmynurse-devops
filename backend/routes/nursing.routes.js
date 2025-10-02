@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const nursingController = require('../controllers/nursing.controller');
 const auth = require('../middleware/auth');
+const { validateBooking } = require('../middleware/validation');
 
 /**
  * @swagger
@@ -36,7 +37,7 @@ const auth = require('../middleware/auth');
  *       500:
  *         description: Internal Server Error
  */
-router.post('/bookings', nursingController.nurseRegController);
+router.post('/bookings', validateBooking, nursingController.nurseRegController);
 
 /**
  * @swagger

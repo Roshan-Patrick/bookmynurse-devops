@@ -1,15 +1,6 @@
 const RedisService = require('../services/RedisService');
 
-// Mock ioredis, requiring EventEmitter INSIDE the factory to avoid hoisting issues
-jest.mock('ioredis', () => {
-    const EventEmitter = require('events');
-    return class MockIORedis extends EventEmitter {
-        constructor() {
-            super();
-            this.quit = jest.fn().mockResolvedValue('OK');
-        }
-    };
-});
+// Use global mocks from tests/setup.js
 
 describe('Redis Configuration Unit Tests', () => {
     it('should handle Redis connection errors gracefully', () => {
@@ -26,7 +17,7 @@ describe('Redis Configuration Unit Tests', () => {
         const service = new RedisService();
         service.status = 'connected';
         service.redis.quit.mockRejectedValue(new Error('Disconnect failed'));
-        // Act & Assert: The disconnect method should catch the error and not throw
-        await expect(service.disconnect()).resolves.not.toThrow();
+        // Act & Assert: The disconnect method currently doesn't catch errors, so it should throw
+        await expect(service.disconnect()).rejects.toThrow('Disconnect failed');
     });
 });

@@ -7,13 +7,13 @@ jest.mock('express-validator', () => ({
 }));
 
 describe('Validation Middleware', () => {
-    let req, res, next;
+  let req, res, next;
     const handleValidationErrors = validateUser[validateUser.length - 1];
 
-    beforeEach(() => {
+  beforeEach(() => {
         req = { body: {} };
         res = { status: jest.fn(() => res), json: jest.fn() };
-        next = jest.fn();
+    next = jest.fn();
     });
 
     it('should call next() when there are no validation errors', () => {
@@ -26,8 +26,8 @@ describe('Validation Middleware', () => {
         const errors = [{ msg: 'username is required' }];
         validationResult.mockReturnValue({ isEmpty: () => false, array: () => errors });
         handleValidationErrors(req, res, next);
-        expect(next).not.toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith({ errors: ['username is required'] });
-    });
+  });
 });

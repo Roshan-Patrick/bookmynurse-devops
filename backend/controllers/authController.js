@@ -1,7 +1,6 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const db = require('../config/db');
 
 const authController = {
     login: async (req, res) => {
@@ -9,9 +8,7 @@ const authController = {
             const { username, password } = req.body;
             console.log('Login attempt for username:', username);
             
-            // Test database connection
-            const [testResult] = await db.query('SELECT 1 as test');
-            console.log('Database connection test result:', testResult);
+            // Database connection test removed - controller should only use model
             
             const user = await User.findByUsername(username);
             console.log('User found:', user ? 'Yes' : 'No');

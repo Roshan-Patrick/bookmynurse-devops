@@ -3,22 +3,26 @@ const app = require('../app');
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mysql = require('mysql2');
 
 jest.mock('../models/userModel');
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
-jest.mock('../config/db', () => ({
-  query: jest.fn().mockResolvedValue([{ test: 1 }])
-}));
+// Use global mocks from tests/setup.js
 
 describe('Authentication API Integration Tests', () => {
+    let mockPromiseQuery;
+
     beforeEach(() => {
         jest.clearAllMocks();
         process.env.JWT_SECRET = 'test-jwt-secret';
         
-        // Mock database query that controller makes
-        const db = require('../config/db');
-        db.query.mockResolvedValue([{ test: 1 }]);
+        // Get handle to the mock query function from global setup
+        const mockPool = mysql.createPool();
+        mockPromiseQuery = mockPool.promise().query;
+        
+        // Set default mock response
+        mockPromiseQuery.mockResolvedValue([{ test: 1 }]);
     });
 
     describe('POST /api/auth/login', () => {

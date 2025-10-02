@@ -40,13 +40,13 @@ jobs:
           languages: javascript
 
       - name: Run Backend Tests
-        run: |
+      run: |
           cd backend
           npm ci
           npm test -- --coverage --watchAll=false
 
       - name: Run Frontend Tests
-        run: |
+      run: |
           cd frontend
           npm ci
           npm run test -- --coverage --watch=false
@@ -56,18 +56,18 @@ jobs:
 
       - name: Build and push backend
         uses: docker/build-push-action@v4
-        with:
-          context: ./backend
+      with:
+        context: ./backend
           file: ./backend/Dockerfile
-          push: true
+        push: true
           tags: emmamyers/bmn-backend:${{ github.sha }}
 
-      - name: Run Trivy vulnerability scanner on backend
-        uses: aquasecurity/trivy-action@master
-        with:
+    - name: Run Trivy vulnerability scanner on backend
+      uses: aquasecurity/trivy-action@master
+      with:
           image-ref: 'emmamyers/bmn-backend:${{ github.sha }}'
-          format: 'sarif'
-          output: 'trivy-backend-results.sarif'
+        format: 'sarif'
+        output: 'trivy-backend-results.sarif'
           exit-code: '1'
           severity: 'HIGH,CRITICAL'
 
@@ -78,19 +78,19 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: emmamyers/bmn-frontend:${{ github.sha }}
-
-      - name: Run Trivy vulnerability scanner on frontend
-        uses: aquasecurity/trivy-action@master
-        with:
+    
+    - name: Run Trivy vulnerability scanner on frontend
+      uses: aquasecurity/trivy-action@master
+      with:
           image-ref: 'emmamyers/bmn-frontend:${{ github.sha }}'
-          format: 'sarif'
-          output: 'trivy-frontend-results.sarif'
+        format: 'sarif'
+        output: 'trivy-frontend-results.sarif'
           exit-code: '1'
           severity: 'HIGH,CRITICAL'
-
+    
       - name: Build and push Redis image
         uses: docker/build-push-action@v4
-        with:
+      with:
           context: .
           file: ./k8s/redis/Dockerfile
           push: true
@@ -110,7 +110,7 @@ jobs:
 
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.7.0
-        with:
+      with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Write extra vars file
@@ -118,7 +118,7 @@ jobs:
           ENVIRONMENT: ${{ github.event.inputs.environment || 'production' }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_APP_PASSWORD: ${{ secrets.MYSQL_APP_PASSWORD }}
-        run: |
+      run: |
           cat <<EOF > extra-vars.yml
           mysql_root_password: "${MYSQL_ROOT_PASSWORD}"
           mysql_app_password: "${MYSQL_APP_PASSWORD}"
@@ -126,7 +126,7 @@ jobs:
           EOF
 
       - name: Prepare repository archive
-        run: |
+      run: |
           echo "=== Current directory contents ==="
           ls -la
           echo "=== k8s directory contents ==="
@@ -153,7 +153,7 @@ jobs:
         if: github.event.inputs.environment == 'production' || github.ref == 'refs/heads/main'
         env:
           GITHUB_SHA: ${{ github.sha }}
-        run: |
+      run: |
           
           # SSH to production server and deploy Kubernetes manifests
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << EOF
@@ -299,8 +299,8 @@ jobs:
     steps:
       - name: Determine Job Status
         id: job_status
-        run: |
-          if [ "${{ needs.deploy.result }}" == "success" ]; then
+      run: |
+        if [ "${{ needs.deploy.result }}" == "success" ]; then
             echo "status_message=✅ Deployment Succeeded" >> $GITHUB_ENV
             echo "status_color=#2EB67D" >> $GITHUB_ENV
           else

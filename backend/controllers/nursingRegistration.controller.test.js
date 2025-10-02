@@ -122,7 +122,7 @@ describe('Nursing Registration Controller Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         message: 'Error processing registration',
-        error: undefined
+        error: process.env.NODE_ENV === 'development' ? mockError.message : undefined
       });
     });
   });
@@ -196,7 +196,7 @@ describe('Nursing Registration Controller Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         message: 'Error fetching registrations',
-        error: undefined
+        error: process.env.NODE_ENV === 'development' ? mockError.message : undefined
       });
     });
   });

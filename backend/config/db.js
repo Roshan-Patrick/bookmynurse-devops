@@ -1,99 +1,165 @@
 const mysql = require('mysql2');
 require('dotenv').config();
 
-// Create a connection pool with better configuration
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'bnmuser',
-    password: process.env.DB_PASSWORD || 'bnmpassword',
-    database: process.env.DB_NAME || 'bookmynurse',
-    waitForConnections: true,
-    connectionLimit: 20,
-    queueLimit: 0,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 10000,
-    connectTimeout: 10000,
-    idleTimeout: 300000,
-    timezone: 'Z',
-    charset: 'utf8mb4',
-    debug: process.env.NODE_ENV === 'development'
-});
+// Singleton pattern - only one pool instance
+let pool = null;
 
-// Create a promise wrapper for the pool
-const promisePool = pool.promise();
+/**
+ * Factory function to create database connection pool
+ * Uses lazy initialization - only creates when first needed
+ */
+const createPool = () => {
+    if (pool) {
+        return pool; // Return existing pool
+    }
 
-// Handle pool errors with more detailed logging
-pool.on('error', (err) => {
-    console.error('Database pool error:', {
-        code: err.code,
-        errno: err.errno,
-        sqlState: err.sqlState,
-        sqlMessage: err.sqlMessage,
-        timestamp: new Date().toISOString()
+    const poolConfig = {
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'bnmuser',
+        password: process.env.DB_PASSWORD || 'bnmpassword',
+        database: process.env.DB_NAME || 'bookmynurse',
+        waitForConnections: true,
+        connectionLimit: process.env.NODE_ENV === 'test' ? 5 : 20, // Smaller limit for tests
+        queueLimit: 0,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000,
+        connectTimeout: process.env.NODE_ENV === 'test' ? 1000 : 10000, // Faster timeout for tests
+        idleTimeout: 300000,
+        timezone: 'Z',
+        charset: 'utf8mb4',
+        debug: process.env.NODE_ENV === 'development'
+    };
+
+    pool = mysql.createPool(poolConfig);
+
+    // Enhanced error handling
+    pool.on('error', (err) => {
+        console.error('Database pool error:', {
+            code: err.code,
+            errno: err.errno,
+            sqlState: err.sqlState,
+            sqlMessage: err.sqlMessage,
+            timestamp: new Date().toISOString()
+        });
     });
 
-    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-        console.error('Database connection was closed. Attempting to reconnect...');
-        // Attempt to reconnect
-        pool.getConnection((err, connection) => {
-            if (err) {
-                console.error('Reconnection failed:', err);
-                return;
-            }
-            console.log('Successfully reconnected to database.');
-            connection.release();
+    pool.on('connection', (connection) => {
+        console.log(`Database connection established as id ${connection.threadId}`);
+    });
+
+    pool.on('acquire', (connection) => {
+        console.log(`Connection ${connection.threadId} acquired`);
+    });
+
+    pool.on('release', (connection) => {
+        console.log(`Connection ${connection.threadId} released`);
+    });
+
+    return pool;
+};
+
+/**
+ * Get the database pool (lazy initialization)
+ */
+const getPool = () => {
+    return createPool();
+};
+
+/**
+ * Execute a database query with proper error handling
+ */
+const query = async (sql, values = []) => {
+    try {
+        const promisePool = getPool().promise();
+        const [results] = await promisePool.query(sql, values);
+        return results;
+    } catch (err) {
+        console.error('Database query error:', {
+            sql: sql.substring(0, 100) + (sql.length > 100 ? '...' : ''),
+            values: values,
+            error: err.message,
+            timestamp: new Date().toISOString()
         });
-    } else if (err.code === 'ER_CON_COUNT_ERROR') {
-        console.error('Database has too many connections. Current pool status:', {
-            totalConnections: pool.totalConnections,
-            idleConnections: pool.idleConnections,
-            waitingRequests: pool.waitingRequests
-        });
-    } else if (err.code === 'ECONNREFUSED') {
-        console.error('Database connection was refused. Check if database is running.');
-    } else if (err.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR') {
-        console.error('Fatal error occurred. Attempting to reconnect...');
+        throw err;
     }
-});
+};
 
-// Add periodic connection check using promise pool (only in non-test environments)
-if (process.env.NODE_ENV !== 'test') {
-    setInterval(async () => {
-        try {
-            const connection = await promisePool.getConnection();
-            await connection.ping();
-            connection.release();
-            console.log('Database connection is alive');
-        } catch (err) {
-            console.error('Periodic connection check failed:', err);
-        }
-    }, 300000);
-}
+/**
+ * Test database connection
+ */
+const testConnection = async () => {
+    try {
+        const result = await query('SELECT 1 as test');
+        console.log('✅ Database connection test successful');
+        return result;
+    } catch (err) {
+        console.error('❌ Database connection test failed:', err.message);
+        throw err;
+    }
+};
 
-// Test the connection using promise pool (only in non-test environments)
-if (process.env.NODE_ENV !== 'test') {
-    (async () => {
+/**
+ * Close the database pool gracefully
+ */
+const closePool = async () => {
+    if (pool) {
         try {
-            const connection = await promisePool.getConnection();
-            console.log('Successfully connected to database.');
-            connection.release();
+            await pool.end();
+            pool = null;
+            console.log('🔒 Database pool closed gracefully');
         } catch (err) {
-            console.error('Error connecting to the database:', err);
-        }
-    })();
-}
-
-// Export the promise pool and a simplified query function
-module.exports = {
-    pool: promisePool, // Export the promise pool as the main pool
-    originalPool: pool, // Export the original pool for cleanup
-    query: async (sql, values) => {
-        try {
-            const [results] = await promisePool.query(sql, values);
-            return results;
-        } catch (err) {
-            console.error('Query error:', err);
+            console.error('Error closing database pool:', err.message);
             throw err;
         }
     }
+};
+
+/**
+ * Get pool statistics for monitoring
+ */
+const getPoolStats = () => {
+    if (!pool) {
+        return { status: 'not_initialized' };
+    }
+    
+    return {
+        status: 'connected',
+        totalConnections: pool._allConnections.length,
+        freeConnections: pool._freeConnections.length,
+        acquiringConnections: pool._acquiringConnections.length,
+        connectionLimit: pool.config.connectionLimit
+    };
+};
+
+// Only run connection test in non-test environments
+if (process.env.NODE_ENV !== 'test') {
+    // Test connection on startup
+    testConnection().catch(err => {
+        console.error('Failed to establish database connection:', err.message);
+    });
+
+    // Health check every 5 minutes
+    setInterval(async () => {
+        try {
+            await testConnection();
+        } catch (err) {
+            console.error('Database health check failed:', err.message);
+        }
+    }, 300000); // 5 minutes
+}
+
+module.exports = {
+    // Core functions
+    query,
+    getPool,
+    createPool, // Expose factory for testing
+    
+    // Utility functions
+    testConnection,
+    closePool,
+    getPoolStats,
+    
+    // Legacy compatibility - CRITICAL for production!
+    pool: () => getPool(), // Function that returns pool for backward compatibility
+    originalPool: getPool() // Direct access to pool for existing code
 };

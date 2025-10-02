@@ -1,36 +1,33 @@
 // Unit Tests for User Model
 const userModel = require('./userModel');
+const mysql = require('mysql2');
 
-// Mock the database
-jest.mock('../config/db', () => ({
-  query: jest.fn()
-}));
-
-// Mock bcryptjs
-jest.mock('bcryptjs', () => ({
-  hash: jest.fn((password, salt) => Promise.resolve(`hashed_${password}`))
-}));
-
-const db = require('../config/db');
+// Use global mocks from tests/setup.js
 const bcrypt = require('bcryptjs');
 
 describe('User Model Unit Tests', () => {
+  let mockPromiseQuery;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Get handle to the mock query function from global setup
+    const mockPool = mysql.createPool();
+    mockPromiseQuery = mockPool.promise().query;
   });
 
   describe('create', () => {
     it('should create a user with role successfully', async () => {
       // Arrange
       const mockResult = { insertId: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await userModel.create('newuser', 'password123', 'admin');
 
       // Assert
       expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
         ['newuser', 'hashed_password123', 'admin']
       );
@@ -40,14 +37,14 @@ describe('User Model Unit Tests', () => {
     it('should create a user without role successfully', async () => {
       // Arrange
       const mockResult = { insertId: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await userModel.create('newuser', 'password123');
 
       // Assert
       expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         'INSERT INTO users (username, password) VALUES (?, ?)',
         ['newuser', 'hashed_password123']
       );
@@ -57,7 +54,7 @@ describe('User Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database connection failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(userModel.create('newuser', 'hashedpassword', 'admin')).rejects.toThrow('Database connection failed');
@@ -73,19 +70,19 @@ describe('User Model Unit Tests', () => {
         password: 'hashedpassword',
         role: 'admin'
       };
-      db.query.mockResolvedValue([mockUser]);
+      mockPromiseQuery.mockResolvedValue([[mockUser], []]);
 
       // Act
       const result = await userModel.findByUsername('testuser');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('SELECT * FROM users WHERE username = ?', ['testuser']);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('SELECT * FROM users WHERE username = ?', ['testuser']);
       expect(result).toEqual(mockUser);
     });
 
     it('should return null if user not found', async () => {
       // Arrange
-      db.query.mockResolvedValue([]);
+      mockPromiseQuery.mockResolvedValue([[], []]);
 
       // Act
       const result = await userModel.findByUsername('nonexistent');
@@ -97,7 +94,7 @@ describe('User Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database query failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(userModel.findByUsername('testuser')).rejects.toThrow('Database query failed');
@@ -111,20 +108,20 @@ describe('User Model Unit Tests', () => {
         { id: 1, username: 'user1', role: 'admin' },
         { id: 2, username: 'user2', role: 'user' }
       ];
-      db.query.mockResolvedValue(mockUsers);
+      mockPromiseQuery.mockResolvedValue([mockUsers, []]);
 
       // Act
       const result = await userModel.getAllUsers();
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('SELECT * FROM users');
+      expect(mockPromiseQuery).toHaveBeenCalledWith('SELECT * FROM users', []);
       expect(result).toEqual(mockUsers);
     });
 
     it('should handle single result object', async () => {
       // Arrange
       const mockUser = { id: 1, username: 'user1', role: 'admin' };
-      db.query.mockResolvedValue(mockUser);
+      mockPromiseQuery.mockResolvedValue([[mockUser], []]);
 
       // Act
       const result = await userModel.getAllUsers();
@@ -136,7 +133,7 @@ describe('User Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database query failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(userModel.getAllUsers()).rejects.toThrow('Database query failed');

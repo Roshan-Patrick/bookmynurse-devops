@@ -1,23 +1,25 @@
 // Unit Tests for Nursing Model
 const nursingModel = require('./nursing.model');
+const mysql = require('mysql2');
 
-// Mock the database
-jest.mock('../config/db', () => ({
-  query: jest.fn()
-}));
-
-const db = require('../config/db');
+// Use global mocks from tests/setup.js
 
 describe('Nursing Model Unit Tests', () => {
+  let mockPromiseQuery;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Get handle to the mock query function from global setup
+    const mockPool = mysql.createPool();
+    mockPromiseQuery = mockPool.promise().query;
   });
 
   describe('createBooking', () => {
     it('should create a booking successfully', async () => {
       // Arrange
       const mockResult = { insertId: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingModel.createBooking(
@@ -31,7 +33,7 @@ describe('Nursing Model Unit Tests', () => {
       );
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO bookings'),
         ['John Doe', '1234567890', 'Registered Nurse', 'New York', 'General Care', 'Day shift', 'ENQ001']
       );
@@ -41,7 +43,7 @@ describe('Nursing Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database connection failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingModel.createBooking(
@@ -58,7 +60,7 @@ describe('Nursing Model Unit Tests', () => {
     it('should throw error for unexpected database result', async () => {
       // Arrange
       const mockResult = null; // Unexpected result
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act & Assert
       await expect(nursingModel.createBooking(
@@ -75,7 +77,7 @@ describe('Nursing Model Unit Tests', () => {
     it('should throw error for missing insertId', async () => {
       // Arrange
       const mockResult = { affectedRows: 1 }; // Missing insertId
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act & Assert
       await expect(nursingModel.createBooking(
@@ -97,13 +99,13 @@ describe('Nursing Model Unit Tests', () => {
         { id: 1, name: 'John Doe', mobile: '1234567890' },
         { id: 2, name: 'Jane Smith', mobile: '0987654321' }
       ];
-      db.query.mockResolvedValue(mockBookings);
+      mockPromiseQuery.mockResolvedValue([mockBookings, []]);
 
       // Act
       const result = await nursingModel.getAllUsers();
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('SELECT * FROM bookings', []);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('SELECT * FROM bookings', []);
       expect(result).toEqual(mockBookings);
     });
 
@@ -112,20 +114,20 @@ describe('Nursing Model Unit Tests', () => {
       const mockBookings = [
         { id: 1, name: 'John Doe', approval_status: 'Approved' }
       ];
-      db.query.mockResolvedValue(mockBookings);
+      mockPromiseQuery.mockResolvedValue([mockBookings, []]);
 
       // Act
       const result = await nursingModel.getAllUsers('Approved');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('SELECT * FROM bookings WHERE approval_status = ?', ['Approved']);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('SELECT * FROM bookings WHERE approval_status = ?', ['Approved']);
       expect(result).toEqual(mockBookings);
     });
 
     it('should handle single result object', async () => {
       // Arrange
       const mockBooking = { id: 1, name: 'John Doe', mobile: '1234567890' };
-      db.query.mockResolvedValue(mockBooking);
+      mockPromiseQuery.mockResolvedValue([[mockBooking], []]);
 
       // Act
       const result = await nursingModel.getAllUsers();
@@ -137,7 +139,7 @@ describe('Nursing Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database query failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingModel.getAllUsers()).rejects.toEqual({ error: 'Database query failed' });
@@ -158,13 +160,13 @@ describe('Nursing Model Unit Tests', () => {
         preferences: 'Day shift'
       };
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingModel.updateBooking(bookingData);
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE bookings'),
         ['ENQ002', 'John Updated', '1234567890', 'Registered Nurse', 'New York', 'General Care', 'Day shift', 1]
       );
@@ -184,7 +186,7 @@ describe('Nursing Model Unit Tests', () => {
         preferences: 'Day shift'
       };
       const mockResult = null; // Unexpected result
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act & Assert
       await expect(nursingModel.updateBooking(bookingData)).rejects.toThrow('Database update did not return expected result.');
@@ -203,7 +205,7 @@ describe('Nursing Model Unit Tests', () => {
         preferences: 'Day shift'
       };
       const mockResult = { insertId: 1 }; // Missing affectedRows
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act & Assert
       await expect(nursingModel.updateBooking(bookingData)).rejects.toThrow('Database update did not return expected result.');
@@ -222,7 +224,7 @@ describe('Nursing Model Unit Tests', () => {
         preferences: 'Day shift'
       };
       const mockError = new Error('Database update failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingModel.updateBooking(bookingData)).rejects.toThrow('Database update failed');
@@ -233,20 +235,20 @@ describe('Nursing Model Unit Tests', () => {
     it('should delete a booking successfully', async () => {
       // Arrange
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingModel.deleteBooking(1);
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('DELETE FROM bookings WHERE id = ?', [1]);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('DELETE FROM bookings WHERE id = ?', [1]);
       expect(result).toEqual(mockResult);
     });
 
     it('should throw error for unexpected database result', async () => {
       // Arrange
       const mockResult = null; // Unexpected result
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act & Assert
       await expect(nursingModel.deleteBooking(1)).rejects.toThrow('Database delete did not return expected result.');
@@ -255,7 +257,7 @@ describe('Nursing Model Unit Tests', () => {
     it('should throw error for missing affectedRows', async () => {
       // Arrange
       const mockResult = { insertId: 1 }; // Missing affectedRows
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act & Assert
       await expect(nursingModel.deleteBooking(1)).rejects.toThrow('Database delete did not return expected result.');
@@ -264,7 +266,7 @@ describe('Nursing Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database delete failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingModel.deleteBooking(1)).rejects.toThrow('Database delete failed');
@@ -275,20 +277,20 @@ describe('Nursing Model Unit Tests', () => {
     it('should update approval status successfully', async () => {
       // Arrange
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingModel.updateApprovalStatus(1, 'Ongoing');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('UPDATE bookings SET approval_status = ? WHERE id = ?', ['Ongoing', 1]);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('UPDATE bookings SET approval_status = ? WHERE id = ?', ['Ongoing', 1]);
       expect(result).toEqual(mockResult);
     });
 
     it('should throw error for unexpected database result', async () => {
       // Arrange
       const mockResult = null; // Unexpected result
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act & Assert
       await expect(nursingModel.updateApprovalStatus(1, 'Ongoing')).rejects.toThrow('Database update did not return expected result.');
@@ -297,7 +299,7 @@ describe('Nursing Model Unit Tests', () => {
     it('should throw error for missing affectedRows', async () => {
       // Arrange
       const mockResult = { insertId: 1 }; // Missing affectedRows
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act & Assert
       await expect(nursingModel.updateApprovalStatus(1, 'Ongoing')).rejects.toThrow('Database update did not return expected result.');
@@ -306,7 +308,7 @@ describe('Nursing Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database update failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingModel.updateApprovalStatus(1, 'Ongoing')).rejects.toThrow('Database update failed');

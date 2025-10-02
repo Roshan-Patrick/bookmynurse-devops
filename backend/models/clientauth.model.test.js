@@ -1,36 +1,33 @@
 // Unit Tests for Client Authentication Model
 const clientauthModel = require('./clientauth.model');
+const mysql = require('mysql2');
 
-// Mock the database
-jest.mock('../config/db', () => ({
-  query: jest.fn()
-}));
-
-// Mock bcryptjs
-jest.mock('bcryptjs', () => ({
-  hash: jest.fn((password, salt) => Promise.resolve(`hashed_${password}`))
-}));
-
-const db = require('../config/db');
-const bcrypt = require('bcryptjs');
+// Use global mocks from tests/setup.js
 
 describe('Client Authentication Model Unit Tests', () => {
+  let mockPool;
+  let mockPromiseQuery;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    // Get the mock pool and query function from our global setup
+    mockPool = mysql.createPool();
+    mockPromiseQuery = mockPool.promise().query;
   });
 
   describe('create', () => {
     it('should create a client user successfully', async () => {
       // Arrange
       const mockResult = { insertId: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await clientauthModel.create('user@example.com', '1234567890', 'password123');
 
       // Assert
+      const bcrypt = require('bcryptjs');
       expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         'INSERT INTO clientusers (email, phone_number, password) VALUES (?, ?, ?)',
         ['user@example.com', '1234567890', 'hashed_password123']
       );
@@ -40,7 +37,7 @@ describe('Client Authentication Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database connection failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(clientauthModel.create('user@example.com', '1234567890', 'hashedpassword')).rejects.toThrow('Database connection failed');
@@ -56,19 +53,19 @@ describe('Client Authentication Model Unit Tests', () => {
         phone_number: '1234567890',
         password: 'hashedpassword'
       };
-      db.query.mockResolvedValue([mockUser]);
+      mockPromiseQuery.mockResolvedValue([[mockUser], []]);
 
       // Act
       const result = await clientauthModel.findByEmail('user@example.com');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('SELECT * FROM clientusers WHERE email = ?', ['user@example.com']);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('SELECT * FROM clientusers WHERE email = ?', ['user@example.com']);
       expect(result).toEqual(mockUser);
     });
 
     it('should return null if user not found', async () => {
       // Arrange
-      db.query.mockResolvedValue([]);
+      mockPromiseQuery.mockResolvedValue([[], []]);
 
       // Act
       const result = await clientauthModel.findByEmail('nonexistent@example.com');
@@ -80,7 +77,7 @@ describe('Client Authentication Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database query failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(clientauthModel.findByEmail('user@example.com')).rejects.toThrow('Database query failed');
@@ -94,20 +91,20 @@ describe('Client Authentication Model Unit Tests', () => {
         { id: 1, email: 'user1@example.com', phone_number: '1234567890' },
         { id: 2, email: 'user2@example.com', phone_number: '0987654321' }
       ];
-      db.query.mockResolvedValue(mockUsers);
+      mockPromiseQuery.mockResolvedValue([mockUsers, []]);
 
       // Act
       const result = await clientauthModel.getAllUsers();
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('SELECT id, email, phone_number FROM clientusers');
+      expect(mockPromiseQuery).toHaveBeenCalledWith('SELECT id, email, phone_number FROM clientusers', []);
       expect(result).toEqual(mockUsers);
     });
 
     it('should handle single result object', async () => {
       // Arrange
       const mockUser = { id: 1, email: 'user1@example.com', phone_number: '1234567890' };
-      db.query.mockResolvedValue(mockUser);
+      mockPromiseQuery.mockResolvedValue([[mockUser], []]);
 
       // Act
       const result = await clientauthModel.getAllUsers();
@@ -119,7 +116,7 @@ describe('Client Authentication Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database query failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(clientauthModel.getAllUsers()).rejects.toThrow('Database query failed');

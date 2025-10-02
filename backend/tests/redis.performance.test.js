@@ -1,16 +1,13 @@
 const request = require('supertest');
 const express = require('express');
 const nursingRoutes = require('../routes/nursing.routes');
+const mysql = require('mysql2');
 
 // Mock RedisService with a stateful implementation
 jest.mock('../services/RedisService');
 const RedisService = require('../services/RedisService');
 
-// Mock database
-jest.mock('../config/db', () => ({
-  query: jest.fn()
-}));
-const db = require('../config/db');
+// Use global mocks from tests/setup.js
 
 // Mock the auth middleware for performance tests
 jest.mock('../middleware/auth', () => (req, res, next) => {
@@ -26,10 +23,15 @@ app.use('/api/nursing', nursingRoutes);
 describe('Redis Performance Tests', () => {
   let redisService;
   let internalCache;
+  let mockPromiseQuery;
 
   beforeAll(() => {
+    // Get handle to the mock query function from global setup
+    const mockPool = mysql.createPool();
+    mockPromiseQuery = mockPool.promise().query;
+    
     // Mock database responses
-    db.query.mockImplementation((sql, params) => {
+    mockPromiseQuery.mockImplementation((sql, params) => {
         return Promise.resolve([[{ id: 1, name: 'John Doe' }]]);
     });
 

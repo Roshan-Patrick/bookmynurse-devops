@@ -1,41 +1,38 @@
 // Unit Tests for Nursing Registration Model
 const nursingRegistrationModel = require('./nursingRegistration.model');
+const mysql = require('mysql2');
 
-// Mock the database
-jest.mock('../config/db', () => ({
-  query: jest.fn(),
-  pool: {
-    promise: jest.fn(() => ({
-      query: jest.fn()
-    }))
-  }
-}));
-
-const db = require('../config/db');
+// Use global mocks from tests/setup.js
 
 describe('Nursing Registration Model Unit Tests', () => {
+  let mockPromiseQuery;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Get handle to the mock query function from global setup
+    const mockPool = mysql.createPool();
+    mockPromiseQuery = mockPool.promise().query;
   });
 
   describe('insertImg', () => {
     it('should insert image successfully', async () => {
       // Arrange
       const mockResult = { insertId: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingRegistrationModel.insertImg('/uploads/test.jpg');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('INSERT INTO images (file_path) VALUES (?)', ['/uploads/test.jpg']);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('INSERT INTO images (file_path) VALUES (?)', ['/uploads/test.jpg']);
       expect(result).toBe(1);
     });
 
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database connection failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.insertImg('/uploads/test.jpg')).rejects.toThrow('Database connection failed');
@@ -61,13 +58,13 @@ describe('Nursing Registration Model Unit Tests', () => {
         imageId: 1
       };
       const mockResult = { insertId: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingRegistrationModel.insertRegistration(registrationData);
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO registration'),
         [
           'Jane Doe', '1234567890', 'jane@example.com', 'Female', '1990-01-01',
@@ -96,7 +93,7 @@ describe('Nursing Registration Model Unit Tests', () => {
         imageId: 1
       };
       const mockError = new Error('Database connection failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.insertRegistration(registrationData)).rejects.toThrow('Database connection failed');
@@ -107,20 +104,20 @@ describe('Nursing Registration Model Unit Tests', () => {
     it('should update approval status successfully', async () => {
       // Arrange
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingRegistrationModel.updateApprovalStatus(1, 'Approved');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('UPDATE registration SET approval_status = ? WHERE id = ?', ['Approved', 1]);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('UPDATE registration SET approval_status = ? WHERE id = ?', ['Approved', 1]);
       expect(result).toEqual(mockResult);
     });
 
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database update failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateApprovalStatus(1, 'Approved')).rejects.toThrow('Database update failed');
@@ -131,20 +128,20 @@ describe('Nursing Registration Model Unit Tests', () => {
     it('should update availability status successfully', async () => {
       // Arrange
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingRegistrationModel.updateAvailableStatus(1, 'Available');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('UPDATE registration SET availability = ? WHERE id = ?', ['Available', 1]);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('UPDATE registration SET availability = ? WHERE id = ?', ['Available', 1]);
       expect(result).toEqual(mockResult);
     });
 
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database update failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateAvailableStatus(1, 'Available')).rejects.toThrow('Database update failed');
@@ -155,20 +152,20 @@ describe('Nursing Registration Model Unit Tests', () => {
     it('should revert approval status to pending successfully', async () => {
       // Arrange
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingRegistrationModel.revertApprovalStatus(1);
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('UPDATE registration SET approval_status = "Pending" WHERE id = ?', [1]);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('UPDATE registration SET approval_status = "Pending" WHERE id = ?', [1]);
       expect(result).toEqual(mockResult);
     });
 
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database update failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.revertApprovalStatus(1)).rejects.toThrow('Database update failed');
@@ -193,13 +190,13 @@ describe('Nursing Registration Model Unit Tests', () => {
         serviceopt: '["General Care", "Emergency Care"]'
       };
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingRegistrationModel.updateNurse(1, updatedData);
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE registration'),
         [
           'Jane Updated', '1234567890', 'jane.updated@example.com', 'Female', '1990-01-01',
@@ -227,7 +224,7 @@ describe('Nursing Registration Model Unit Tests', () => {
         serviceopt: '["General Care", "Emergency Care"]'
       };
       const mockError = new Error('Database update failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateNurse(1, updatedData)).rejects.toThrow('Database update failed');
@@ -247,13 +244,13 @@ describe('Nursing Registration Model Unit Tests', () => {
           file_path: '/uploads/test.jpg'
         }
       ];
-      db.query.mockResolvedValue(mockRegistrations);
+      mockPromiseQuery.mockResolvedValue([mockRegistrations, []]);
 
       // Act
       const result = await nursingRegistrationModel.getAllRegistrations();
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         expect.stringContaining('SELECT r.*'),
         []
       );
@@ -282,13 +279,13 @@ describe('Nursing Registration Model Unit Tests', () => {
           file_path: '/uploads/test.jpg'
         }
       ];
-      db.query.mockResolvedValue(mockRegistrations);
+      mockPromiseQuery.mockResolvedValue([mockRegistrations, []]);
 
       // Act
       const result = await nursingRegistrationModel.getAllRegistrations('Approved');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         expect.stringContaining('WHERE r.approval_status = ?'),
         ['Approved']
       );
@@ -315,7 +312,7 @@ describe('Nursing Registration Model Unit Tests', () => {
         serviceopt: '["General Care"]',
         file_path: '/uploads/test.jpg'
       };
-      db.query.mockResolvedValue(mockRegistration);
+      mockPromiseQuery.mockResolvedValue([[mockRegistration], []]);
 
       // Act
       const result = await nursingRegistrationModel.getAllRegistrations();
@@ -343,7 +340,7 @@ describe('Nursing Registration Model Unit Tests', () => {
           file_path: '/uploads/test.jpg'
         }
       ];
-      db.query.mockResolvedValue(mockRegistrations);
+      mockPromiseQuery.mockResolvedValue([mockRegistrations, []]);
 
       // Act
       const result = await nursingRegistrationModel.getAllRegistrations();
@@ -364,7 +361,7 @@ describe('Nursing Registration Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database query failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.getAllRegistrations()).rejects.toThrow('Database query failed');
@@ -375,20 +372,20 @@ describe('Nursing Registration Model Unit Tests', () => {
     it('should update charges successfully', async () => {
       // Arrange
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingRegistrationModel.updateCharges(1, 500, 'per_hour');
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('UPDATE registration SET charges = ?, charges_type = ? WHERE id = ?', [500, 'per_hour', 1]);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('UPDATE registration SET charges = ?, charges_type = ? WHERE id = ?', [500, 'per_hour', 1]);
       expect(result).toEqual(mockResult);
     });
 
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database update failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateCharges(1, 500, 'per_hour')).rejects.toThrow('Database update failed');
@@ -399,20 +396,20 @@ describe('Nursing Registration Model Unit Tests', () => {
     it('should update nurse ID successfully', async () => {
       // Arrange
       const mockResult = { affectedRows: 1 };
-      db.query.mockResolvedValue(mockResult);
+      mockPromiseQuery.mockResolvedValue([mockResult, []]);
 
       // Act
       const result = await nursingRegistrationModel.updateNurseId(1, 2);
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith('UPDATE bookings SET nurse_id = ? WHERE id = ?', [2, 1]);
+      expect(mockPromiseQuery).toHaveBeenCalledWith('UPDATE bookings SET nurse_id = ? WHERE id = ?', [2, 1]);
       expect(result).toEqual(mockResult);
     });
 
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database update failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateNurseId(1, 2)).rejects.toThrow('Database update failed');
@@ -428,13 +425,13 @@ describe('Nursing Registration Model Unit Tests', () => {
         email: 'jane@example.com',
         specialization: 'ICU Care'
       };
-      db.query.mockResolvedValue([mockNurse]);
+      mockPromiseQuery.mockResolvedValue([[mockNurse], []]);
 
       // Act
       const result = await nursingRegistrationModel.fetchNurseDetails(1);
 
       // Assert
-      expect(db.query).toHaveBeenCalledWith(
+      expect(mockPromiseQuery).toHaveBeenCalledWith(
         expect.stringContaining('SELECT r.*'),
         [1]
       );
@@ -443,7 +440,7 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should return null if no nurse found', async () => {
       // Arrange
-      db.query.mockResolvedValue([]);
+      mockPromiseQuery.mockResolvedValue([[], []]);
 
       // Act
       const result = await nursingRegistrationModel.fetchNurseDetails(999);
@@ -455,7 +452,7 @@ describe('Nursing Registration Model Unit Tests', () => {
     it('should handle database errors', async () => {
       // Arrange
       const mockError = new Error('Database query failed');
-      db.query.mockRejectedValue(mockError);
+      mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.fetchNurseDetails(1)).rejects.toThrow('Database query failed');
