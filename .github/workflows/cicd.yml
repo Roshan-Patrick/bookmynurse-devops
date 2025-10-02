@@ -30,7 +30,7 @@ jobs:
           - 3306:3306
         # Health check to ensure MySQL is ready before tests run
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -p${{ secrets.TEST_DB_PASSWORD }}"
+          --health-cmd="mysqladmin ping -h localhost -prootpassword"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
