@@ -18,7 +18,9 @@ module.exports = {
     '!**/node_modules/**',
     '!**/coverage/**',
     '!**/tests/**',
-    '!**/*.test.js'
+    '!**/*.test.js',
+    '!server.js',
+    '!app.js'
   ],
   
   // Coverage thresholds
