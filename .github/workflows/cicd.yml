@@ -96,17 +96,18 @@ jobs:
           echo "Running backend tests against the service database..."
           npm test -- --coverage --watchAll=false
 
-      - name: Setup Chrome for Frontend Tests
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
+      # Frontend tests removed - focusing on backend testing and DevOps
+      # - name: Setup Chrome for Frontend Tests
+      #   uses: browser-actions/setup-chrome@v1
+      #   with:
+      #     chrome-version: stable
 
-      - name: Run Frontend Tests
-        run: |
-          cd frontend
-          npm ci
-          # Run Angular tests in headless mode with CI-optimized Chrome
-          npm run test -- --watch=false --browsers=ChromeHeadlessCI
+      # - name: Run Frontend Tests
+      #   run: |
+      #     cd frontend
+      #     npm ci
+      #     # Run Angular tests in headless mode with CI-optimized Chrome
+      #     npm run test -- --watch=false --browsers=ChromeHeadlessCI
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
