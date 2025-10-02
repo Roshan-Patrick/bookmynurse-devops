@@ -18,6 +18,22 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    # Define the MySQL service container
+    services:
+      mysql:
+        image: mysql:8.0
+        # Environment variables for the database service itself
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          MYSQL_DATABASE: bookmynurse_test
+        ports:
+          - 3306:3306
+        # Health check to ensure MySQL is ready before tests run
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -p${{ secrets.TEST_DB_PASSWORD }}"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -39,10 +55,45 @@ jobs:
         with:
           languages: javascript
 
-      - name: Run Backend Tests
+      - name: Install MySQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+
+      - name: Wait for MySQL to be fully ready
+        run: |
+          # Loop until the mysql server is accepting connections
+          until mysql -h 127.0.0.1 -u root -p"${{ secrets.TEST_DB_PASSWORD }}" -e "SELECT 1"; do
+            echo "Waiting for MySQL connection..."
+            sleep 2
+          done
+
+      - name: Setup Test Database Schema
+        env:
+          DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+        run: |
+          echo "Database is ready. Loading schema..."
+          mysql -h 127.0.0.1 -u root -p"${DB_PASSWORD}" bookmynurse_test < backend/test-schema.sql
+          echo "Test database schema setup complete."
+
+      - name: Install Backend Dependencies
         run: |
           cd backend
           npm ci
+
+      - name: Run Backend Integration Tests
+        # Environment variables for your Node.js app to connect to the service
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          DB_NAME: bookmynurse_test
+          NODE_ENV: test
+          JWT_SECRET: a-very-secret-key-for-testing
+        run: |
+          cd backend
+          echo "Running backend tests against the service database..."
           npm test -- --coverage --watchAll=false
 
       - name: Run Frontend Tests
@@ -310,7 +361,6 @@ jobs:
       - name: Send Slack Notification
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           payload: |
             {
               "attachments": [
@@ -362,3 +412,6 @@ jobs:
                 }
               ]
             }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
