@@ -148,13 +148,14 @@ jobs:
           exit-code: '0'  # Don't fail on vulnerabilities - just report them
           severity: 'HIGH,CRITICAL'
     
-      - name: Build and push Redis image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./k8s/redis/Dockerfile
-          push: true
-          tags: emmamyers/bmn-redis:${{ github.sha }}
+      # Redis uses official redis:7-alpine image - no custom build needed
+      # - name: Build and push Redis image
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     file: ./k8s/redis/Dockerfile
+      #     push: true
+      #     tags: emmamyers/bmn-redis:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
