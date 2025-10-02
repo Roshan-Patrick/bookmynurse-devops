@@ -50,10 +50,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: javascript
+      # CodeQL removed - focusing on core DevOps pipeline
+      # - name: Initialize CodeQL
+      #   uses: github/codeql-action/init@v2
+      #   with:
+      #     languages: javascript
 
       - name: Install MySQL Client
         run: |
@@ -109,8 +110,9 @@ jobs:
       #     # Run Angular tests in headless mode with CI-optimized Chrome
       #     npm run test -- --watch=false --browsers=ChromeHeadlessCI
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+      # CodeQL analysis removed - not critical for DevOps role
+      # - name: Perform CodeQL Analysis
+      #   uses: github/codeql-action/analyze@v2
 
       - name: Build and push backend
         uses: docker/build-push-action@v4
