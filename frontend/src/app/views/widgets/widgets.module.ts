@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import {
@@ -47,7 +47,8 @@ import { WidgetsEComponent } from './widgets-e/widgets-e.component';
   exports: [
     WidgetsBrandComponent,
     WidgetsDropdownComponent
-  ]
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class WidgetsModule {
 }

@@ -122,15 +122,14 @@ jobs:
           push: true
           tags: emmamyers/bmn-backend:${{ github.sha }}
 
-      # Trivy vulnerability scanner removed - focusing on core DevOps pipeline
-      # - name: Run Trivy vulnerability scanner on backend
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: 'emmamyers/bmn-backend:${{ github.sha }}'
-      #     format: 'sarif'
-      #     output: 'trivy-backend-results.sarif'
-      #     exit-code: '1'
-      #     severity: 'HIGH,CRITICAL'
+      - name: Run Trivy vulnerability scanner on backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'emmamyers/bmn-backend:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+          exit-code: '0'  # Don't fail on vulnerabilities - just report them
+          severity: 'HIGH,CRITICAL'
 
       - name: Build and push frontend
         uses: docker/build-push-action@v4
@@ -140,15 +139,14 @@ jobs:
           push: true
           tags: emmamyers/bmn-frontend:${{ github.sha }}
     
-      # Trivy vulnerability scanner removed - focusing on core DevOps pipeline
-      # - name: Run Trivy vulnerability scanner on frontend
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: 'emmamyers/bmn-frontend:${{ github.sha }}'
-      #     format: 'sarif'
-      #     output: 'trivy-frontend-results.sarif'
-      #     exit-code: '1'
-      #     severity: 'HIGH,CRITICAL'
+      - name: Run Trivy vulnerability scanner on frontend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'emmamyers/bmn-frontend:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+          exit-code: '0'  # Don't fail on vulnerabilities - just report them
+          severity: 'HIGH,CRITICAL'
     
       - name: Build and push Redis image
         uses: docker/build-push-action@v4
