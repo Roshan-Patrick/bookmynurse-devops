@@ -109,7 +109,6 @@ spec:
               mountPath: /backup
             - name: usb-storage
               mountPath: /mnt/usb
-              optional: true
           volumes:
           - name: backup-storage
             persistentVolumeClaim:

@@ -332,25 +332,41 @@ jobs:
       - name: Rollback on Deployment Failure
         if: failure()
         run: |
-          echo "🚨 Deployment failed - Initiating automated rollback!"
+          echo "🚨 Deployment failed - Checking for rollback options..."
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << 'EOF'
-            echo "🔄 Rolling back backend and frontend deployments to the previous stable version..."
-            # Execute rollback
-            kubectl rollout undo deployment/backend-deployment -n bookmynurse
-            kubectl rollout undo deployment/frontend-deployment -n bookmynurse
-            echo "⏳ Waiting for rollback to complete and deployments to stabilize..."
-            # Verify rollback status and handle errors
-            if ! kubectl rollout status deployment/backend-deployment -n bookmynurse --timeout=300s; then
-              echo "❌ Backend rollback failed!"
-              exit 1
+            echo "🔍 Checking if deployments exist and have rollout history..."
+            
+            # Check if backend deployment exists and has history
+            if kubectl get deployment backend-deployment -n bookmynurse >/dev/null 2>&1; then
+              echo "Backend deployment exists, checking rollout history..."
+              if kubectl rollout history deployment/backend-deployment -n bookmynurse >/dev/null 2>&1; then
+                echo "🔄 Rolling back backend deployment..."
+                kubectl rollout undo deployment/backend-deployment -n bookmynurse
+                kubectl rollout status deployment/backend-deployment -n bookmynurse --timeout=300s || echo "Backend rollback failed"
+              else
+                echo "⚠️ No rollout history for backend deployment - skipping rollback"
+              fi
+            else
+              echo "⚠️ Backend deployment doesn't exist - skipping rollback"
             fi
-            if ! kubectl rollout status deployment/frontend-deployment -n bookmynurse --timeout=300s; then
-              echo "❌ Frontend rollback failed!"
-              exit 1
+            
+            # Check if frontend deployment exists and has history
+            if kubectl get deployment frontend-deployment -n bookmynurse >/dev/null 2>&1; then
+              echo "Frontend deployment exists, checking rollout history..."
+              if kubectl rollout history deployment/frontend-deployment -n bookmynurse >/dev/null 2>&1; then
+                echo "🔄 Rolling back frontend deployment..."
+                kubectl rollout undo deployment/frontend-deployment -n bookmynurse
+                kubectl rollout status deployment/frontend-deployment -n bookmynurse --timeout=300s || echo "Frontend rollback failed"
+              else
+                echo "⚠️ No rollout history for frontend deployment - skipping rollback"
+              fi
+            else
+              echo "⚠️ Frontend deployment doesn't exist - skipping rollback"
             fi
-            echo "✅ Rollback successful. Application is now running the previous stable version."
-            echo "=== Post-Rollback Status ==="
-            kubectl get pods -n bookmynurse
+            
+            echo "✅ Rollback check completed."
+            echo "=== Current Pod Status ==="
+            kubectl get pods -n bookmynurse || echo "No pods found"
           EOF
 
   notify:
