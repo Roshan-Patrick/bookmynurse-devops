@@ -105,8 +105,8 @@ jobs:
         run: |
           cd frontend
           npm ci
-          # Run Angular tests in headless mode
-          npm run test -- --watch=false --browsers=ChromeHeadless --no-sandbox
+          # Run Angular tests in headless mode with CI-optimized Chrome
+          npm run test -- --watch=false --browsers=ChromeHeadlessCI
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
