@@ -18,6 +18,9 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      backend-changed: ${{ steps.changes.outputs.backend }}
+      frontend-changed: ${{ steps.changes.outputs.frontend }}
     # Define the MySQL service container
     services:
       mysql:
@@ -30,13 +33,27 @@ jobs:
           - 3306:3306
         # Health check to ensure MySQL is ready before tests run
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -prootpassword"
+          --health-cmd="mysqladmin ping -h localhost -p${{ secrets.TEST_DB_PASSWORD }}"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Check for file changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - 'k8s/backend/**'
+            frontend:
+              - 'frontend/**'
+              - 'k8s/frontend/**'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -115,14 +132,20 @@ jobs:
       #   uses: github/codeql-action/analyze@v2
 
       - name: Build and push backend
+        if: steps.changes.outputs.backend == 'true'
         uses: docker/build-push-action@v4
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: emmamyers/bmn-backend:${{ github.sha }}
+          tags: |
+            emmamyers/bmn-backend:${{ github.sha }}
+            emmamyers/bmn-backend:latest
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
 
       - name: Run Trivy vulnerability scanner on backend
+        if: steps.changes.outputs.backend == 'true'
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'emmamyers/bmn-backend:${{ github.sha }}'
@@ -132,14 +155,20 @@ jobs:
           severity: 'HIGH,CRITICAL'
 
       - name: Build and push frontend
+        if: steps.changes.outputs.frontend == 'true'
         uses: docker/build-push-action@v4
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: emmamyers/bmn-frontend:${{ github.sha }}
+          tags: |
+            emmamyers/bmn-frontend:${{ github.sha }}
+            emmamyers/bmn-frontend:latest
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
     
       - name: Run Trivy vulnerability scanner on frontend
+        if: steps.changes.outputs.frontend == 'true'
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'emmamyers/bmn-frontend:${{ github.sha }}'
