@@ -393,75 +393,75 @@ jobs:
             kubectl get pods -n bookmynurse || echo "No pods found"
           EOF
 
-  notify:
-    runs-on: ubuntu-latest
-    needs: deploy
-    if: always()
-    steps:
-      - name: Determine Job Status
-        id: job_status
-        run: |
-          if [ "${{ needs.deploy.result }}" == "success" ]; then
-            echo "status_message=✅ Deployment Succeeded" >> $GITHUB_ENV
-            echo "status_color=#2EB67D" >> $GITHUB_ENV
-          else
-            echo "status_message=❌ Deployment Failed" >> $GITHUB_ENV
-            echo "status_color=#E01E5A" >> $GITHUB_ENV
-          fi
-      - name: Send Slack Notification
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "attachments": [
-                {
-                  "color": "${{ env.status_color }}",
-                  "blocks": [
-                    {
-                      "type": "section",
-                      "text": {
-                        "type": "mrkdwn",
-                        "text": "${{ env.status_message }} on ${{ github.event.inputs.environment || 'production' }}"
-                      }
-                    },
-                    {
-                      "type": "section",
-                      "fields": [
-                        {
-                          "type": "mrkdwn",
-                          "text": "*Repository:*\n${{ github.repository }}"
-                        },
-                        {
-                          "type": "mrkdwn",
-                          "text": "*Branch:*\n${{ github.ref_name }}"
-                        },
-                        {
-                          "type": "mrkdwn",
-                          "text": "*Commit:*\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha_short }}>"
-                        },
-                        {
-                          "type": "mrkdwn",
-                          "text": "*Triggered by:*\n${{ github.actor }}"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "actions",
-                      "elements": [
-                        {
-                          "type": "button",
-                          "text": {
-                            "type": "plain_text",
-                            "text": "View Workflow Run"
-                          },
-                          "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+  # notify:
+  #   runs-on: ubuntu-latest
+  #   needs: deploy
+  #   if: always()
+  #   steps:
+  #     - name: Determine Job Status
+  #       id: job_status
+  #       run: |
+  #         if [ "${{ needs.deploy.result }}" == "success" ]; then
+  #           echo "status_message=✅ Deployment Succeeded" >> $GITHUB_ENV
+  #           echo "status_color=#2EB67D" >> $GITHUB_ENV
+  #         else
+  #           echo "status_message=❌ Deployment Failed" >> $GITHUB_ENV
+  #           echo "status_color=#E01E5A" >> $GITHUB_ENV
+  #         fi
+  #     - name: Send Slack Notification
+  #       uses: slackapi/slack-github-action@v1.24.0
+  #       with:
+  #         payload: |
+  #           {
+  #             "attachments": [
+  #               {
+  #                 "color": "${{ env.status_color }}",
+  #                 "blocks": [
+  #                   {
+  #                     "type": "section",
+  #                     "text": {
+  #                       "type": "mrkdwn",
+  #                       "text": "${{ env.status_message }} on ${{ github.event.inputs.environment || 'production' }}"
+  #                     }
+  #                   },
+  #                   {
+  #                     "type": "section",
+  #                     "fields": [
+  #                       {
+  #                         "type": "mrkdwn",
+  #                         "text": "*Repository:*\n${{ github.repository }}"
+  #                       },
+  #                       {
+  #                         "type": "mrkdwn",
+  #                         "text": "*Branch:*\n${{ github.ref_name }}"
+  #                       },
+  #                       {
+  #                         "type": "mrkdwn",
+  #                         "text": "*Commit:*\n<https://github.com/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha_short }}>"
+  #                       },
+  #                       {
+  #                         "type": "mrkdwn",
+  #                         "text": "*Triggered by:*\n${{ github.actor }}"
+  #                       }
+  #                     ]
+  #                   },
+  #                   {
+  #                     "type": "actions",
+  #                     "elements": [
+  #                       {
+  #                         "type": "button",
+  #                         "text": {
+  #                           "type": "plain_text",
+  #                           "text": "View Workflow Run"
+  #                         },
+  #                         "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  #                       }
+  #                     ]
+  #                   }
+  #                 ]
+  #               }
+  #             ]
+  #           }
+  #       env:
+  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #         SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
