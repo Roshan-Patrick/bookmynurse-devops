@@ -31,12 +31,7 @@ jobs:
           MYSQL_DATABASE: bookmynurse_test
         ports:
           - 3306:3306
-        # Health check to ensure MySQL is ready before tests run
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -p${{ secrets.TEST_DB_PASSWORD }}"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
