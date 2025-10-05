@@ -10,7 +10,19 @@ const setupSwagger = require('./swagger');
 const v8 = require("v8");
 const util = require("util");
 
+// Redis Integration
+const RedisService = require('./services/RedisService');
+
 const app = express();
+
+// Initialize Redis
+const redisService = RedisService.singleton;
+
+// Redis connection middleware
+app.use(async (req, res, next) => {
+    req.redis = redisService;
+    next();
+});
 
 app.use(cors());
 app.use(bodyParser.json());

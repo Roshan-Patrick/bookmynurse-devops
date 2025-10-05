@@ -30,6 +30,11 @@ spec:
         prometheus.io/path: "/metrics"
         component: caching
     spec:
+      # Security context for volume permissions
+      securityContext:
+        fsGroup: 999  # The group ID for the 'redis' user in the official image
+        runAsUser: 999 # The user ID for the 'redis' user
+        runAsGroup: 999
       containers:
       - name: redis
         image: redis:7-alpine

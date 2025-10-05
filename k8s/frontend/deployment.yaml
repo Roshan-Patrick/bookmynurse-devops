@@ -27,9 +27,12 @@ spec:
         app: frontend
         tier: web
     spec:
+      # Docker registry secret for private repository access
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: frontend
-        image: emmamyers/bmn-frontend:${GITHUB_SHA}
+        image: emmamyers/bmn-frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

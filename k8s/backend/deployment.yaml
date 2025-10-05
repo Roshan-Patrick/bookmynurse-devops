@@ -32,6 +32,9 @@ spec:
         prometheus.io/port: "30008"
         prometheus.io/path: "/metrics"
     spec:
+      # Docker registry secret for private repository access
+      imagePullSecrets:
+      - name: regcred
       # Init container to wait for MySQL to be ready
       initContainers:
       - name: wait-for-mysql
@@ -47,7 +50,7 @@ spec:
           echo "MySQL is ready!"
       containers:
       - name: backend
-        image: emmamyers/bmn-backend:${GITHUB_SHA}
+        image: emmamyers/bmn-backend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 30008

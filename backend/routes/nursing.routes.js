@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const nursingController = require('../controllers/nursing.controller');
+const { cache, invalidateCache } = require('../middleware/cache');
 const auth = require('../middleware/auth');
 const { validateBooking } = require('../middleware/validation');
 
@@ -72,7 +73,7 @@ router.post('/bookings', validateBooking, nursingController.nurseRegController);
  *       500:
  *         description: Internal Server Error
  */
-router.get('/getBookings', nursingController.getAllBookings);
+router.get('/getBookings', cache(300, 'nursing'), nursingController.getAllBookings);
 
 /**
  * @swagger

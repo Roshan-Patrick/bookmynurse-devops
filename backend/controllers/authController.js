@@ -35,6 +35,23 @@ const authController = {
                 { expiresIn: "1hr" }
             );
 
+            // Store session in Redis if available
+            if (req.redis && req.redis.status === 'connected') {
+                try {
+                    const sessionData = {
+                        id: user.id,
+                        username: user.username,
+                        role: user.role,
+                        loginTime: new Date().toISOString()
+                    };
+                    await req.redis.set(`session:${token}`, JSON.stringify(sessionData), 3600); // 1 hour TTL
+                    console.log('✅ Session stored in Redis for user:', user.username);
+                } catch (redisError) {
+                    console.error('❌ Failed to store session in Redis:', redisError.message);
+                    // Continue with login even if Redis fails
+                }
+            }
+
             res.json({ 
                 token: token,
                 msg: "Authorized"

@@ -1,11 +1,36 @@
 const Redis = require('ioredis');
+const { getRedisConfig } = require('../config/redis');
 
 class RedisService {
     constructor(config = {}) {
-        this.redis = new Redis(config);
+        // Use provided config or get from environment
+        const redisConfig = Object.keys(config).length > 0 ? config : getRedisConfig();
+        this.redis = new Redis(redisConfig);
         this.status = 'disconnected';
-        this.redis.on('connect', () => { this.status = 'connected'; });
-        this.redis.on('error', () => { this.status = 'error'; });
+        
+        // Enhanced event handling
+        this.redis.on('connect', () => { 
+            this.status = 'connected';
+            console.log('✅ RedisService: Connected to Redis');
+        });
+        
+        this.redis.on('ready', () => {
+            console.log('✅ RedisService: Ready for operations');
+        });
+        
+        this.redis.on('error', (err) => { 
+            this.status = 'error';
+            console.error('❌ RedisService Error:', err.message);
+        });
+        
+        this.redis.on('close', () => {
+            this.status = 'disconnected';
+            console.log('🔒 RedisService: Connection closed');
+        });
+        
+        this.redis.on('reconnecting', () => {
+            console.log('🔄 RedisService: Reconnecting...');
+        });
     }
     
     async get(key) {
@@ -31,7 +56,8 @@ class RedisService {
 let singletonInstance = null;
 const getSingleton = () => {
     if (!singletonInstance) {
-        singletonInstance = new RedisService();
+        // Create singleton with proper config from environment
+        singletonInstance = new RedisService(getRedisConfig());
     }
     return singletonInstance;
 };
@@ -42,6 +68,14 @@ module.exports = RedisService;
 module.exports.singleton = getSingleton();
 // A way to reset the singleton for tests
 module.exports.closeRedisConnection = () => {
+    if (singletonInstance) {
+        singletonInstance.disconnect();
+        singletonInstance = null;
+    }
+};
+
+// Add a reset method for cleaner test cleanup
+module.exports.resetInstance = () => {
     if (singletonInstance) {
         singletonInstance.disconnect();
         singletonInstance = null;
