@@ -59,6 +59,7 @@ describe('Nursing Controller Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       req.body = {
         name: 'John Doe',
         mobile: '1234567890',
@@ -80,6 +81,7 @@ describe('Nursing Controller Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         message: 'Internal Server Error'
       });
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -126,6 +128,7 @@ describe('Nursing Controller Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database query failed');
       nursingModel.getAllUsers.mockRejectedValue(mockError);
 
@@ -138,6 +141,7 @@ describe('Nursing Controller Unit Tests', () => {
         success: false,
         error: 'Error fetching bookings'
       });
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -190,6 +194,7 @@ describe('Nursing Controller Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       req.body = { id: 1, name: 'John Updated' };
       const mockError = new Error('Database update failed');
       nursingModel.updateBooking.mockRejectedValue(mockError);
@@ -202,6 +207,7 @@ describe('Nursing Controller Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'Failed to update booking'
       });
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -255,6 +261,7 @@ describe('Nursing Controller Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       req.params.id = '1';
       const mockError = new Error('Database delete failed');
       nursingModel.deleteBooking.mockRejectedValue(mockError);
@@ -267,6 +274,7 @@ describe('Nursing Controller Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         error: 'Internal Server Error'
       });
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -323,6 +331,7 @@ describe('Nursing Controller Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       req.body = { id: 1, status: 'Ongoing' };
       const mockError = new Error('Database update failed');
       nursingModel.updateApprovalStatus.mockRejectedValue(mockError);
@@ -336,6 +345,7 @@ describe('Nursing Controller Unit Tests', () => {
         success: false,
         message: 'Error updating approval status'
       });
+      consoleErrorSpy.mockRestore();
     });
   });
 });

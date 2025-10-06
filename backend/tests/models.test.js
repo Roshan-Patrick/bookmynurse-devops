@@ -45,6 +45,7 @@ describe('Database Models Unit Tests', () => {
 
       it('should handle database errors', async () => {
         // Arrange
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         const mockError = new Error('Database connection failed');
         mockPromiseQuery.mockRejectedValue(mockError);
 
@@ -58,6 +59,7 @@ describe('Database Models Unit Tests', () => {
           'Day shift',
           'ENQ001'
         )).rejects.toThrow('Database connection failed');
+        consoleErrorSpy.mockRestore();
       });
     });
 

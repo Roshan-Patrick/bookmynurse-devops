@@ -48,10 +48,10 @@ jest.mock('ioredis', () => {
             this.exists = jest.fn().mockResolvedValue(0);
             this.expire = jest.fn().mockResolvedValue(1);
             
-            // Auto-connect for testing
-            setImmediate(() => {
-                this.emit('connect');
-            });
+            // Auto-connect for testing (removed to prevent async logging after tests)
+            // setImmediate(() => {
+            //     this.emit('connect');
+            // });
         }
     };
 });

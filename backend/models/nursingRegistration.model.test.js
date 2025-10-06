@@ -31,11 +31,13 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database connection failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.insertImg('/uploads/test.jpg')).rejects.toThrow('Database connection failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -77,6 +79,7 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const registrationData = {
         name: 'Jane Doe',
         mobile: '1234567890',
@@ -97,6 +100,7 @@ describe('Nursing Registration Model Unit Tests', () => {
 
       // Act & Assert
       await expect(nursingRegistrationModel.insertRegistration(registrationData)).rejects.toThrow('Database connection failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -116,11 +120,13 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database update failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateApprovalStatus(1, 'Approved')).rejects.toThrow('Database update failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -140,11 +146,13 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database update failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateAvailableStatus(1, 'Available')).rejects.toThrow('Database update failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -164,11 +172,13 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database update failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.revertApprovalStatus(1)).rejects.toThrow('Database update failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -209,6 +219,7 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const updatedData = {
         name: 'Jane Updated',
         mobile: '1234567890',
@@ -228,6 +239,7 @@ describe('Nursing Registration Model Unit Tests', () => {
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateNurse(1, updatedData)).rejects.toThrow('Database update failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -360,11 +372,13 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database query failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.getAllRegistrations()).rejects.toThrow('Database query failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -384,11 +398,13 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database update failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateCharges(1, 500, 'per_hour')).rejects.toThrow('Database update failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -408,11 +424,13 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database update failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.updateNurseId(1, 2)).rejects.toThrow('Database update failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -451,11 +469,13 @@ describe('Nursing Registration Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database query failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingRegistrationModel.fetchNurseDetails(1)).rejects.toThrow('Database query failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 });

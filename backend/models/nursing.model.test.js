@@ -42,6 +42,7 @@ describe('Nursing Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database connection failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
@@ -55,6 +56,7 @@ describe('Nursing Model Unit Tests', () => {
         'Day shift',
         'ENQ001'
       )).rejects.toThrow('Database connection failed');
+      consoleErrorSpy.mockRestore();
     });
 
     it('should throw error for unexpected database result', async () => {
@@ -138,11 +140,13 @@ describe('Nursing Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database query failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingModel.getAllUsers()).rejects.toEqual({ error: 'Database query failed' });
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -213,6 +217,7 @@ describe('Nursing Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const bookingData = {
         id: 1,
         enquiryno: 'ENQ002',
@@ -228,6 +233,7 @@ describe('Nursing Model Unit Tests', () => {
 
       // Act & Assert
       await expect(nursingModel.updateBooking(bookingData)).rejects.toThrow('Database update failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -265,11 +271,13 @@ describe('Nursing Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database delete failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingModel.deleteBooking(1)).rejects.toThrow('Database delete failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -307,11 +315,13 @@ describe('Nursing Model Unit Tests', () => {
 
     it('should handle database errors', async () => {
       // Arrange
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockError = new Error('Database update failed');
       mockPromiseQuery.mockRejectedValue(mockError);
 
       // Act & Assert
       await expect(nursingModel.updateApprovalStatus(1, 'Ongoing')).rejects.toThrow('Database update failed');
+      consoleErrorSpy.mockRestore();
     });
   });
 });
