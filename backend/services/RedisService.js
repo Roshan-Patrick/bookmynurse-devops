@@ -20,7 +20,7 @@ class RedisService {
         
         this.redis.on('error', (err) => { 
             this.status = 'error';
-            console.error('❌ RedisService Error:', err.message);
+            console.error('❌ RedisService Error:', err?.message || err || 'Unknown error');
         });
         
         this.redis.on('close', () => {
