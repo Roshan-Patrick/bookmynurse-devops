@@ -1,0 +1,19 @@
+# =============================================================================
+# k8s/monitoring/prometheus-pvc.yaml
+# Prometheus Persistent Volume Claim for Data Persistence
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc
+  namespace: bookmynurse
+  labels:
+    app: prometheus
+    component: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+  storageClassName: local-storage

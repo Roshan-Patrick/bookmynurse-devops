@@ -345,9 +345,11 @@ jobs:
             sudo mkdir -p /mnt/data
             sudo mkdir -p /mnt/uploads
             sudo mkdir -p /mnt/redis-data
+            sudo mkdir -p /var/lib/prometheus
             sudo chmod 755 /mnt/data
             sudo chmod 755 /mnt/uploads
             sudo chmod 755 /mnt/redis-data
+            sudo chmod 755 /var/lib/prometheus
             
             # Apply all Kubernetes manifests
             kubectl apply -f k8s/namespace/ -n bookmynurse
