@@ -9,6 +9,7 @@ describe('Nursing Registration Controller Unit Tests', () => {
   let req, res;
 
   beforeEach(() => {
+    jest.resetModules();
     req = {
       body: {},
       params: {},
@@ -126,6 +127,43 @@ describe('Nursing Registration Controller Unit Tests', () => {
         error: process.env.NODE_ENV === 'development' ? mockError.message : undefined
       });
       consoleErrorSpy.mockRestore();
+    });
+
+    it('should attempt to send an email if SMTP is configured', async () => {
+      // Arrange
+      process.env.SMTP_HOST = 'smtp.example.com';
+      process.env.SMTP_USER = 'user';
+      process.env.SMTP_PASS = 'pass';
+
+      const nodemailer = require('nodemailer');
+      const mockSendMail = jest.fn().mockResolvedValue(true);
+      nodemailer.createTransport.mockReturnValue({ sendMail: mockSendMail });
+
+      req.body = {
+        name: 'Jane Doe',
+        mobile: '1234567890',
+        email: 'jane@example.com',
+        languages: '[]',
+        serviceopt: '[]'
+      };
+      req.file = { path: '/uploads/test-image.jpg' };
+
+      nursingRegistrationModel.insertImg.mockResolvedValue(1);
+      nursingRegistrationModel.insertRegistration.mockResolvedValue(1);
+
+      // Dynamically require the controller to re-evaluate the transporter
+      const nursingControllerWithSmtp = require('./nursingRegistration.controller');
+
+      // Act
+      await nursingControllerWithSmtp.registerNurse(req, res);
+
+      // Assert
+      expect(mockSendMail).toHaveBeenCalled();
+
+      // Cleanup
+      delete process.env.SMTP_HOST;
+      delete process.env.SMTP_USER;
+      delete process.env.SMTP_PASS;
     });
   });
 
