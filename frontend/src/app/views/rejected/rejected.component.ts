@@ -31,8 +31,8 @@ export class RejectedComponent {
       console.log(res)
       this.users = res.data.map((user: any) => ({
         ...user,
-        photoUrl: `${environment.s3BaseUrl}/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`,
-        // photoUrl: `${environment.APIEndpoint}/uploads/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`, 
+        // photoUrl: `${environment.s3BaseUrl}/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`,
+        photoUrl: `${environment.APIEndpoint}/uploads/${user.file_path.replace(/\\/g, '/').replace(/^uploads\//, '')}`, 
         // photoUrl: `http://localhost:3000/${user.file_path}`, 
       }));
     })

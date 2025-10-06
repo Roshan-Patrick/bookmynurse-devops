@@ -232,7 +232,35 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
         run: |
-          ansible-playbook -i ansible/ansible_inventory.txt ansible/ansible_playbook.txt --extra-vars "@extra-vars.yml" --extra-vars "confirm_migration=yes"
+          ansible-playbook -i ansible/ansible_inventory.txt ansible/ansible_playbook.txt --extra-vars "@extra-vars.yml" --extra-vars "confirm_migration=yes" --ssh-extra-args="-o ServerAliveInterval=60 -o ServerAliveCountMax=5 -o TCPKeepAlive=yes"
+
+      - name: Install Flannel CNI
+        run: |
+          ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=5 -p ${{ secrets.PRODUCTION_SSH_PORT }} root@${{ secrets.PRODUCTION_IP }} << 'EOF'
+            echo "🔧 Installing Flannel CNI..."
+            
+            # Check if Flannel is already installed
+            if kubectl get pods -n kube-system -l app=flannel >/dev/null 2>&1; then
+              echo "✅ Flannel CNI already installed"
+            else
+              # Install Flannel CNI
+              kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+              
+              # Wait for Flannel to be ready
+              echo "⏳ Waiting for Flannel to be ready..."
+              kubectl wait --for=condition=ready pod -l app=flannel -n kube-system --timeout=300s
+              
+              # Untaint the control plane node to allow pods
+              echo "🔓 Untainting control plane node..."
+              kubectl taint nodes --all node-role.kubernetes.io/control-plane- || true
+              
+              echo "✅ Flannel CNI installed and ready"
+            fi
+            
+            # Verify network connectivity
+            echo "🔍 Verifying network connectivity..."
+            kubectl get pods -n kube-system -l app=flannel
+          EOF
 
       - name: Deploy to Kubernetes
         if: github.event.inputs.environment == 'production' || github.ref == 'refs/heads/main'
@@ -330,14 +358,25 @@ jobs:
             kubectl apply -f k8s/monitoring/ -n bookmynurse  # Deploy monitoring stack
             kubectl apply -f k8s/backend/ -n bookmynurse
             kubectl apply -f k8s/frontend/ -n bookmynurse
+            
+            # Install Nginx Ingress Controller with proper timeout handling
+            echo "🚀 Installing Nginx Ingress Controller..."
+            kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/baremetal/deploy.yaml
+            
+            # Wait for ingress controller to be ready with extended timeout
+            echo "⏳ Waiting for Ingress Controller to be ready..."
+            kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=600s
+            
+            # Apply ingress rules after controller is ready
             kubectl apply -f k8s/ingress/ -n bookmynurse
             
-            # Wait for deployments to be ready
-            kubectl rollout status statefulset/redis-statefulset -n bookmynurse --timeout=300s
-            kubectl rollout status deployment/prometheus-deployment -n bookmynurse --timeout=300s
-            kubectl rollout status deployment/grafana-deployment -n bookmynurse --timeout=300s
-            kubectl rollout status deployment/backend-deployment -n bookmynurse --timeout=300s
-            kubectl rollout status deployment/frontend-deployment -n bookmynurse --timeout=300s
+            # Wait for deployments to be ready with extended timeouts
+            echo "⏳ Waiting for all deployments to be ready..."
+            kubectl rollout status statefulset/redis-statefulset -n bookmynurse --timeout=600s
+            kubectl rollout status deployment/prometheus-deployment -n bookmynurse --timeout=600s
+            kubectl rollout status deployment/grafana-deployment -n bookmynurse --timeout=600s
+            kubectl rollout status deployment/backend-deployment -n bookmynurse --timeout=600s
+            kubectl rollout status deployment/frontend-deployment -n bookmynurse --timeout=600s
             
             # Check deployment status
             echo "=== Deployment Status ==="
@@ -349,8 +388,17 @@ jobs:
             echo "=== Health Check ==="
             kubectl get pods -n bookmynurse | grep -E "(backend|frontend)" | awk '{print $1}' | while read pod; do
               echo "Checking health of $pod..."
-              kubectl exec -n bookmynurse $pod -- curl -f http://localhost:3000/health || echo "Health check failed for $pod"
+              kubectl exec -n bookmynurse $pod -- curl -f http://localhost:30008/health || echo "Health check failed for $pod"
             done
+            
+            # Patch ingress controller to use NodePort for bare metal
+            echo "🔧 Configuring Ingress Controller for bare metal..."
+            kubectl patch service ingress-nginx-controller -n ingress-nginx -p '{"spec":{"type":"NodePort"}}' || echo "Ingress controller already configured"
+            
+            # Display access information
+            echo "=== Access Information ==="
+            echo "🌐 Application URL: http://${{ secrets.PRODUCTION_IP }}:$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.spec.ports[0].nodePort}')"
+            echo "📊 Backend Health: http://${{ secrets.PRODUCTION_IP }}:$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.spec.ports[0].nodePort}')/api/health"
           EOF
 
       - name: Rollback on Deployment Failure
